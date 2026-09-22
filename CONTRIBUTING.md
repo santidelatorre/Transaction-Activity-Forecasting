@@ -4,6 +4,8 @@ Gracias por colaborar en el proyecto. Mantenemos `main` estable y trabajamos med
 
 ## Flujo diario
 
+Use the repository setup script for a reproducible local environment. Before opening a Pull Request, run the tests, Ruff checks, and `pre-commit run --all-files`. Keep notebooks focused and clean unnecessary outputs before committing; reusable logic belongs in `src/`.
+
 Antes de empezar:
 
 ```bash

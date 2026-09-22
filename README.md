@@ -4,6 +4,42 @@ Base de proyecto para un hackathon de AI/ML. El objetivo provisional es predecir
 
 Esta fase prepara infraestructura; no incluye datos reales, no asume columnas concretas y no entrena modelos.
 
+## Local development setup
+
+The project targets Python 3.11. Python 3.12 is a compatible fallback when 3.11 is not available locally.
+
+Windows PowerShell (recommended):
+
+```powershell
+git clone https://github.com/santidelatorre/Transaction-Activity-Forecasting.git
+cd Transaction-Activity-Forecasting
+.\scripts\setup.ps1
+```
+
+Activate the environment manually when needed with `.\.venv\Scripts\Activate.ps1`.
+
+Linux/macOS:
+
+```bash
+git clone https://github.com/santidelatorre/Transaction-Activity-Forecasting.git
+cd Transaction-Activity-Forecasting
+./scripts/setup.sh
+source .venv/bin/activate
+```
+
+The setup script creates the editable package, installs development dependencies, registers the `transaction-forecasting` Jupyter kernel, and installs pre-commit hooks. It is safe to run again. If PowerShell blocks local scripts, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once.
+
+In VS Code, open the repository folder and select `.venv\Scripts\python.exe` (Windows) or `.venv/bin/python` (Linux/macOS) if it is not selected automatically. Run tests and quality checks with:
+
+```powershell
+pytest
+ruff check .
+ruff format --check .
+pre-commit run --all-files
+```
+
+Start Jupyter with `jupyter lab`. Install a new dependency by adding it to `pyproject.toml`, then rerun `python -m pip install -e ".[dev]"`. The local `.env` file is optional; copy `.env.example` to `.env` and never commit secrets or challenge datasets.
+
 ## Estructura
 
 - `data/`: datos locales (`raw`, `interim`, `processed`, `external`), nunca versionados.
