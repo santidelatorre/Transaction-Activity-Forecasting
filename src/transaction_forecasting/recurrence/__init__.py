@@ -1,0 +1,1 @@
+"""Detección de patrones recurrentes."""

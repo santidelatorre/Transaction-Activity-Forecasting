@@ -1,0 +1,39 @@
+name: Experiment
+description: Registrar un experimento de ML
+title: "[Experiment] "
+labels: [experiment]
+body:
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hipótesis
+    validations:
+      required: true
+  - type: input
+    id: dataset
+    attributes:
+      label: Dataset utilizado
+  - type: textarea
+    id: features
+    attributes:
+      label: Features
+  - type: input
+    id: model
+    attributes:
+      label: Modelo
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validación
+  - type: input
+    id: metric
+    attributes:
+      label: Métrica
+  - type: textarea
+    id: result
+    attributes:
+      label: Resultado
+  - type: textarea
+    id: conclusion
+    attributes:
+      label: Conclusión

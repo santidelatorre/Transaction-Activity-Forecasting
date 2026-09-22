@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "transaction-activity-forecasting"
+version = "0.1.0"
+description = "Base reproducible para forecasting de actividad transaccional"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "numpy>=1.26,<3", "pandas>=2.1,<3", "polars>=0.20,<2", "pyarrow>=14,<22",
+    "scipy>=1.11,<2", "statsmodels>=0.14,<1", "matplotlib>=3.8,<4", "plotly>=5.18,<7",
+    "scikit-learn>=1.4,<2", "catboost>=1.2,<2", "lightgbm>=4.1,<5", "xgboost>=2.0,<4",
+    "optuna>=3.5,<5", "shap>=0.44,<1", "rapidfuzz>=3.5,<4",
+]
+
+[project.optional-dependencies]
+dev = ["jupyterlab>=4.0,<5", "ipykernel>=6.27,<8", "pre-commit>=3.6,<5", "pytest>=8.0,<9", "ruff>=0.6,<1"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+exclude = [".venv", ".pre-commit-cache", ".pytest_cache", "pytest-cache-files-*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

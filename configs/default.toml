@@ -1,0 +1,18 @@
+[project]
+random_seed = 42
+
+[paths]
+raw_data = "data/raw"
+interim_data = "data/interim"
+processed_data = "data/processed"
+external_data = "data/external"
+figures = "outputs/figures"
+metrics = "outputs/metrics"
+predictions = "outputs/predictions"
+models = "outputs/models"
+
+[processing]
+# Completar cuando se conozca el contrato del dataset.
+
+[training]
+# Completar cuando se definan el objetivo y la validación temporal.

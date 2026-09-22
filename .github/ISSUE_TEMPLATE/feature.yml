@@ -1,0 +1,21 @@
+name: Feature
+description: Proponer una nueva funcionalidad
+title: "[Feature] "
+labels: [feature]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema u oportunidad
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Propuesta
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Criterios de aceptación
