@@ -38,6 +38,8 @@ exclude = [
     ".pytest_tmp",
     ".pytest_review_tmp",
     ".ruff_cache",
+    "data",
+    "outputs",
     "pytest-cache-files-*",
     "review_pytest_tmp",
 ]

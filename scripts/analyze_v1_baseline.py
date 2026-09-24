@@ -476,7 +476,7 @@ Resultados de V2, lint y pre-commit de esta auditoría se registran en `v1_bench
 """
     submission_text = (
         table(pd.DataFrame(submissions))
-        + f"\n\nTest: {test_same} predicciones coinciden; {1000-test_same} difieren. No se conoce cuál acierta.\n\n"
+        + f"\n\nTest: {test_same} predicciones coinciden; {1000 - test_same} difieren. No se conoce cuál acierta.\n\n"
         + """Se validaron columnas exactas, IDs únicos, cobertura, orden sample, ausencia de nulos y vocabulario.
 Submissions reproducidas: `outputs/metrics/v1_benchmark/v1/submission.csv` y `v2/submission.csv`.
 No son prueba de que el CSV enviado al dashboard sea el mismo: no se recibió un adjunto CSV en esta tarea.
@@ -629,13 +629,13 @@ V2 COMMIT: {V2}
 
 V1 HISTORICAL MACRO-F1: 0.2710243
 
-V1 REPRODUCED MACRO-F1: {m1['macro_f1']:.9f}
+V1 REPRODUCED MACRO-F1: {m1["macro_f1"]:.9f}
 
-V1 REPRODUCED ACCURACY: {m1['accuracy']:.6f}
+V1 REPRODUCED ACCURACY: {m1["accuracy"]:.6f}
 
-V2 COMPARABLE MACRO-F1: {m2['macro_f1']:.9f}
+V2 COMPARABLE MACRO-F1: {m2["macro_f1"]:.9f}
 
-DELTA: {m2['macro_f1']-m1['macro_f1']:+.9f}
+DELTA: {m2["macro_f1"] - m1["macro_f1"]:+.9f}
 
 ## V1 main components
 
@@ -658,7 +658,7 @@ DELTA: {m2['macro_f1']-m1['macro_f1']:+.9f}
 ## What V2 improves
 
 - Macro-F1 y accuracy suben bajo el mismo protocolo.
-- {paired['only_v2_correct']} errores V1 corregidos frente a {paired['only_v1_correct']} aciertos V1 perdidos.
+- {paired["only_v2_correct"]} errores V1 corregidos frente a {paired["only_v1_correct"]} aciertos V1 perdidos.
 - none presenta la mayor mejora de F1.
 
 ## What V2 worsens
