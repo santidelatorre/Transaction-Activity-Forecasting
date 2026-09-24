@@ -1,6 +1,6 @@
 # Auditoría de validación y leakage UBS V1
 
-Fecha: 2026-09-24. Código revisado en `dev/santiago`, actualizada desde `origin/main` (módulos `ubs/` y `scripts/run_ubs_baseline.py`). Los datos brutos no están disponibles en este workspace. Las cifras proceden del informe versionado `docs/UBS_DATASET_ANALYSIS.md`, generado por `scripts/analyze_ubs_dataset.py`. No se modificó el pipeline.
+Fecha: 2026-09-24. Código revisado en `dev/javi`, actualizada desde `origin/main` (módulos `ubs/` y `scripts/run_ubs_baseline.py`). Los datos brutos no están disponibles en este workspace. Las cifras proceden del informe versionado `docs/UBS_DATASET_ANALYSIS.md`, generado por `scripts/analyze_ubs_dataset.py`. No se modificó el pipeline.
 
 ## Qué evalúa realmente UBS V1 en el código
 
