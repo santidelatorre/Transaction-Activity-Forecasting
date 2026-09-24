@@ -78,6 +78,12 @@ organizador si se proporciona; queda explícita en la salida local.
 
 ## Comandos disponibles
 
+El flujo de entrenamiento oficial ya está implementado en
+`scripts/run_ubs_baseline.py --config configs/ubs_v1.toml`, con adaptador en
+`ubs.data` y features/modelos en `ubs/`. Los comandos siguientes son utilidades
+para comprobar archivos; comparten métricas y controles con el runner UBS V1.
+Este conserva su formato de informe y su exigencia de orden idéntico al sample.
+
 Con el paquete instalado, o `PYTHONPATH=src`, evaluar un CSV de validación:
 
 ```powershell

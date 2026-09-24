@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 
 from transaction_forecasting.data.contracts import mock_transactions
-from transaction_forecasting.evaluation.temporal import temporal_split
+from transaction_forecasting.evaluation.temporal import temporal_split, train_validation_test_split
 
 
 def test_temporal_split_keeps_test_after_train() -> None:
@@ -22,3 +22,10 @@ def test_no_strict_split_and_missing_timestamp_rejected():
     for timestamps in (["2025-01-01"] * 3, ["2025-01-01", None]):
         with pytest.raises(ValueError):
             temporal_split(pd.DataFrame({"timestamp": timestamps}))
+
+
+def test_three_way_split_keeps_all_partitions_in_time_order() -> None:
+    train, validation, test = train_validation_test_split(
+        mock_transactions(), time_column="timestamp", validation_fraction=0.2, test_fraction=0.2
+    )
+    assert train["timestamp"].max() < validation["timestamp"].min() < test["timestamp"].min()

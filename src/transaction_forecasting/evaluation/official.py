@@ -74,8 +74,21 @@ def score_predictions(labels: pd.DataFrame, predictions: pd.DataFrame) -> dict[s
         raise ValueError(f"labels: cutoff_date must be {CUTOFF_DATE}")
     sample = labels[["client_id"]].assign(**{PREDICTION: "none"})
     aligned = validate_submission(predictions, sample)
-    truth = labels[TARGET].reset_index(drop=True)
-    predicted = aligned[PREDICTION]
+    return classification_metrics(labels[TARGET], aligned[PREDICTION])
+
+
+def classification_metrics(target: pd.Series, prediction: pd.Series) -> dict[str, object]:
+    """Shared eight-class metric core for aligned vectors (not an ID join).
+
+    Public CSV scoring checks coverage and aligns IDs before calling this core.
+    UBS model callers supply vectors in matching client order.
+    """
+    truth = pd.Series(target).reset_index(drop=True)
+    predicted = pd.Series(prediction).reset_index(drop=True)
+    if len(truth) == 0 or len(truth) != len(predicted):
+        raise ValueError("Target and prediction must have the same nonzero length")
+    if not truth.isin(LABELS).all() or not predicted.isin(LABELS).all():
+        raise ValueError("Target or prediction contains invalid labels")
     per_class = {}
     for label in LABELS:
         actual_mask = truth.eq(label)
@@ -95,7 +108,7 @@ def score_predictions(labels: pd.DataFrame, predictions: pd.DataFrame) -> dict[s
         for actual in LABELS
     }
     return {
-        "clients": len(labels),
+        "clients": len(truth),
         "macro_f1": sum(row["f1"] for row in per_class.values()) / len(LABELS),
         "accuracy": float(truth.eq(predicted).mean()),
         "label_order": list(LABELS),

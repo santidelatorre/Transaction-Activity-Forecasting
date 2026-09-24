@@ -90,12 +90,13 @@ Ideas diferenciadoras que sí se pueden comprobar:
   de descripciones, conservando el corte. Reportar cambios en predicciones como
   estabilidad; no llamarlos accuracy nueva si los targets dejan de ser válidos.
 
-## Comparación de repositorios y qué integrar
+## Comparación inicial de repositorios (histórica)
 
-Main revisado: `d67605d` (incluye el smoke pipeline de `9f2c8da`). Es una base
-útil de colaboración, no una solución entrenada ni un estándar incuestionable.
+Esta tabla describe la revisión inicial de `d67605d`, no el estado actual.
+Después se incorporó `origin/main` en `1a4b336`, que ya incluye adaptador UBS,
+features, modelos y runner de entrenamiento. Ver la actualización más abajo.
 
-| Componente | Main actual | Preparación local previa | Decisión |
+| Componente | Main en d67605d | Preparación local previa | Decisión inicial |
 |---|---|---|---|
 | Organización | Paquete modular, CI, pandas y tests | Paquete distinto `taf`, stdlib | Mantener `transaction_forecasting`; no duplicar dos pipelines |
 | Predicción | Comercio más frecuente; fecha por mediana de intervalos | Ranking de streams mock, calendario y overdue | Portar señales más adelante, después de inspeccionar los datos oficiales |
@@ -125,12 +126,28 @@ No se incorporan datasets, transcripción, respuestas del formulario, credencial
 ni resultados mock como evidencia oficial. No se añade un dashboard, modelo
 entrenado, adaptador de datos ni entrega competitiva en esta aportación.
 
-El siguiente PR puede añadir el adaptador y primer clasificador tras coordinar
-quién lo implementa. La interfaz común es un DataFrame de predicciones con
-`client_id,predicted_next_recurring_merchant`; los autores de modelos pueden
-usar el evaluador sin depender de la arquitectura del otro modelo.
+El adaptador y los clasificadores ya llegaron con UBS V1 desde main. La interfaz
+común sigue siendo `client_id,predicted_next_recurring_merchant`; las siguientes
+aportaciones deben ampliar ese recorrido y evitar crear un segundo adaptador.
 
-## Verificación local de esta aportación
+## Actualización al integrar main 1a4b336 en dev/carles
+
+- Se conservan `temporal_split` con empates agrupados y
+  `train_validation_test_split` con sus contratos y grupos de tests originales.
+  El helper de tres particiones mantiene su semántica de filas y embargo; no
+  se cambia el entrenamiento UBS para usar ninguno de estos splits genéricos.
+- `evaluation.official.classification_metrics` centraliza las métricas de ocho
+  clases; `ubs.evaluation.evaluate_predictions` adapta al formato que ya consume
+  el runner (incluidos `f1-score`, matriz y distribución).
+- Vocabulario, corte y nombres de columnas se comparten entre ambos módulos.
+- `ubs.data.validate_submission` delega esquema, clases y cobertura al núcleo
+  compartido, manteniendo orden estricto, comprobación de clientes de test y
+  retorno None. El helper CSV acepta filas desordenadas y devuelve copia alineada.
+- Tests de compatibilidad verifican valores manuales, clases ausentes, errores
+  de cobertura, orden y ausencia de mutación. No se eliminan los tests UBS V1.
+- No se incluye el script local de emergencia ni datasets en este merge.
+
+## Verificación inicial (antes de integrar UBS V1)
 
 - Python 3.12.10, pandas 2.3.3, NumPy 2.3.5, pytest 8.4.2, Ruff 0.6.9.
 - `python -m pytest -q`: 20 tests correctos, incluidos los tests anteriores.
