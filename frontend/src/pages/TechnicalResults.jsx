@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { EmptyState, Note, Panel } from '@/components/insights/Primitives';
 import { getResults } from '@/lib/api';
+import ExperimentHistory from '@/components/insights/ExperimentHistory';
 
 function score(value) {
     return typeof value === 'number' && Number.isFinite(value) ? value.toFixed(4) : 'Not provided';
@@ -34,6 +35,7 @@ export default function TechnicalResults() {
             title="Technical results"
             subtitle="Validation metrics are read from the UBS runner output; test labels are never available to this dashboard."
         >
+            <ExperimentHistory />
             {error && <p role="alert" className="rounded-lg bg-rose-50 p-4 text-sm text-rose-800">{error}</p>}
             {!result && !error && <p className="py-10 text-center text-sm text-slate-500">Loading evaluation artifacts…</p>}
             {result && !result.available ? (

@@ -13,6 +13,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from transaction_forecasting.tracking_integration import record_validation_run
 from transaction_forecasting.ubs.data import (
     LABELS,
     PREDICTION_COLUMN,
@@ -421,6 +422,14 @@ def main() -> None:
     )
     best_output = outputs[best_name]
     best_metrics = details[best_name]
+
+    record_validation_run(
+        repo_root=Path(__file__).resolve().parents[1],
+        experiments=experiments,
+        details=details,
+        settings=settings,
+        selected_model=best_name,
+    )
 
     # Model selection is complete. Refit the selected approach on every labelled
     # client before touching test predictions; test labels never exist or enter here.

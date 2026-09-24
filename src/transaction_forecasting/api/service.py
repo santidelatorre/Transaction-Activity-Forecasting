@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 import tomllib
 from functools import lru_cache
 from pathlib import Path
@@ -15,9 +16,17 @@ from transaction_forecasting.evaluation.official import (
     PREDICTION,
     validate_submission,
 )
+from transaction_forecasting.tracking_integration import DEFAULT_DATABASE, read_experiments
 from transaction_forecasting.ubs.data import read_transactions
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
+
+
+def get_experiments(*, limit: int = 100, offset: int = 0) -> dict[str, Any]:
+    try:
+        return read_experiments(PROJECT_ROOT / DEFAULT_DATABASE, limit=limit, offset=offset)
+    except (OSError, sqlite3.Error, ValueError, KeyError) as error:
+        raise ArtifactUnavailable("Experiment history is unavailable or invalid.") from error
 
 
 class ArtifactUnavailable(Exception):

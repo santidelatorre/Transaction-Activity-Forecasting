@@ -10,6 +10,14 @@ from transaction_forecasting.api import service
 router = APIRouter(prefix="/api/v1")
 
 
+@router.get("/experiments")
+def experiments(
+    limit: int = Query(default=100, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+) -> dict[str, object]:
+    return service.get_experiments(limit=limit, offset=offset)
+
+
 @router.get("/health")
 def health() -> dict[str, object]:
     return service.get_health()

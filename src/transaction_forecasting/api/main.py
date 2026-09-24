@@ -9,8 +9,8 @@ from transaction_forecasting.api.service import PROJECT_ROOT, ArtifactUnavailabl
 
 app = FastAPI(
     title="Transaction Activity Forecasting",
-    description="Dashboard API backed by UBS V1 predictions and evaluation artifacts.",
-    version="0.1.0",
+    description="Dashboard API for UBS predictions, validation artifacts and experiment history.",
+    version="0.2.0",
 )
 app.include_router(router)
 
