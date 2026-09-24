@@ -94,28 +94,28 @@ indicar: `Recomiendo escalar esta tarea a [modelo] con reasoning [nivel] porque
 
 Seguir el flujo de ramas y Pull Requests definido en `CONTRIBUTING.md` y el
 plan de workstreams de `docs/HACKATHON_PLAN.md`: mantener `main` estable, usar
-una rama por tarea, mantener los notebooks enfocados y mover la lógica
-reutilizable a `src/`.
+la rama personal correspondiente, mantener los notebooks enfocados y mover la
+lógica reutilizable a `src/`.
 
-## Política de ramas de Santiago
+## Política de ramas del equipo
 
-- La rama personal de trabajo por defecto es `dev/santiago`, con seguimiento de
-  `origin/dev/santiago`.
+- Cada participante trabaja en su rama personal `dev/<nombre>`, con seguimiento
+  de la rama remota del mismo nombre. Por ejemplo, Carles usa `dev/carles` y
+  Santiago usa `dev/santiago`.
 - Nunca hacer commits, pushes ni merges directos a `main`. La integración en
   `main` se realiza exclusivamente mediante Pull Request desde una rama de
   trabajo publicada.
 - Antes de una tarea importante, comprobar la rama actual, actualizar las
   referencias remotas y evaluar si se deben incorporar los cambios recientes de
-  `origin/main` a `dev/santiago`. No sobrescribir trabajo local o remoto.
-- Los commits y pushes ordinarios se realizan en `dev/santiago`, con cambios
-  pequeños y mensajes descriptivos. Antes de un commit relevante, ejecutar las
-  comprobaciones disponibles: pre-commit, Ruff, formato, tests e imports cuando
-  correspondan.
-- Para tareas independientes o experimentales, crear desde `dev/santiago` una
-  rama `feature/santiago-nombre-tarea`; integrarla después en `dev/santiago`,
-  nunca directamente en `main`.
+  `origin/main` a la rama personal. No sobrescribir trabajo local o remoto.
+- Los commits y pushes ordinarios se realizan en la rama personal, con cambios
+  pequeños y mensajes descriptivos. Una rama puede contener varias tareas, pero
+  cada commit y Pull Request debe mantener un alcance claro y revisable.
+- Antes de un commit relevante, ejecutar las comprobaciones disponibles:
+  pre-commit, Ruff, formato, tests e imports cuando correspondan.
 - Ante conflictos al incorporar cambios de `main`, conservar en lo posible la
   intención de ambos lados y no descartar cambios automáticamente.
 - Mantener fuera del control de versiones los archivos personales, temporales,
   credenciales, entornos y cachés mediante patrones apropiados de `.gitignore`.
-  Las ramas, no `.gitignore`, aíslan el trabajo de cada miembro del equipo.
+  `.gitignore` protege archivos locales; las ramas aíslan el trabajo de cada
+  miembro del equipo.
