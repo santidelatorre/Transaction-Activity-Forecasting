@@ -1,10 +1,9 @@
-"""V3 stream-candidate model aiming above V2 toward the Santiago oracle ceiling.
+"""V3 stream-candidate ensemble: V2 blend + history/due-stream CatBoost.
 
-Uses exact (client, description) streams with a train-only family map. Emits
-per-family due-stream features that CatBoost can combine with V2 history
-features. Also exposes a confident single-family override over V2.
+Frozen try-branch recipe (VALID-reported):
+  0.65 * IntegratedV2Model blend + 0.35 * CatBoost(history + due-stream features)
 
-Stream geometry never uses labels. The family map is fit only on train labels.
+Search also found ~0.402 with 0.85/0.15; the 0.65/0.35 mix is stronger on VALID.
 """
 
 from __future__ import annotations
@@ -24,18 +23,13 @@ from transaction_forecasting.ubs.v2 import HistoryFeatureBuilder, IntegratedV2Mo
 
 
 def apply_family_map(streams: pd.DataFrame, mapper: TrainOnlyFamilyMapper) -> pd.DataFrame:
-    """Apply a fitted description→family map without the disjoint-client guard.
-
-    The guard remains for external audits. Training feature construction needs the
-    same map on fit clients; validation still uses a mapper fit only on train.
-    """
+    """Apply a fitted description→family map without the disjoint-client guard."""
     result = streams.copy()
     result["mapped_family"] = result["description"].map(mapper.mapping_)
     return result
 
 
 def _stream_quality(streams: pd.DataFrame) -> pd.DataFrame:
-    """Attach unsupervised quality scores to mapped candidate streams."""
     frame = streams.copy()
     gap = frame["gap_median_days"].astype(float).clip(lower=1.0)
     days_to_next = (frame["projected_next_date"] - CUTOFF).dt.total_seconds().div(86400)
@@ -78,21 +72,12 @@ def client_stream_features(
     features["stream_mapped_candidate_count"] = (
         due.groupby("client_id").size().reindex(clients, fill_value=0)
     )
-    empty_cols = []
     for family in POSITIVE_LABELS:
-        empty_cols.extend(
-            [
-                f"due_{family}_count",
-                f"due_{family}_max_weight",
-                f"due_{family}_best_lift",
-                f"due_{family}_min_days",
-                f"due_{family}_max_regularity",
-            ]
-        )
-    for column in empty_cols:
-        features[column] = 0.0
-    for family in POSITIVE_LABELS:
+        features[f"due_{family}_count"] = 0.0
+        features[f"due_{family}_max_weight"] = 0.0
+        features[f"due_{family}_best_lift"] = 0.0
         features[f"due_{family}_min_days"] = 999.0
+        features[f"due_{family}_max_regularity"] = 0.0
     features["stream_unique_families"] = 0.0
     features["stream_top_weight"] = 0.0
     features["stream_top_family_index"] = -1.0
@@ -108,7 +93,6 @@ def client_stream_features(
     for family in POSITIVE_LABELS:
         subset = due[due["mapped_family"].eq(family)]
         if subset.empty:
-            features[f"due_{family}_min_days"] = 999.0
             continue
         grouped = subset.groupby("client_id")
         features[f"due_{family}_count"] = grouped.size().reindex(clients, fill_value=0)
@@ -139,12 +123,9 @@ def client_stream_features(
 
 @dataclass
 class StreamV3Model:
-    """History CatBoost + due-stream features, blended with frozen V2."""
+    """Frozen ensemble: V2 blend + CatBoost(history + due-stream features)."""
 
-    v2_blend: float = 0.85
-    override_weight: float = 2.0
-    override_margin: float = 0.05
-    override_min_weight: float = 1.0
+    v2_blend: float = 0.65
     seed: int = 42
 
     def fit(self, transactions: pd.DataFrame, labels: pd.DataFrame) -> StreamV3Model:
@@ -160,8 +141,9 @@ class StreamV3Model:
         matrix = history.join(stream)
         self.feature_names_ = matrix.columns.tolist()
         self.model_ = make_model()
-        self.model_.iterations = 450
-        self.model_.depth = 5
+        self.model_.iterations = 600
+        self.model_.depth = 6
+        self.model_.learning_rate = 0.04
         self.model_.seed = self.seed
         self.model_.fit(matrix, target.reindex(matrix.index))
         self.v2_ = IntegratedV2Model().fit(transactions, labels)
@@ -183,22 +165,6 @@ class StreamV3Model:
         v2 = self.v2_.predict_components(transactions)["blend"].reindex(matrix.index)
         blended = self.v2_blend * v2.to_numpy() + (1.0 - self.v2_blend) * stream_model.to_numpy()
         blended = pd.DataFrame(blended, index=matrix.index, columns=LABELS)
-
-        single = stream["stream_single_family"].gt(0.5) & stream["stream_margin"].ge(
-            self.override_margin
-        )
-        top_weight = stream["stream_top_weight"]
-        top_idx = stream["stream_top_family_index"].astype(int)
-        eligible = single & top_weight.ge(self.override_min_weight)
-        for client in matrix.index[eligible]:
-            family = POSITIVE_LABELS[int(top_idx.loc[client])]
-            boost = float(top_weight.loc[client]) * self.override_weight
-            blended.loc[client, family] = float(blended.loc[client, family]) + boost
-        if eligible.any():
-            values = blended.loc[eligible].to_numpy(dtype=float)
-            values = np.clip(values, 1e-12, None)
-            values = values / values.sum(axis=1, keepdims=True)
-            blended.loc[eligible] = values
         return {
             "stream_model": stream_model,
             "v2": v2,

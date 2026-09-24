@@ -16,7 +16,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", default="data/raw/ubs_2026")
     parser.add_argument("--output-dir", default="outputs/metrics/ubs_v3")
-    parser.add_argument("--v2-blend", type=float, default=0.85)
+    parser.add_argument("--v2-blend", type=float, default=0.65)
     args = parser.parse_args()
     output = Path(args.output_dir)
     output.mkdir(parents=True, exist_ok=True)

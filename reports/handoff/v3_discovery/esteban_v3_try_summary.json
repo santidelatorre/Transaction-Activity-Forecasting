@@ -1,19 +1,22 @@
 {
   "model": "StreamV3Model",
-  "v2_blend": 0.85,
+  "v2_blend": 0.65,
   "v2_macro_f1": 0.3915494559105542,
-  "v3_macro_f1": 0.402339508886895,
-  "v3_accuracy": 0.435,
-  "delta_vs_v2": 0.0107900529763408,
-  "per_class_f1": {
-    "cloud": 0.4416,
-    "gym": 0.4727,
-    "insurance": 0.4291,
-    "mobile": 0.4426,
-    "music": 0.2063,
-    "software": 0.3786,
-    "streaming": 0.3085,
-    "none": 0.5392
+  "v3_macro_f1": 0.4134155421910242,
+  "delta_vs_v2": 0.02186608628047,
+  "weights": {
+    "v2": 0.65,
+    "cat_hist_due_stream": 0.35
   },
-  "note": "From esteban_v3_search.py blend grid; frozen as default StreamV3Model(v2_blend=0.85)"
+  "per_class_f1": {
+    "cloud": 0.44,
+    "gym": 0.473,
+    "insurance": 0.441,
+    "mobile": 0.46,
+    "music": 0.198,
+    "software": 0.419,
+    "streaming": 0.296,
+    "none": 0.581
+  },
+  "note": "Blend weights selected on VALID grid in try branch (reported, not OOF-frozen)."
 }
