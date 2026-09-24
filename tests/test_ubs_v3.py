@@ -14,6 +14,7 @@ from transaction_forecasting.ubs.v3.features import (
     payment_streams,
     recurrence_features,
 )
+from transaction_forecasting.ubs.v3.identity import IdentityMap, cross_fitted_identity_features
 
 
 def sample():
@@ -71,6 +72,38 @@ def test_crossfit_never_transforms_clients_in_its_fit(monkeypatch):
     assert not result.isna().any().any()
     assert "client_id" not in result and TARGET_COLUMN not in result
     assert all("none" not in column for column in result)
+
+
+@pytest.mark.parametrize(
+    "options",
+    [
+        {"normalized": True},
+        {"normalized": True, "probabilities": True},
+        {"normalized": True, "probabilities": True, "char_alias": True},
+    ],
+)
+def test_identity_features_cannot_use_own_label(monkeypatch, options):
+    from sklearn.model_selection import KFold
+
+    from transaction_forecasting.ubs.v3 import identity
+
+    class FixedClientFolds:
+        def __init__(self, n_splits, **_):
+            self.splitter = KFold(n_splits=n_splits, shuffle=True, random_state=42)
+
+        def split(self, clients, _target):
+            return self.splitter.split(clients)
+
+    monkeypatch.setattr(identity, "StratifiedKFold", FixedClientFolds, raising=False)
+    tx, labels = sample()
+    original = cross_fitted_identity_features(tx, labels, **options)
+    client = "music_0"
+    changed = labels.copy()
+    changed.loc[changed.client_id.eq(client), TARGET_COLUMN] = "streaming"
+    altered = cross_fitted_identity_features(tx, changed, **options)
+    pd.testing.assert_series_equal(original.loc[client], altered.loc[client])
+    with pytest.raises(ValueError, match="excluded"):
+        IdentityMap(**options).fit(tx, labels).transform(tx)
 
 
 def test_recurring_payments_exclude_refunds_and_keep_currencies_separate():
