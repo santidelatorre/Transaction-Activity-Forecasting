@@ -81,13 +81,13 @@ Import with `from transaction_forecasting.experiment_tracking import ExperimentL
 
 ## 10. Commits worth integrating
 
-`29213ff`
+`fe85154`
 Add SQLite experiment tracking utility and ignore local database artifacts.
 CHERRY-PICK RECOMMENDED as the logger foundation.
 
-`d97df2b`
+`cd19c44`
 Capture experiment outcomes and validate concurrency, with focused tests.
-CHERRY-PICK RECOMMENDED after `29213ff` (or cherry-pick both in order).
+CHERRY-PICK RECOMMENDED after `fe85154` (or cherry-pick both in order).
 
 No debugging-only or model-experiment commits were created.
 
@@ -122,5 +122,5 @@ Run the unchanged V1 pipeline once on the official local train/valid files, usin
 - Integrate the logger and focused tests if a lightweight local tracker is useful.
 - Log protocol, seed, data/config identity, class metrics, runtime, risks, and Git dirty state for each V2 candidate.
 - Do not integrate synthetic test metrics as model results or claim a V2 gain from this work.
-- Review `29213ff` (logger foundation), then `d97df2b` (outcome fields and concurrency tests).
+- Review `fe85154` (logger foundation), then `cd19c44` (outcome fields and concurrency tests).
 - Multi-process stress testing and future SQLite schema migrations remain follow-up work.

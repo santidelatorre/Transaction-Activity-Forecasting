@@ -15,6 +15,6 @@
 2. **SHOULD:** Include data/config identifiers, seed, runtime, risk notes, and require a clean Git tree for final results.
 3. **COULD:** Add a multi-process stress test and compact SQLite export when needed.
 
-- **Relevant commits:** `29213ff` logger foundation; `d97df2b` outcome fields and concurrency tests.
+- **Relevant commits:** `fe85154` logger foundation; `cd19c44` outcome fields and concurrency tests.
 - **Main risk:** no multi-process stress test yet; SQLite WAL should stay on a local filesystem.
 - **What V2 should do:** use this logger for a clean, unchanged V1 rerun first, then compare single, controlled model experiments against Macro-F1 `0.2710243`.
