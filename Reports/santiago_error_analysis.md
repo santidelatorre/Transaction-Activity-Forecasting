@@ -337,8 +337,7 @@ No V1 production modules were modified for this diagnosis.
 
 | commit_hash | description | recommendation |
 |---|---|---|
-| `0199a8b7c8b2c790a9d3447b156f2088708c2864` | analysis: add reproducible V1 error diagnostics | ANALYSIS ONLY / keep script |
-| `358d6048acf6b46d401d649a29d519b513ec8f90` | docs: add V1 error analysis handoff under Reports | CHERRY-PICK RECOMMENDED for integrator reading |
+|  | analysis: add reproducible V1 error diagnostics and Reports handoff | CHERRY-PICK RECOMMENDED (script + Reports) |
 
 ## 15. Dependencies and conflicts
 
