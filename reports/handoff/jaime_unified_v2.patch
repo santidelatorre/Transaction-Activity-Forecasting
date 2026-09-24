@@ -1,0 +1,356 @@
+diff --git a/src/transaction_forecasting/tracking_integration.py b/src/transaction_forecasting/tracking_integration.py
+new file mode 100644
+--- /dev/null
++++ b/src/transaction_forecasting/tracking_integration.py
+@@ -0,0 +1,92 @@
++"""Adapt UBS validation records and read tracking history without creating a DB."""
++
++from __future__ import annotations
++
++import json
++import sqlite3
++import uuid
++from contextlib import closing
++from pathlib import Path
++from typing import Any
++
++from transaction_forecasting.experiment_tracking import ExperimentLogger
++
++DEFAULT_DATABASE = "outputs/experiments/experiments.sqlite3"
++
++
++def record_validation_run(
++    *,
++    repo_root: Path,
++    experiments: list[dict[str, Any]],
++    details: dict[str, dict[str, Any]],
++    settings: dict[str, Any],
++    selected_model: str,
++) -> list[str]:
++    """Record evaluated candidates, before refitting on train + validation.
++
++    Feature entries describe feature sets, not individual transformed columns.
++    The complete configuration and candidate notes preserve tuning context.
++    """
++    logger = ExperimentLogger(repo_root=repo_root)
++    run_id = str(uuid.uuid4())
++    ids = []
++    for row in experiments:
++        name = row["model"]
++        metrics = details[name]
++        ids.append(
++            logger.log_experiment(
++                description=f"UBS validation candidate: {name}",
++                model_name=name,
++                model_version="ubs-v1",
++                features=[row["feature_set"]],
++                hyperparameters={
++                    "config": settings,
++                    "class_weight": row["class_weight"],
++                    "candidate_notes": row["notes"],
++                },
++                metrics={
++                    **metrics,
++                    "f1_per_class": {
++                        label: values["f1-score"] for label, values in metrics["per_class"].items()
++                    },
++                    "run_id": run_id,
++                    "scope": "validation",
++                    "validation_clients": row["validation_clients"],
++                },
++                compute_seconds=row["train_seconds"] + row["inference_seconds"],
++                result="selected" if name == selected_model else "evaluated",
++                notes=(
++                    f"{row['notes']}; feature-set description; "
++                    "compute time excludes shared feature construction and scoring"
++                ),
++                risk_notes=(
++                    "Validation used for tuning and model selection; "
++                    "not an independent test or leaderboard score."
++                ),
++            )
++        )
++    return ids
++
++
++def read_experiments(database: Path, *, limit: int = 100, offset: int = 0) -> dict[str, Any]:
++    """Read a bounded history page; a missing DB is an ordinary empty state."""
++    if not 1 <= limit <= 100 or offset < 0:
++        raise ValueError("limit must be 1..100 and offset must be non-negative")
++    if not database.is_file():
++        return {"available": False, "experiments": [], "limit": limit, "offset": offset}
++    uri = database.resolve().as_uri() + "?mode=ro"
++    with closing(sqlite3.connect(uri, uri=True, timeout=5)) as connection:
++        connection.row_factory = sqlite3.Row
++        rows = connection.execute(
++            "SELECT * FROM experiments ORDER BY recorded_at_utc DESC, experiment_id DESC "
++            "LIMIT ? OFFSET ?",
++            (limit, offset),
++        ).fetchall()
++    records = []
++    for row in rows:
++        record = dict(row)
++        for field in ("features", "hyperparameters", "metrics"):
++            record[field] = json.loads(record.pop(f"{field}_json"))
++        record["git_dirty"] = None if record["git_dirty"] is None else bool(record["git_dirty"])
++        records.append(record)
++    return {"available": True, "experiments": records, "limit": limit, "offset": offset}
+diff --git a/src/transaction_forecasting/api/service.py b/src/transaction_forecasting/api/service.py
+--- a/src/transaction_forecasting/api/service.py
++++ b/src/transaction_forecasting/api/service.py
+@@ -3,6 +3,7 @@
+ from __future__ import annotations
+
+ import json
++import sqlite3
+ import tomllib
+ from functools import lru_cache
+ from pathlib import Path
+@@ -15,9 +16,17 @@
+     PREDICTION,
+     validate_submission,
+ )
++from transaction_forecasting.tracking_integration import DEFAULT_DATABASE, read_experiments
+ from transaction_forecasting.ubs.data import read_transactions
+
+ PROJECT_ROOT = Path(__file__).resolve().parents[3]
++
++
++def get_experiments(*, limit: int = 100, offset: int = 0) -> dict[str, Any]:
++    try:
++        return read_experiments(PROJECT_ROOT / DEFAULT_DATABASE, limit=limit, offset=offset)
++    except (OSError, sqlite3.Error, ValueError, KeyError) as error:
++        raise ArtifactUnavailable("Experiment history is unavailable or invalid.") from error
+
+
+ class ArtifactUnavailable(Exception):
+diff --git a/src/transaction_forecasting/api/router.py b/src/transaction_forecasting/api/router.py
+--- a/src/transaction_forecasting/api/router.py
++++ b/src/transaction_forecasting/api/router.py
+@@ -8,6 +8,14 @@
+ from transaction_forecasting.api import service
+
+ router = APIRouter(prefix="/api/v1")
++
++
++@router.get("/experiments")
++def experiments(
++    limit: int = Query(default=100, ge=1, le=100),
++    offset: int = Query(default=0, ge=0),
++) -> dict[str, object]:
++    return service.get_experiments(limit=limit, offset=offset)
+
+
+ @router.get("/health")
+diff --git a/src/transaction_forecasting/api/main.py b/src/transaction_forecasting/api/main.py
+--- a/src/transaction_forecasting/api/main.py
++++ b/src/transaction_forecasting/api/main.py
+@@ -9,8 +9,8 @@
+
+ app = FastAPI(
+     title="Transaction Activity Forecasting",
+-    description="Dashboard API backed by UBS V1 predictions and evaluation artifacts.",
+-    version="0.1.0",
++    description="Dashboard API for UBS predictions, validation artifacts and experiment history.",
++    version="0.2.0",
+ )
+ app.include_router(router)
+
+diff --git a/scripts/run_ubs_baseline.py b/scripts/run_ubs_baseline.py
+--- a/scripts/run_ubs_baseline.py
++++ b/scripts/run_ubs_baseline.py
+@@ -13,6 +13,7 @@
+ import numpy as np
+ import pandas as pd
+
++from transaction_forecasting.tracking_integration import record_validation_run
+ from transaction_forecasting.ubs.data import (
+     LABELS,
+     PREDICTION_COLUMN,
+@@ -422,6 +423,14 @@
+     best_output = outputs[best_name]
+     best_metrics = details[best_name]
+
++    record_validation_run(
++        repo_root=Path(__file__).resolve().parents[1],
++        experiments=experiments,
++        details=details,
++        settings=settings,
++        selected_model=best_name,
++    )
++
+     # Model selection is complete. Refit the selected approach on every labelled
+     # client before touching test predictions; test labels never exist or enter here.
+     final_feature_started = perf_counter()
+diff --git a/scripts/format_submission.py b/scripts/format_submission.py
+--- a/scripts/format_submission.py
++++ b/scripts/format_submission.py
+@@ -63,13 +63,13 @@
+     result = pd.read_csv(submission_path)
+     assert list(result.columns) == OUTPUT_COLUMNS, "Incorrect submission columns"
+     assert len(result) == len(sample_submission), "Submission row count does not match sample"
+-    assert (
+-        result[ID_COLUMN].tolist() == sample_submission[ID_COLUMN].tolist()
+-    ), "Submission client IDs or order do not match sample_submission"
++    assert result[ID_COLUMN].tolist() == sample_submission[ID_COLUMN].tolist(), (
++        "Submission client IDs or order do not match sample_submission"
++    )
+     assert not result.isna().any().any(), "Submission contains missing values"
+-    assert (
+-        result[PREDICTION_COLUMN].isin(ALLOWED_LABELS).all()
+-    ), "Submission contains labels outside the allowed list"
++    assert result[PREDICTION_COLUMN].isin(ALLOWED_LABELS).all(), (
++        "Submission contains labels outside the allowed list"
++    )
+     print(f"Validation successful: {len(result)} rows, schema and labels are valid.")
+
+
+diff --git a/frontend/src/components/insights/ExperimentHistory.jsx b/frontend/src/components/insights/ExperimentHistory.jsx
+new file mode 100644
+--- /dev/null
++++ b/frontend/src/components/insights/ExperimentHistory.jsx
+@@ -0,0 +1,55 @@
++import { useEffect, useState } from 'react';
++import { Panel } from '@/components/insights/Primitives';
++
++function score(value) {
++    return typeof value === 'number' && Number.isFinite(value) ? value.toFixed(4) : '—';
++}
++
++export default function ExperimentHistory() {
++    const [data, setData] = useState(null);
++    const [error, setError] = useState(null);
++    const [offset, setOffset] = useState(0);
++    const [refresh, setRefresh] = useState(0);
++    const limit = 20;
++
++    useEffect(() => {
++        const controller = new AbortController();
++        setData(null);
++        setError(null);
++        fetch(`/api/v1/experiments?limit=${limit}&offset=${offset}`, { signal: controller.signal })
++            .then(async (response) => {
++                if (!response.ok) throw new Error('Experiment history is currently unavailable.');
++                return response.json();
++            })
++            .then(setData)
++            .catch((reason) => {
++                if (reason.name !== 'AbortError') setError(reason.message);
++            });
++        return () => controller.abort();
++    }, [offset, refresh]);
++
++    return (
++        <Panel title="Experiment history" description="Latest recorded runs. Compare scores only when their data and validation protocol match; selection is local to each run.">
++            <div className="mb-4 flex gap-4">
++                <button onClick={() => setRefresh((value) => value + 1)}>Refresh</button>
++                <button disabled={offset === 0 || !data} onClick={() => setOffset(offset - limit)}>Previous</button>
++                <button disabled={!data || data.experiments.length < limit} onClick={() => setOffset(offset + limit)}>Next</button>
++            </div>
++            {error && <p role="alert">{error}</p>}
++            {!data && !error && <p>Loading experiment history…</p>}
++            {data && data.experiments.length === 0 && <p>No recorded experiments on this page.</p>}
++            {data?.experiments.map((row) => (
++                <details key={row.experiment_id} className="mb-3 rounded-lg border p-3">
++                    <summary>{row.model_name} · Macro-F1 {score(row.metrics.macro_f1)} · Accuracy {score(row.metrics.accuracy)} · {row.result}</summary>
++                    <p>{row.recorded_at_utc} · {row.model_version} · Scope: {row.metrics.scope ?? 'Not recorded'}</p>
++                    <p>Run: {row.metrics.run_id ?? 'Not recorded'} · Experiment: {row.experiment_id}</p>
++                    <p>Commit: {row.git_commit ?? 'Unknown'} · Working tree: {row.git_dirty === null ? 'Unknown' : row.git_dirty ? 'Modified' : 'Clean'}</p>
++                    <p>Compute: {row.compute_seconds ?? '—'} s · Baseline delta: {score(row.delta_vs_baseline)}</p>
++                    <p>{row.notes}</p>
++                    <p>{row.risk_notes}</p>
++                    <pre className="overflow-auto text-xs">{JSON.stringify({ features: row.features, hyperparameters: row.hyperparameters, metrics: row.metrics }, null, 2)}</pre>
++                </details>
++            ))}
++        </Panel>
++    );
++}
+diff --git a/frontend/src/pages/TechnicalResults.jsx b/frontend/src/pages/TechnicalResults.jsx
+--- a/frontend/src/pages/TechnicalResults.jsx
++++ b/frontend/src/pages/TechnicalResults.jsx
+@@ -13,6 +13,7 @@
+ } from '@/components/ui/table';
+ import { EmptyState, Note, Panel } from '@/components/insights/Primitives';
+ import { getResults } from '@/lib/api';
++import ExperimentHistory from '@/components/insights/ExperimentHistory';
+
+ function score(value) {
+     return typeof value === 'number' && Number.isFinite(value) ? value.toFixed(4) : 'Not provided';
+@@ -34,6 +35,7 @@
+             title="Technical results"
+             subtitle="Validation metrics are read from the UBS runner output; test labels are never available to this dashboard."
+         >
++            <ExperimentHistory />
+             {error && <p role="alert" className="rounded-lg bg-rose-50 p-4 text-sm text-rose-800">{error}</p>}
+             {!result && !error && <p className="py-10 text-center text-sm text-slate-500">Loading evaluation artifacts…</p>}
+             {result && !result.available ? (
+diff --git a/tests/test_tracking_integration.py b/tests/test_tracking_integration.py
+new file mode 100644
+--- /dev/null
++++ b/tests/test_tracking_integration.py
+@@ -0,0 +1,65 @@
++from pathlib import Path
++
++import pytest
++
++from transaction_forecasting.api import service
++from transaction_forecasting.tracking_integration import (
++    DEFAULT_DATABASE,
++    read_experiments,
++    record_validation_run,
++)
++
++
++def test_missing_database_is_not_created(tmp_path):
++    database = tmp_path / DEFAULT_DATABASE
++    assert read_experiments(database)["experiments"] == []
++    assert not database.parent.exists()
++
++
++def test_runner_records_and_api_reads_validation(tmp_path, monkeypatch):
++    row = {
++        "model": "dummy",
++        "feature_set": "none",
++        "class_weight": "none",
++        "notes": "fixture",
++        "train_seconds": 0,
++        "inference_seconds": 0.1,
++        "validation_clients": 2,
++    }
++    metrics = {"macro_f1": 0.5, "accuracy": 0.5, "per_class": {"none": {"f1-score": 0.5}}}
++    ids = record_validation_run(
++        repo_root=tmp_path,
++        experiments=[row, {**row, "model": "other"}],
++        details={"dummy": metrics, "other": metrics},
++        settings={"project": {"random_seed": 42}},
++        selected_model="dummy",
++    )
++    monkeypatch.setattr(service, "PROJECT_ROOT", tmp_path)
++    history = service.get_experiments()
++    assert {item["experiment_id"] for item in history["experiments"]} == set(ids)
++    records = {item["model_name"]: item for item in history["experiments"]}
++    assert records["dummy"]["metrics"]["f1_per_class"] == {"none": 0.5}
++    assert records["dummy"]["result"] == "selected"
++    assert records["other"]["result"] == "evaluated"
++    assert records["dummy"]["metrics"]["run_id"] == records["other"]["metrics"]["run_id"]
++    assert records["dummy"]["compute_seconds"] == 0.1
++    assert records["dummy"]["baseline_macro_f1"] is None
++    first = service.get_experiments(limit=1)["experiments"]
++    second = service.get_experiments(limit=1, offset=1)["experiments"]
++    assert first[0]["experiment_id"] != second[0]["experiment_id"]
++    assert service.get_experiments(offset=2)["experiments"] == []
++
++
++def test_corrupt_database_reports_unavailable(tmp_path, monkeypatch):
++    database = tmp_path / DEFAULT_DATABASE
++    database.parent.mkdir(parents=True)
++    database.write_text("invalid database", encoding="utf-8")
++    monkeypatch.setattr(service, "PROJECT_ROOT", tmp_path)
++    with pytest.raises(service.ArtifactUnavailable):
++        service.get_experiments()
++
++
++@pytest.mark.parametrize("limit,offset", [(0, 0), (101, 0), (1, -1)])
++def test_invalid_page(limit, offset):
++    with pytest.raises(ValueError):
++        read_experiments(Path("missing.sqlite3"), limit=limit, offset=offset)

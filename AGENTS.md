@@ -5,6 +5,48 @@ Estas instrucciones complementan, sin sustituir, las normas de `README.md`,
 conflicto, se debe preservar la seguridad, la reproducibilidad, las interfaces
 compartidas y las instrucciones más específicas del área afectada.
 
+## Autonomía y permisos del CLI Codex
+
+El usuario autoriza a ejecutar los cambios y comandos necesarios para completar
+la tarea solicitada sin pedir confirmación adicional en cada paso. Esto incluye
+editar y crear archivos, ejecutar scripts, tests y linters, instalar dependencias
+del proyecto y realizar las operaciones Git comprendidas en la tarea.
+
+- Actuar directamente dentro del alcance solicitado; no preguntar «¿continúo?»
+  ni volver a pedir autorización para una acción ya autorizada.
+- Resolver decisiones rutinarias de implementación con criterio propio y
+  verificar los resultados. Informar del progreso sin convertirlo en una
+  solicitud de permiso.
+- Respetar la rama indicada expresamente por el usuario por encima de la rama
+  personal por defecto. Para la integración V3, usar `integration/v3-discovery`.
+- Mantener las restricciones explícitas de la tarea: no modificar `main`, no
+  hacer merges ciegos, no sobrescribir trabajo ajeno y no publicar secretos ni
+  datasets. Esta autonomía no amplía el alcance de la tarea.
+- Respetar los permisos efectivos del entorno. Si una operación está bloqueada,
+  comunicar el bloqueo concreto; este archivo no permite eludirlo.
+
+Las instrucciones de `AGENTS.md` no cambian el sandbox ni los avisos de aprobación
+del CLI. Para iniciar una sesión sin solicitudes de aprobación y con acceso
+completo, el usuario puede ejecutar desde este repositorio:
+
+```powershell
+codex --ask-for-approval never --sandbox danger-full-access
+```
+
+Ese modo desactiva el aislamiento de archivos y red. Si se quiere mantener el
+aislamiento del repositorio y eliminar únicamente las preguntas de aprobación:
+
+```powershell
+codex --ask-for-approval never --sandbox workspace-write
+```
+
+Con `workspace-write`, las operaciones fuera de los permisos del sandbox se
+rechazan en lugar de solicitar aprobación. Las políticas administradas del
+entorno pueden limitar ambos modos. Estos comandos se aplican al iniciar una
+nueva sesión; editar este archivo no cambia los permisos de la sesión actual.
+
+Referencia: [permisos y sandbox de Codex](https://learn.chatgpt.com/docs/sandboxing).
+
 ## Objetivo operativo
 
 El equipo dispone de crédito limitado de API. Priorizar, en este orden:
