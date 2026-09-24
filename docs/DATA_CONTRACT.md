@@ -1,5 +1,21 @@
 # Data contract
 
+## Official contract now available
+
+The [UBS 2026 contract](OFFICIAL_CHALLENGE.md) supersedes the unresolved task
+assumptions below. The table below remains the **legacy mock interface**, not
+the official raw schema. Official files use `client_id`, `description`, `mcc`,
+`direction`, etc.; they do not document `transaction_id` or `merchant`.
+Do not treat a raw description as a known merchant family.
+
+Official prediction output is exactly `client_id,predicted_next_recurring_merchant`.
+Date, amount and explanations are optional demo metadata, kept outside that CSV.
+The existing `confidence` field is heuristic and is not a calibrated probability.
+Use `evaluation.official` for class metrics and submission checks. The official
+source adapter and training workflow are still to be implemented.
+
+## Legacy smoke interface
+
 This is the boundary between source-specific data work and the rest of the
 pipeline. A loader or adapter must return a pandas `DataFrame` with the
 canonical columns below before calling recurrence, features, models, or

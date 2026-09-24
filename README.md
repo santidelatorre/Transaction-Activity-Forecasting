@@ -1,5 +1,33 @@
 # Swiss AI Weeks / Transaction Activity Forecasting
 
+## Contrato oficial y trabajo actual — 24 septiembre 2026
+
+El objetivo oficial ya está confirmado: predecir la próxima familia recurrente
+por cliente (`cloud`, `gym`, `insurance`, `mobile`, `music`, `software`,
+`streaming`, `none`), corte `2026-01-01`, horizonte 90 días, métrica macro-F1.
+El [contrato oficial](docs/OFFICIAL_CHALLENGE.md) sustituye las hipótesis
+provisionales de las secciones históricas siguientes. La [propuesta de producto
+e integración](docs/IDEAS_AND_INTEGRATION.md) compara las ideas del equipo y las
+dos bases de código.
+
+El smoke pipeline actual sigue siendo MOCK y no mide calidad predictiva.
+Ya se pueden puntuar predicciones oficiales y comprobar el CSV de entrega:
+
+```powershell
+python -m transaction_forecasting.evaluation.official score --labels data/raw/valid_labels.csv --predictions outputs/predictions/valid.csv
+python -m transaction_forecasting.evaluation.official validate --sample data/raw/sample_submission.csv --predictions outputs/predictions/submission.csv
+```
+
+Requiere el paquete instalado según las instrucciones de entorno de abajo.
+Todavía hay que incorporar datos, adaptador y entrenamiento oficial. Conservar
+el split train/valid/test suministrado; no sustituirlo por un split de filas.
+
+Acuerdo actual comunicado por Carles: cada persona trabaja en su rama
+`dev/<nombre>` y propone cambios mediante PR a `main`. Los nombres por tarea
+de la documentación anterior son ejemplos, no una obligación vigente.
+
+## Contexto inicial y entorno
+
 Base de proyecto para un hackathon de AI/ML. El objetivo provisional es predecir la siguiente transacción recurrente de un cliente a partir de su historial. El esquema, el objetivo exacto y las reglas de evaluación pueden cambiar cuando recibamos el dataset y la documentación oficial.
 
 Esta fase prepara infraestructura; no incluye datos reales, no asume columnas concretas y no entrena modelos.

@@ -1,5 +1,17 @@
 # Zurich AI Weeks hackathon plan
 
+## Current decisions — 24 September 2026
+
+The [official contract](OFFICIAL_CHALLENGE.md) takes precedence over the
+provisional plan below: eight-class client prediction, macro-F1 and a two-column
+submission. Date/amount/confidence are optional demo outputs, not requirements
+of the scored CSV. Keep the supplied train/valid/test split.
+
+Carles reports the team agreed one branch per person (`dev/<name>`) with PRs
+to main. Workstream branch names below are historical suggestions. Assign people
+after a short team discussion; no automatic assignment is implied by this table.
+Prioritize a valid official submission before expanding the dashboard.
+
 ## Goal and priority
 
 Deliver a working path early:

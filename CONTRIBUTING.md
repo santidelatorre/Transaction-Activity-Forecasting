@@ -1,5 +1,12 @@
 # Contribuir
 
+Acuerdo actualizado del equipo (24 septiembre): una rama personal `dev/<nombre>`
+por participante, por ejemplo `dev/carles`. Mantener commits acotados y Pull
+Requests hacia `main`; no trabajar directamente sobre `main`. Actualizar la rama
+personal con `git fetch origin` y `git merge origin/main`, resolviendo y probando
+cualquier conflicto antes de proponer integración. Los ejemplos de ramas por
+tarea que siguen describen una alternativa anterior.
+
 Gracias por colaborar en el proyecto. Mantenemos `main` estable y trabajamos mediante Pull Requests.
 
 ## Flujo diario

@@ -1,5 +1,11 @@
 # Architecture
 
+Official-task update: see [UBS contract](OFFICIAL_CHALLENGE.md). The current
+pipeline is a mock smoke test; official evaluation and CSV checks are provided
+by `evaluation.official`. Official supervised training must use the supplied
+client-level train/valid splits. The generic temporal helper is not a substitute.
+The official adapter and trained classifier are not yet implemented.
+
 The pipeline is intentionally modular and replaceable:
 
 ```text
