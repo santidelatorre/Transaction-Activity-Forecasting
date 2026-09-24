@@ -1,0 +1,57 @@
+[project]
+random_seed = 42
+baseline_macro_f1 = 0.2710242658492452
+
+[data]
+directory = "data/raw/ubs_2026"
+cutoff = "2026-01-01"
+target = "target_next_recurring_merchant"
+
+[features]
+# Reuse the same V1 feature builder; this search only changes models.
+tfidf_max_features = 2500
+
+[search]
+# Keep the grid small so each change is interpretable.
+include_logistic = true
+include_catboost = true
+include_lightgbm = true
+include_xgboost = true
+include_calibration = true
+include_ensembles = true
+
+[logistic]
+c_values = [0.1, 0.3, 1.0]
+class_weights = ["balanced"]
+
+[catboost]
+iterations = [300, 500]
+depths = [4, 6]
+learning_rates = [0.05, 0.1]
+balanced_options = [true]
+
+[lightgbm]
+n_estimators = [300]
+learning_rates = [0.05, 0.1]
+num_leaves = [15, 31]
+balanced_options = [true]
+
+[xgboost]
+n_estimators = [300]
+learning_rates = [0.05, 0.1]
+max_depths = [4, 6]
+balanced_options = [true]
+
+[calibration]
+temperatures = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0]
+none_biases = [-1.5, -1.0, -0.5, 0.0, 0.5, 1.0]
+
+[ensemble]
+# Soft-vote top ML models with the validation-calibrated heuristic.
+max_ml_components = 2
+heuristic_weights = [0.2, 0.35, 0.5]
+
+[outputs]
+metrics_directory = "outputs/metrics/ubs_model_search"
+experiments_jsonl = "outputs/metrics/ubs_model_search/experiments.jsonl"
+submission = "outputs/predictions/submission_model_search.csv"

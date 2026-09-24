@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -190,3 +191,195 @@ class CatBoostClientModel:
         return pd.DataFrame(
             {"feature": self.columns_, "importance": self.model.get_feature_importance()}
         ).sort_values("importance", ascending=False)
+
+
+def _balanced_sample_weights(target: pd.Series) -> np.ndarray:
+    weights = compute_class_weight(
+        class_weight="balanced", classes=np.asarray(LABELS), y=target.to_numpy()
+    )
+    mapping = {label: float(weight) for label, weight in zip(LABELS, weights, strict=True)}
+    return target.map(mapping).to_numpy(dtype=float)
+
+
+def _prepare_numeric_matrix(
+    features: pd.DataFrame, columns: list[str], medians: pd.Series
+) -> pd.DataFrame:
+    return features[columns].fillna(medians)
+
+
+@dataclass
+class LightGBMClientModel:
+    """LightGBM multiclass model on numeric client aggregates."""
+
+    balanced: bool = False
+    seed: int = 42
+    n_estimators: int = 300
+    learning_rate: float = 0.05
+    num_leaves: int = 31
+    min_child_samples: int = 20
+    model: Any = field(init=False)
+    columns_: list[str] = field(default_factory=list, init=False)
+    medians_: pd.Series = field(default_factory=pd.Series, init=False)
+
+    def fit(self, features: pd.DataFrame, target: pd.Series) -> LightGBMClientModel:
+        try:
+            from lightgbm import LGBMClassifier
+        except (ImportError, OSError) as exc:  # pragma: no cover - environment specific
+            raise RuntimeError(
+                "LightGBM is unavailable in this environment (often missing libomp on macOS)"
+            ) from exc
+
+        self.columns_ = features.columns.tolist()
+        self.medians_ = features.median().fillna(0.0)
+        train = _prepare_numeric_matrix(features, self.columns_, self.medians_)
+        sample_weight = _balanced_sample_weights(target) if self.balanced else None
+        self.model = LGBMClassifier(
+            n_estimators=self.n_estimators,
+            learning_rate=self.learning_rate,
+            num_leaves=self.num_leaves,
+            min_child_samples=self.min_child_samples,
+            objective="multiclass",
+            class_weight=None,
+            random_state=self.seed,
+            n_jobs=4,
+            verbosity=-1,
+        )
+        self.model.fit(train, target, sample_weight=sample_weight)
+        return self
+
+    def predict_proba(self, features: pd.DataFrame) -> np.ndarray:
+        matrix = _prepare_numeric_matrix(features, self.columns_, self.medians_)
+        probabilities = self.model.predict_proba(matrix)
+        return _reorder_probabilities(probabilities, np.asarray(self.model.classes_))
+
+    def predict(self, features: pd.DataFrame) -> np.ndarray:
+        return np.asarray(LABELS)[self.predict_proba(features).argmax(axis=1)]
+
+    def feature_importance(self) -> pd.DataFrame:
+        return pd.DataFrame(
+            {"feature": self.columns_, "importance": self.model.feature_importances_}
+        ).sort_values("importance", ascending=False)
+
+
+@dataclass
+class XGBoostClientModel:
+    """XGBoost multiclass model on numeric client aggregates."""
+
+    balanced: bool = False
+    seed: int = 42
+    n_estimators: int = 300
+    learning_rate: float = 0.05
+    max_depth: int = 6
+    min_child_weight: float = 1.0
+    model: Any = field(init=False)
+    columns_: list[str] = field(default_factory=list, init=False)
+    medians_: pd.Series = field(default_factory=pd.Series, init=False)
+
+    def fit(self, features: pd.DataFrame, target: pd.Series) -> XGBoostClientModel:
+        from xgboost import XGBClassifier
+
+        self.columns_ = features.columns.tolist()
+        self.medians_ = features.median().fillna(0.0)
+        train = _prepare_numeric_matrix(features, self.columns_, self.medians_)
+        sample_weight = _balanced_sample_weights(target) if self.balanced else None
+        self.model = XGBClassifier(
+            n_estimators=self.n_estimators,
+            learning_rate=self.learning_rate,
+            max_depth=self.max_depth,
+            min_child_weight=self.min_child_weight,
+            objective="multi:softprob",
+            num_class=len(LABELS),
+            eval_metric="mlogloss",
+            tree_method="hist",
+            random_state=self.seed,
+            n_jobs=4,
+            verbosity=0,
+        )
+        encoded = pd.Categorical(target, categories=LABELS).codes
+        self.model.fit(train, encoded, sample_weight=sample_weight)
+        return self
+
+    def predict_proba(self, features: pd.DataFrame) -> np.ndarray:
+        matrix = _prepare_numeric_matrix(features, self.columns_, self.medians_)
+        probabilities = np.asarray(self.model.predict_proba(matrix), dtype=float)
+        # Training used Categorical(LABELS).codes, so columns already follow LABELS.
+        if probabilities.shape[1] != len(LABELS):
+            raise ValueError("XGBoost probability width does not match LABELS")
+        return probabilities
+
+    def predict(self, features: pd.DataFrame) -> np.ndarray:
+        return np.asarray(LABELS)[self.predict_proba(features).argmax(axis=1)]
+
+    def feature_importance(self) -> pd.DataFrame:
+        return pd.DataFrame(
+            {"feature": self.columns_, "importance": self.model.feature_importances_}
+        ).sort_values("importance", ascending=False)
+
+
+@dataclass
+class TemperatureCalibrator:
+    """Scale class logits on validation only; does not retrain the base model."""
+
+    temperature: float = 1.0
+    none_bias: float = 0.0
+
+    def tune(
+        self,
+        probabilities: np.ndarray,
+        target: pd.Series,
+        *,
+        temperatures: tuple[float, ...] = (0.5, 0.75, 1.0, 1.25, 1.5, 2.0),
+        none_biases: tuple[float, ...] | None = None,
+    ) -> TemperatureCalibrator:
+        if none_biases is None:
+            none_biases = tuple(float(value) for value in np.arange(-1.5, 1.51, 0.25))
+        best: tuple[float, float, float] | None = None
+        best_parameters = (1.0, 0.0)
+        for temperature in temperatures:
+            for none_bias in none_biases:
+                calibrated = self.apply(probabilities, temperature=temperature, none_bias=none_bias)
+                predicted = np.asarray(LABELS)[calibrated.argmax(axis=1)]
+                score = float(f1_score(target, predicted, labels=LABELS, average="macro"))
+                candidate = (score, -abs(none_bias), -abs(temperature - 1.0))
+                if best is None or candidate > best:
+                    best = candidate
+                    best_parameters = (float(temperature), float(none_bias))
+        self.temperature, self.none_bias = best_parameters
+        return self
+
+    def apply(
+        self,
+        probabilities: np.ndarray,
+        *,
+        temperature: float | None = None,
+        none_bias: float | None = None,
+    ) -> np.ndarray:
+        temperature = self.temperature if temperature is None else temperature
+        none_bias = self.none_bias if none_bias is None else none_bias
+        clipped = np.clip(probabilities, 1e-12, 1.0)
+        logits = np.log(clipped)
+        logits = logits / max(float(temperature), 1e-6)
+        logits[:, LABELS.index("none")] += float(none_bias)
+        logits -= logits.max(axis=1, keepdims=True)
+        exp_logits = np.exp(logits)
+        return exp_logits / exp_logits.sum(axis=1, keepdims=True)
+
+
+def blend_probabilities(
+    components: list[np.ndarray],
+    weights: list[float],
+) -> np.ndarray:
+    """Weighted soft-vote over aligned class probability matrices."""
+    if len(components) != len(weights):
+        raise ValueError("Probability components and weights must have the same length")
+    total = float(sum(weights))
+    if total <= 0:
+        raise ValueError("Blend weights must sum to a positive value")
+    blended = np.zeros_like(components[0], dtype=float)
+    for matrix, weight in zip(components, weights, strict=True):
+        blended += (float(weight) / total) * matrix
+    return blended
+
+
+def predict_from_probabilities(probabilities: np.ndarray) -> np.ndarray:
+    return np.asarray(LABELS)[probabilities.argmax(axis=1)]
