@@ -70,3 +70,32 @@ def test_calibration_direction_label_order_and_invalid_inputs():
             calibrate_probabilities(bad)
     with pytest.raises(ValueError):
         calibrate_probabilities(raw, temperature=0)
+
+
+def test_integrated_model_never_trains_on_family_features_and_refuses_fit_clients(monkeypatch):
+    from transaction_forecasting.ubs import v2
+
+    class InspectModel:
+        def fit(self, features, target):
+            assert features.index.equals(target.index)
+            assert not any(c.startswith("family_") for c in features)
+            return self
+
+        def predict_proba(self, features):
+            return np.full((len(features), len(LABELS)), 1 / len(LABELS))
+
+    monkeypatch.setattr(v2, "make_model", InspectModel)
+    transactions = histories()
+    labels = pd.DataFrame(
+        {"client_id": transactions.client_id.unique(), TARGET_COLUMN: np.repeat(LABELS, 2)}
+    )
+    model = v2.IntegratedV2Model().fit(transactions, labels)
+    with pytest.raises(ValueError, match="excluded"):
+        model.predict(transactions)
+    unseen = transactions.assign(client_id="unseen_" + transactions.client_id)
+    result = model.predict_components(unseen)
+    assert result["blend"].index.is_unique
+    assert result["blend"].columns.tolist() == list(LABELS)
+    assert np.allclose(result["blend"].sum(axis=1), 1)
+    with pytest.raises(ValueError, match="unique labels"):
+        v2.IntegratedV2Model().fit(transactions, labels.iloc[:-1])

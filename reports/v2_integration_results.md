@@ -16,5 +16,6 @@ Official eight-class validation; V1 reference 0.2710242658492452. Rejected trial
 | 9 | origin/esteban-v2-models | 358d604 | catboost_v1_calibrated | 0.350493131 | 0.077856848 | 0.079468865 | 0.340000000 | REJECT_SELF_LABEL | Reported T=2 and bias=-1.5 reproduced without tuning; rejected for training self-label features. |
 | 10 | origin/esteban-v2-models | 358d604 | catboost_history_raw | 0.383950488 | 0.111314205 | 0.112926222 | 0.424000000 | KEEP_PROVISIONAL | Same fixed model; only change is removal of all 72 supervised family features; no labels enter feature fitting. |
 | 11 | origin/esteban-v2-models | 358d604 | catboost_history_calibrated | 0.318662517 | -0.065287971 | 0.047638251 | 0.325000000 | REJECT | Only frozen T=2 and bias=-1.5 added to safe history model; no retuning. |
+| 12 | origin/esteban-v2-models+origin/features/ginestar-v2-temporal | 358d604+6ba1311 | catboost_history_temporal_blend | 0.391549456 | 0.007598968 | 0.120525190 | 0.424000000 | KEEP_PROVISIONAL | Single predeclared 75% safe CatBoost / 25% periodicity heuristic; hypothesis: recover music and streaming. |
 
 Full per-class F1, confusion matrices, predictions and provenance: `outputs/metrics/v2_integration/results.json` (local, ignored).

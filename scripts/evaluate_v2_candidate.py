@@ -10,9 +10,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import subprocess
-from importlib.metadata import version
-from pathlib import Path
 from time import perf_counter
 
 import numpy as np
@@ -23,38 +20,10 @@ from transaction_forecasting.ubs.data import LABELS, PREDICTION_COLUMN, TARGET_C
 from transaction_forecasting.ubs.evaluation import evaluate_predictions
 from transaction_forecasting.ubs.features import ClientFeatureBuilder
 from transaction_forecasting.ubs.models import RecurrenceHeuristic
+from transaction_forecasting.ubs.provenance import ROOT, digest, provenance
 
-ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "outputs/metrics/v2_integration"
 REFERENCE = 0.2710242658492452
-FILES = (
-    "train_transactions.jsonl",
-    "train_labels.csv",
-    "valid_transactions.jsonl",
-    "valid_labels.csv",
-    "test_transactions.jsonl",
-    "sample_submission.csv",
-)
-
-
-def digest(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
-
-
-def provenance():
-    return {
-        "data": {name: digest(ROOT / "data/raw/ubs_2026" / name) for name in FILES},
-        "source": {
-            str(p.relative_to(ROOT)).replace("\\", "/"): digest(p)
-            for directory in ("src", "scripts", "configs")
-            for p in sorted((ROOT / directory).rglob("*"))
-            if p.suffix in {".py", ".toml"}
-        },
-        "versions": {p: version(p) for p in ("numpy", "pandas", "scikit-learn", "catboost")},
-        "commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT).decode().strip(),
-        "protocol": "official train=2000 / valid=1000; cutoff=2026-01-01; fixed 8 labels",
-        "validation_independent": False,
-    }
 
 
 def inputs():

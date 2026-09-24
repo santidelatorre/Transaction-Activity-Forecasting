@@ -10,9 +10,10 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from transaction_forecasting.ubs.data import CUTOFF, LABELS
+from transaction_forecasting.ubs.data import CUTOFF, LABELS, TARGET_COLUMN
 from transaction_forecasting.ubs.features import ClientFeatureBuilder
-from transaction_forecasting.ubs.models import CatBoostClientModel
+from transaction_forecasting.ubs.models import CatBoostClientModel, RecurrenceHeuristic
+from transaction_forecasting.ubs.temporal_features import apply_temporal_blocks, temporal_streams
 
 
 class HistoryFeatureBuilder(ClientFeatureBuilder):
@@ -61,3 +62,46 @@ def calibrate_probabilities(probabilities, temperature=2.0, none_bias=-1.5):
     logits -= logits.max(axis=1, keepdims=True)
     weights = np.exp(logits)
     return weights / weights.sum(axis=1, keepdims=True)
+
+
+class IntegratedV2Model:
+    """Fixed 75% history CatBoost / 25% periodicity heuristic for unseen clients.
+
+    CatBoost never receives target-derived features. The heuristic's supervised
+    description map is used only for clients excluded from its fit. No parameter
+    is selected or calibrated in fit or predict.
+    """
+
+    def fit(self, transactions: pd.DataFrame, labels: pd.DataFrame) -> IntegratedV2Model:
+        target = labels.set_index("client_id")[TARGET_COLUMN]
+        if not target.index.is_unique or set(target.index) != set(transactions.client_id):
+            raise ValueError("Training clients and unique labels must match")
+        if set(target) != set(LABELS):
+            raise ValueError("Training must contain all eight official classes")
+        self.fit_clients_ = set(target.index)
+        self.history_ = HistoryFeatureBuilder().fit(transactions)
+        matrix = self.history_.transform(transactions)
+        self.feature_names_ = matrix.columns.tolist()
+        self.model_ = make_model().fit(matrix, target.reindex(matrix.index))
+        self.mapping_ = ClientFeatureBuilder().fit(transactions, labels)
+        return self
+
+    def predict_components(self, transactions: pd.DataFrame) -> dict[str, pd.DataFrame]:
+        if not hasattr(self, "model_"):
+            raise RuntimeError("Fit the V2 model before prediction")
+        if self.fit_clients_.intersection(transactions.client_id):
+            raise ValueError("Prediction clients must be excluded from model and mapping fit")
+        numeric = self.history_.transform(transactions)
+        raw = self.model_.predict_proba(numeric)
+        base = self.mapping_.transform(transactions)
+        temporal = apply_temporal_blocks(
+            base, temporal_streams(transactions), self.mapping_.description_lift_, ("periodicity",)
+        )
+        heuristic = RecurrenceHeuristic(none_bias=-1.0, temperature=1.0).predict_proba(temporal)
+        return {
+            name: pd.DataFrame(values, index=numeric.index, columns=LABELS)
+            for name, values in (("history", raw), ("blend", 0.75 * raw + 0.25 * heuristic))
+        }
+
+    def predict(self, transactions: pd.DataFrame) -> pd.Series:
+        return self.predict_components(transactions)["blend"].idxmax(axis=1)
