@@ -29,6 +29,42 @@ entrega; UBS conserva además su requisito de orden idéntico al sample.
 Acuerdo actual comunicado por Carles: cada persona trabaja en su rama
 `dev/<nombre>` y propone cambios mediante PR a `main`, sin hacer merge automáticamente.
 
+## Discovery V3
+
+**Current competitive baseline: V3-A (family identity).**
+TRAIN OOF Macro-F1: `0.459793826869`; VALID Macro-F1: `0.424111097737`.
+V2 es la baseline anterior (VALID: `0.391549455911`), disponible con
+`python scripts/run_ubs_v2.py`; la mejora de V3-A en VALID es `+0.032561641826`.
+Los demás brazos V3 siguen disponibles para investigación y reproducción, pero
+no son la baseline. AB/full obtuvo OOF algo superior y transfirió peor a VALID.
+La [síntesis](reports/v3_discovery_synthesis.md) y el
+[protocolo](reports/v3_experiment_protocol.md) conservan la evidencia y las
+decisiones históricas previas a esta promoción.
+
+```powershell
+python scripts/run_ubs_v3.py --phase oof
+python scripts/run_ubs_v3.py --phase valid
+python scripts/run_ubs_v3.py --phase submission
+```
+
+A queda congelada para `V3Model.predict()`, VALID y submission, sin nueva
+selección por OOF ni VALID. La receta conserva history features de V2, family
+identity y CatBoost con la mezcla fija 75% modelo numérico + 25% periodicity
+heuristic, sin el bloque de recurrencia B. Se evalúa con cinco folds por cliente
+dentro de TRAIN; los mappings supervisados se calculan con otros cinco folds
+internos. La submission reajusta A con TRAIN+VALID y valida sus 1.000 filas,
+sin enviar archivos.
+Predicciones, probabilidades, métricas, fingerprints y submission quedan en
+`outputs/metrics/ubs_v3/`, ignorado por Git. Un cambio de código o datos exige
+un directorio nuevo mediante `--output-dir`; los folds completos permiten
+reanudar una ejecución interrumpida con la misma fuente.
+
+Para reproducir una rama original sin fusionarla:
+`python scripts/reproduce_v3_discovery.py NOMBRE`, donde NOMBRE es `v2`,
+`santiago`, `ginestar`, `javier`, `christian`, `jaime`, `esteban` o `laura`.
+Ejecutar `v2` primero para las comparaciones que necesitan sus predicciones.
+Los snapshots y sus copias locales de datos también permanecen ignorados.
+
 ## Contexto inicial y entorno
 
 El proyecto incluye tres recorridos: smoke con datos ficticios, pipeline genérico
