@@ -8,7 +8,7 @@ submission. Date/amount/confidence are optional demo outputs, not requirements
 of the scored CSV. Keep the supplied train/valid/test split.
 
 Carles reports the team agreed one branch per person (`dev/<name>`) with PRs
-to main. Workstream branch names below are historical suggestions. Assign people
+to main. Workstreams below share each owner's personal branch. Assign people
 after a short team discussion; no automatic assignment is implied by this table.
 Prioritize a valid official submission before expanding the dashboard.
 
@@ -29,16 +29,16 @@ plain-language explanation. Technical model names and metrics are secondary.
 
 | Person | Scope | Branch | First usable output |
 | --- | --- | --- | --- |
-| 1 | Data / schema / EDA | `feat/data` | Raw-to-canonical loader and data-quality notes |
-| 2 | Entity resolution | `feat/entity-resolution` | Stable `merchant_normalized` mapping |
-| 3 | Recurrence detection | `feat/recurrence-detection` | Interval, stability, recurrence score, expected date |
-| 4 | Candidate generation + features | `feat/candidate-features` | Candidate table and feature matrix |
-| 5 | Statistical baseline | `feat/statistical-baseline` | First end-to-end prediction and baseline score |
-| 6 | ML / model comparison | `feat/ml-ranker` | Leakage-safe tabular model compared with baseline |
-| 7 | Evaluation / integration / dashboard | `feat/evaluation-pipeline` | Temporal evaluation, selection, reproducible demo |
+| 1 | Data / schema / EDA | `dev/<owner>` | Raw-to-canonical loader and data-quality notes |
+| 2 | Entity resolution | `dev/<owner>` | Stable `merchant_normalized` mapping |
+| 3 | Recurrence detection | `dev/<owner>` | Interval, stability, recurrence score, expected date |
+| 4 | Candidate generation + features | `dev/<owner>` | Candidate table and feature matrix |
+| 5 | Statistical baseline | `dev/<owner>` | First end-to-end prediction and baseline score |
+| 6 | ML / model comparison | `dev/<owner>` | Leakage-safe tabular model compared with baseline |
+| 7 | Evaluation / integration / dashboard | `dev/<owner>` | Temporal evaluation, selection, reproducible demo |
 
-If dashboard work becomes substantial, use `feat/dashboard` in addition to
-the integration branch. Everyone can start against `mock_transactions()` and
+If dashboard work becomes substantial, assign a named owner and keep its changes
+in that owner's personal branch. Everyone can start against `mock_transactions()` and
 the contracts in `docs/DATA_CONTRACT.md`; no workstream waits for the final
 dataset adapter.
 
@@ -115,9 +115,9 @@ README, demo, and submission artifacts.
 No functional work directly on `main`:
 
 ```bash
-git checkout main
-git pull origin main
-git checkout -b feat/<workstream>
+git switch dev/carles
+git fetch origin
+git merge origin/main
 ```
 
 Use small commits and pull requests. Before a PR, run:

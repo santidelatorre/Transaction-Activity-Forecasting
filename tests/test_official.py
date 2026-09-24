@@ -1,3 +1,5 @@
+from io import StringIO
+
 import pandas as pd
 import pytest
 
@@ -89,6 +91,23 @@ def test_wrong_cutoff_and_duplicate_labels_rejected():
     labels.loc[1, "client_id"] = "c0"
     with pytest.raises(ValueError, match="duplicate"):
         score_predictions(labels, predictions)
+
+
+def test_observed_official_label_csv_schema_and_line_endings():
+    # Header and CRCRLF structure inspected in the official ZIP; rows are fictional.
+    csv_text = (
+        "client_id,cutoff_date,target_next_recurring_merchant\r\r\n"
+        "fixture-a,2026-01-01,cloud\r\r\n"
+        "fixture-b,2026-01-01,none\r\r\n"
+    )
+    labels = pd.read_csv(StringIO(csv_text), dtype=str, keep_default_na=False)
+    predictions = pd.DataFrame(
+        {"client_id": ["fixture-b", "fixture-a"], PREDICTION: ["none", "cloud"]}
+    )
+    result = score_predictions(labels, predictions)
+    assert result["clients"] == 2
+    assert result["accuracy"] == 1.0
+    assert result["macro_f1"] == 2 / 8
 
 
 def test_cli_reads_literal_none_and_checks_submission(tmp_path, capsys):

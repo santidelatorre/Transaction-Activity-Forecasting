@@ -23,8 +23,7 @@ Todavía hay que incorporar datos, adaptador y entrenamiento oficial. Conservar
 el split train/valid/test suministrado; no sustituirlo por un split de filas.
 
 Acuerdo actual comunicado por Carles: cada persona trabaja en su rama
-`dev/<nombre>` y propone cambios mediante PR a `main`. Los nombres por tarea
-de la documentación anterior son ejemplos, no una obligación vigente.
+`dev/<nombre>` y propone cambios mediante PR a `main`, sin hacer merge automáticamente.
 
 ## Contexto inicial y entorno
 
@@ -127,12 +126,16 @@ pytest
 No trabajes directamente sobre `main`:
 
 ```bash
-git checkout main
-git pull
-git checkout -b feat/nombre-descriptivo
+git switch dev/carles
+git fetch origin
+git merge origin/main
 ```
 
-Después: `git add .`, `git commit`, `git push -u origin feat/nombre-descriptivo` y abre un Pull Request hacia `main`. Para este hackathon, usa las ramas concretas de `docs/HACKATHON_PLAN.md`.
+El ejemplo supone que tu rama personal ya existe. Usa tu nombre en lugar de `carles`.
+Añade archivos concretos con `git add`, crea un commit y usa
+`git push -u origin dev/carles`. Un PR propone cambios a `main`; no los integra
+automáticamente. Consulta [CONTRIBUTING.md](CONTRIBUTING.md) para crear o recuperar
+tu rama por primera vez.
 
 ## Notebooks y datos
 

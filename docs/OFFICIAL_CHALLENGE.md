@@ -38,9 +38,19 @@ comercio limpia ni una etiqueta de familia. El target por cliente tampoco
 etiqueta cada transacción histórica. No sumar monedas distintas sin una
 conversión definida. Mantener dirección separada del importe observado.
 
-Conservar originales en `data/raw/`, fuera de Git. Verificar los archivos reales
-antes de implementar el adaptador: esta aportación verifica el enunciado, no
-afirma haber inspeccionado el ZIP.
+Conservar originales en `data/raw/`, fuera de Git.
+
+Verificación posterior con el ZIP oficial descargado el 24 de septiembre:
+`train_labels.csv` contiene 2.000 filas y `valid_labels.csv` contiene 1.000.
+Ambos tienen exactamente el encabezado
+`client_id,cutoff_date,target_next_recurring_merchant`; todas las filas tienen
+`cutoff_date=2026-01-01`. Por tanto, exigir esa columna en el evaluador es
+compatible con los archivos reales. El test de regresión incluye ese encabezado
+y terminadores de línea CRCRLF observados en el ZIP, con filas ficticias.
+
+ZIP SHA-256: `1afc95470f4e8641601503172be3e698ef9eaf91528d911a6a01a120911634c6`.
+Fuente: https://github.com/UBS-AG/Swiss-AI-Weeks/blob/main/hackathons/2026/data/dataset.zip
+Esta comprobación del esquema no sustituye la auditoría completa de transacciones.
 
 ## Evaluación que corresponde a este reto
 
