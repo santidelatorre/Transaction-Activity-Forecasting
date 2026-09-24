@@ -1,0 +1,35 @@
+{
+  "model": "StreamV3PushModel",
+  "weights": {
+    "vmax": 0.3333333333333333,
+    "identity_A": 0.3333333333333333,
+    "stream_v3": 0.3333333333333333
+  },
+  "v2_macro_f1": 0.3915494559105542,
+  "v3max_macro_f1": 0.4318614926653391,
+  "v3push_macro_f1": 0.44454709747059196,
+  "v3push_accuracy": 0.476,
+  "delta_vs_v2": 0.05299764156003778,
+  "delta_vs_v3max": 0.012685604805252881,
+  "per_class_f1": {
+    "cloud": 0.4968152866242038,
+    "gym": 0.46774193548387094,
+    "insurance": 0.4329004329004329,
+    "mobile": 0.4533333333333333,
+    "music": 0.3687150837988827,
+    "software": 0.3700440528634361,
+    "streaming": 0.36129032258064514,
+    "none": 0.6055363321799307
+  },
+  "prediction_distribution": {
+    "none": 285,
+    "insurance": 132,
+    "gym": 127,
+    "software": 123,
+    "mobile": 121,
+    "music": 86,
+    "cloud": 68,
+    "streaming": 58
+  },
+  "note": "Equal probability stack of StreamV3Max, Astra-style IdentityV3-A, and StreamV3. Stack recipe selected on VALID in try/push branch."
+}
