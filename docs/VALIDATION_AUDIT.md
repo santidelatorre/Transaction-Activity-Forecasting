@@ -1,0 +1,29 @@
+# Auditoría de validación y leakage UBS V1
+
+Fecha: 2026-09-24. Código revisado en `dev/santiago`, actualizada desde `origin/main` (módulos `ubs/` y `scripts/run_ubs_baseline.py`). Los datos brutos no están disponibles en este workspace. Las cifras proceden del informe versionado `docs/UBS_DATASET_ANALYSIS.md`, generado por `scripts/analyze_ubs_dataset.py`. No se modificó el pipeline.
+
+## Qué evalúa realmente UBS V1 en el código
+
+- La unidad es **un cliente**, con historial de transacciones anterior a `2026-01-01` y predicción de una entre ocho clases (`ubs/data.py:10-13`). Los ficheros de train, validation y test ya vienen separados. `load_ubs_data()` rechaza solapamiento de clientes entre particiones y discrepancias entre clientes y etiquetas (`ubs/data.py:79-107`). No procede aplicar el split por filas del módulo genérico.
+- `read_transactions()` convierte timestamps a UTC y rechaza eventos en o después del corte, y duplicados exactos (`ubs/data.py:39-58`). `ClientFeatureBuilder.fit()` usa transacciones y labels de train; los tres `transform()` se aplican por separado (`scripts/run_ubs_baseline.py:169-179`). Así se evita usar transacciones futuras o labels de validation/test para aprender el transformador.
+- La métrica local sí es **Macro-F1 multiclase** con `sklearn.metrics.f1_score(..., labels=LABELS, average="macro")` (`ubs/evaluation.py:12-37`), junto a F1 por clase, matriz de confusión y distribución de predicciones. Las ocho clases están fijadas en `ubs/data.py:11`; `read_labels()` rechaza etiquetas desconocidas y cortes erróneos (`ubs/data.py:61-76`). Esto corrige la conclusión del primer examen del esqueleto genérico: el flujo UBS V1 **sí** calcula Macro-F1. Falta una copia del evaluador oficial para comprobar si UBS usa idénticas reglas para clases ausentes, filas excluidas o desempates.
+- El informe UBS V1 registra 2000/1000/1000 clientes en train/validation/test, con solapamiento cero, y ninguna transacción posterior al corte. `none` representa 597/2000 (29,85 %) de train y 293/1000 (29,3 %) de validation; las demás clases tienen entre 190 y 225 ejemplos en train, y entre 89 y 121 en validation. Es un desbalance moderado relevante para Macro-F1. El mismo informe detecta timestamps repetidos **globalmente**, pero cero pares duplicados `(client_id, timestamp)` en train. Compartir timestamp entre clientes distintos no implica leakage en este split por cliente.
+
+## Riesgos y acciones
+
+| Severidad | Hallazgo | Acción concreta |
+| --- | --- | --- |
+| Alta para interpretar el score | Se usan los mismos 1000 clientes de validation para ajustar la heurística (`scripts/run_ubs_baseline.py:209-212`), escoger configuración logística/CatBoost (`230-299`), escoger peso del ensemble (`301-315`) y seleccionar el ganador (`337-345`). El Macro-F1 reportado del ganador está sesgado al alza por selección sobre la misma muestra. | Mantener validation para selección, pero estimar el resultado final en un holdout independiente de clientes o con evaluación anidada por grupos dentro de train. No describir el score seleccionado como una estimación no sesgada del rendimiento en test. |
+| Media | El `description_lift_` se aprende usando los labels de todos los clientes de train y luego se transforma ese mismo train (`ubs/features.py:81-115`; `scripts/run_ubs_baseline.py:170-171`). Cada cliente puede contribuir a su propia codificación de descripciones. No contamina validation, pero genera features de train más informativas que las de clientes nuevos. | Para modelos entrenados con ese lift, calcular la versión de train fuera de fold por cliente; después ajustar el mapeo final con todo train para validation/test. Comparar Macro-F1 con y sin lift. |
+| Media | No hay prueba local contra una implementación oficial de scoring. El código incluye exactamente ocho clases al calcular Macro-F1 (`ubs/evaluation.py:14-31`), lo cual es razonable para este contrato, pero el enunciado/evaluador oficial no está presente. | Obtener las reglas oficiales y cotejar un ejemplo de `y_true/y_pred`, especialmente el tratamiento de clases ausentes, orden de etiquetas y unidad evaluada. |
+| Baja, supervisión | El informe de dataset declara soportes por clase y cliente; la función de evaluación produce F1 por clase, matriz de confusión y distribución de predicción (`ubs/evaluation.py:21-37`). No hay evidencia de clientes con muy poco historial en el workspace actual. | En cada experimento guardar soporte y F1 por clase, y cortar el análisis de errores por tamaño de historial. Comprobar que una subida de Macro-F1 no oculte una clase colapsada. |
+
+## Submission UBS V1
+
+El script ordena las predicciones según `sample_submission`, valida columnas, cardinalidad, IDs, orden, etiquetas y el conjunto de clientes de test, escribe CSV y vuelve a leerlo para validarlo (`scripts/run_ubs_baseline.py:379-392`; `ubs/data.py:110-127`). La utilidad independiente `transaction_forecasting.submission predict`, documentada en `docs/SUBMISSION.md`, aplica esas comprobaciones a predicciones CSV suministradas sin ejecutar el modelo. El informe UBS V1 registra 1000 filas de muestra y ninguna diferencia de IDs respecto a test.
+
+## Esqueleto genérico que no debe confundirse con UBS V1
+
+El módulo genérico `src/transaction_forecasting/evaluation/temporal.py:16-20,44-55` corta por posiciones y puede repartir timestamps iguales; además, `pipeline.py:81-90` mide MAE/RMSE con un regresor de media. Son limitaciones de esa ruta genérica, **no hallazgos del flujo UBS V1**, que trabaja por clientes disjuntos y usa Macro-F1. No se debe basar una comparación UBS en los scores del pipeline genérico.
+
+No se pudieron ejecutar los experimentos UBS: faltan los datos brutos y el Python del `.venv` apunta a una instalación 3.12 ausente. La auditoría del flujo y del informe versionado es estática. La [página pública del reto](https://ai-weeks.ch/2026/challenges) no expone un evaluador oficial verificable.
