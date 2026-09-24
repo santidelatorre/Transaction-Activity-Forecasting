@@ -28,6 +28,21 @@ el split temporal train/validation/test, ajusta transformadores solo con train,
 evalúa candidatos y guarda registros JSONL. El baseline genérico es una media
 del target y existe solo para verificar el flujo hasta que se defina la tarea.
 
+## UBS baseline V1
+
+El baseline real del challenge crea una fila por cliente, aprende asociaciones de
+descripciones solo con train y compara dummy, recurrencia, regresión logística,
+CatBoost y un ensemble simple. Se ejecuta desde la raíz del repositorio:
+
+```powershell
+python scripts/run_ubs_baseline.py --config configs/ubs_v1.toml
+```
+
+El comando usa train para todos los ajustes supervisados, valid para evaluación y
+selección, y test únicamente para generar
+`outputs/predictions/submission_v1.csv`. Los resultados detallados quedan en
+`outputs/metrics/ubs_v1/`; datos y outputs permanecen ignorados por Git.
+
 The shared contracts, workstream split, temporal evaluation rules, and milestone
 plan are in [`docs/HACKATHON_PLAN.md`](docs/HACKATHON_PLAN.md),
 [`docs/DATA_CONTRACT.md`](docs/DATA_CONTRACT.md), and
