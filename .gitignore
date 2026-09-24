@@ -60,3 +60,10 @@ checkpoints/
 *.swp
 dist/
 build/
+.mplconfig/
+.cache/
+
+Reports/tables/
+Reports/figures/
+Reports/v1_error_analysis.json
+Reports/.DS_Store
