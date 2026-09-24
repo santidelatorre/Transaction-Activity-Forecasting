@@ -1,5 +1,10 @@
 # Error Analysis — Meeting Summary
 
+> Nota: el mejor modelo de esta rama **no** es V1.
+> Ver `Reports/esteban_mejor_modelo_0.35.md` → Macro-F1 **0.3505**
+> (`calibrated_catboost_i300_d4_lr0.05_bal`).
+> Este resumen solo diagnostica el **baseline V1 (0.271)**.
+
 ## Baseline
 Macro-F1: **0.2710243** (verified)
 Accuracy: **0.2660**

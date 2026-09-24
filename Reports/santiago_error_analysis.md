@@ -1,5 +1,10 @@
 # Team Handoff — Error Analysis
 
+> Related: best model on this branch is documented in
+> `Reports/esteban_mejor_modelo_0.35.md`
+> (Macro-F1 **0.3505**, calibrated shallow CatBoost). This handoff diagnoses
+> the official V1 baseline (**0.271**), not that candidate.
+
 ## 1. Scope
 
 Role: person **5/7 — Error Analysis / diagnóstico de V1** (executed on branch
