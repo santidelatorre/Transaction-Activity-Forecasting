@@ -100,7 +100,12 @@ def synthetic_config(
     """Return an isolated test configuration; its fields are not dataset assumptions."""
     return PipelineConfig(
         dataset=DatasetConfig(required_columns=("event_time", "target")),
-        split=SplitConfig(time_column="event_time", validation_fraction=0.2, test_fraction=0.2),
+        split=SplitConfig(
+            time_column="event_time",
+            validation_fraction=0.2,
+            test_fraction=0.2,
+            forecast_horizon="1D",
+        ),
         model=ModelConfig(target_column="target"),
         experiment=ExperimentConfig(results_path=Path(results_path)),
     )

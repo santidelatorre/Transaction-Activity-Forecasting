@@ -24,6 +24,7 @@ class SplitConfig:
     validation_fraction: float = 0.2
     test_fraction: float = 0.2
     embargo_rows: int = 0
+    forecast_horizon: str = ""
 
 
 @dataclass(frozen=True)
@@ -55,6 +56,7 @@ class PipelineConfig:
                 "dataset.path": self.dataset.path,
                 "dataset.format": self.dataset.format,
                 "split.time_column": self.split.time_column,
+                "split.forecast_horizon": self.split.forecast_horizon,
                 "model.target_column": self.model.target_column,
             }.items()
             if not value
@@ -86,6 +88,7 @@ def load_config(path: str | Path) -> PipelineConfig:
             validation_fraction=float(split.get("validation_fraction", 0.2)),
             test_fraction=float(split.get("test_fraction", 0.2)),
             embargo_rows=int(split.get("embargo_rows", 0)),
+            forecast_horizon=str(split.get("forecast_horizon", "")),
         ),
         model=ModelConfig(
             target_column=str(model.get("target_column", "")),
