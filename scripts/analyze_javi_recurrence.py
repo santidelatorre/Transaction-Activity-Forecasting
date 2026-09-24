@@ -60,6 +60,78 @@ def _percent(count: int, total: int) -> float:
     return round(100 * count / total, 2) if total else 0.0
 
 
+def _learn_candidate_descriptions(
+    labels: dict[str, str], histories: dict[str, list[dict]]
+) -> dict[str, str]:
+    """Assign descriptions to families using train clients only, for EDA.
+
+    This is a fixed descriptive screen, not a transaction-level ground truth.
+    Require at least 20 clients with the description, 20% coverage within a
+    family, and a smoothed coverage lift of at least 2 over other clients.
+    """
+    clients_by_description: dict[str, set[str]] = defaultdict(set)
+    for client, history in histories.items():
+        for description in {str(row["description"]).lower().strip() for row in history}:
+            clients_by_description[description].add(client)
+    class_sizes = Counter(labels.values())
+    selected: dict[str, str] = {}
+    for description, clients in clients_by_description.items():
+        if len(clients) < 20:
+            continue
+        counts = Counter(labels[client] for client in clients)
+        best: tuple[float, str] | None = None
+        for family in LABELS:
+            if family == "none":
+                continue
+            coverage = counts[family] / class_sizes[family]
+            outside = (len(clients) - counts[family] + 1) / (len(labels) - class_sizes[family] + 2)
+            lift = ((counts[family] + 1) / (class_sizes[family] + 2)) / outside
+            if coverage >= 0.2 and lift >= 2:
+                candidate = (lift, family)
+                if best is None or candidate > best:
+                    best = candidate
+        if best is not None:
+            selected[description] = best[1]
+    return selected
+
+
+def _candidate_stats(history: list[dict], mapping: dict[str, str]) -> dict:
+    """Summarize mapped historical series without using this client's label."""
+    streams: dict[str, list[dict]] = defaultdict(list)
+    for row in sorted(history, key=lambda item: item["timestamp"]):
+        description = str(row["description"]).lower().strip()
+        if description in mapping:
+            streams[description].append(row)
+    result = {
+        "candidate_streams": 0,
+        "recent_candidate_streams": 0,
+        "regular_candidate_streams": 0,
+        "recent_regular_candidate_streams": 0,
+        "candidate_families": set(),
+        "recent_candidate_families": set(),
+    }
+    for description, rows in streams.items():
+        if len(rows) < 2:
+            continue
+        result["candidate_streams"] += 1
+        family = mapping[description]
+        result["candidate_families"].add(family)
+        gaps = [
+            (right["timestamp"] - left["timestamp"]).total_seconds() / 86400
+            for left, right in zip(rows, rows[1:], strict=False)
+        ]
+        typical_gap = median(gaps)
+        last_age = (CUTOFF - rows[-1]["timestamp"]).total_seconds() / 86400
+        recent = typical_gap > 0 and last_age <= 2 * typical_gap
+        regular = len(gaps) >= 2 and pstdev(gaps) <= 3
+        result["recent_candidate_streams"] += int(recent)
+        if recent:
+            result["recent_candidate_families"].add(family)
+        result["regular_candidate_streams"] += int(regular)
+        result["recent_regular_candidate_streams"] += int(recent and regular)
+    return result
+
+
 def _client_stats(history: list[dict]) -> tuple[dict, Counter[str], Counter[str]]:
     ordered = sorted(history, key=lambda row: row["timestamp"])
     first, last = ordered[0]["timestamp"], ordered[-1]["timestamp"]
@@ -108,14 +180,19 @@ def _client_stats(history: list[dict]) -> tuple[dict, Counter[str], Counter[str]
     return stats, periods, regular_periods
 
 
-def analyze(root: Path, prefix: str) -> dict:
+def analyze(
+    labels: dict[str, str],
+    histories: dict[str, list[dict]],
+    prefix: str,
+    candidate_descriptions: dict[str, str],
+) -> dict:
     """Return reproducible per-class recurrence and anomaly aggregates."""
-    labels, histories = _read_partition(root, prefix)
     by_label: dict[str, list[dict]] = defaultdict(list)
     periods: Counter[str] = Counter()
     regular_periods: Counter[str] = Counter()
     for client, label in labels.items():
         stats, client_periods, client_regular_periods = _client_stats(histories[client])
+        stats.update(_candidate_stats(histories[client], candidate_descriptions))
         by_label[label].append(stats)
         periods.update(client_periods)
         regular_periods.update(client_regular_periods)
@@ -145,6 +222,30 @@ def analyze(root: Path, prefix: str) -> dict:
                 "with_regular_monthly_out_pct": _percent(
                     sum(row["regular_monthly_out_streams"] > 0 for row in rows), count
                 ),
+                "with_candidate_stream_pct": _percent(
+                    sum(row["candidate_streams"] > 0 for row in rows), count
+                ),
+                "with_recent_candidate_stream_pct": _percent(
+                    sum(row["recent_candidate_streams"] > 0 for row in rows), count
+                ),
+                "with_regular_candidate_stream_pct": _percent(
+                    sum(row["regular_candidate_streams"] > 0 for row in rows), count
+                ),
+                "with_recent_regular_candidate_stream_pct": _percent(
+                    sum(row["recent_regular_candidate_streams"] > 0 for row in rows), count
+                ),
+                "with_target_family_stream_pct": (
+                    None
+                    if label in {"none", "any_family"}
+                    else _percent(sum(label in row["candidate_families"] for row in rows), count)
+                ),
+                "with_recent_target_family_stream_pct": (
+                    None
+                    if label in {"none", "any_family"}
+                    else _percent(
+                        sum(label in row["recent_candidate_families"] for row in rows), count
+                    )
+                ),
                 "last_age_days_median": round(median(row["last_age_days"] for row in rows), 2),
                 "zero_gap_streams": sum(row["zero_gap_streams"] for row in rows),
                 "single_gap_streams": sum(row["single_gap_streams"] for row in rows),
@@ -167,7 +268,14 @@ def main() -> None:
     parser.add_argument("--data-dir", type=Path, default=Path("data/raw/ubs_2026"))
     parser.add_argument("--output", type=Path, default=Path("outputs/metrics/javi_recurrence.json"))
     args = parser.parse_args()
-    result = {partition: analyze(args.data_dir, partition) for partition in ("train", "valid")}
+    train_labels, train_histories = _read_partition(args.data_dir, "train")
+    valid_labels, valid_histories = _read_partition(args.data_dir, "valid")
+    candidate_descriptions = _learn_candidate_descriptions(train_labels, train_histories)
+    result = {
+        "candidate_descriptions_by_family": dict(Counter(candidate_descriptions.values())),
+        "train": analyze(train_labels, train_histories, "train", candidate_descriptions),
+        "valid": analyze(valid_labels, valid_histories, "valid", candidate_descriptions),
+    }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"

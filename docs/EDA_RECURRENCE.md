@@ -85,6 +85,40 @@ descripción**, con recencia respecto a su cadencia y número de observaciones,
 antes de convertir «hay recurrencia» en una predicción. Las descripciones son
 texto observado; el target por cliente no etiqueta cada transacción histórica.
 
+### Series candidatas por familia, aprendidas solo en train
+
+Para explorar esa hipótesis, el script asigna una descripción a la familia con
+mayor *lift* de cobertura en **clientes de train**. Exige al menos 20 clientes
+con la descripción, cobertura de al menos el 20 % dentro de la familia y lift
+suavizado ≥2 frente al resto. Resultan 22 descripciones: cloud 4, gym 4,
+insurance 4, mobile 3, music 2, software 3 y streaming 2. Esta asignación es
+una criba EDA; no convierte cada transacción en una etiqueta verdadera. Se
+aplica sin reajuste a validation.
+
+Una serie candidata tiene al menos dos eventos de una descripción asignada.
+«Reciente» significa que el último evento ocurrió hace como máximo **dos veces
+su intervalo mediano**; «regular» vuelve a exigir tres eventos y desviación de
+intervalos ≤3 días. Los porcentajes son de clientes y buscan **cualquier**
+familia candidata, por lo que la comparación con `none` usa la misma definición.
+
+| Partición y etiqueta | Alguna serie candidata | Alguna candidata reciente | Alguna candidata regular y reciente |
+| --- | ---: | ---: | ---: |
+| Train, `any_family` | 94,87 % | 90,45 % | 13,26 % |
+| Train, `none` | 80,23 % | 70,35 % | 10,55 % |
+| Validation, `any_family` | 83,73 % | 73,69 % | 3,96 % |
+| Validation, `none` | 61,77 % | 49,83 % | 1,37 % |
+
+La separación de cobertura y recencia permanece en validation, pero `none`
+conserva bastantes series candidatas. La regularidad estricta tiene muy poca
+cobertura; no debe usarse como filtro obligatorio. El porcentaje de clientes
+cuya serie candidata coincide con su **propia** etiqueta cae de train a
+validation: cloud 82,63→69,66 %, gym 82,63→52,89 %, insurance 81,78→48,48 %,
+mobile 82,20→67,31 %, music 68,18→37,63 %, software 79,49→44,23 % y streaming
+72,00→26,80 %. Train está sesgado porque las asociaciones se eligieron con sus
+etiquetas; la caída externa sugiere contrastar la futura normalización de alias
+de Laura antes de integrar señales de texto. Estas son coberturas de historial, **no
+Macro-F1 ni una mejora de modelo**.
+
 ## Historiales cortos y casos extraños
 
 - El mínimo es 8 transacciones por cliente en train y validation. No hay
