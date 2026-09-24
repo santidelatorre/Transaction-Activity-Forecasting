@@ -186,7 +186,25 @@ def record(name, source, commit, metrics, prediction, previous, decision, notes,
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--candidate", required=True)
+    parser.add_argument(
+        "--candidate",
+        required=True,
+        choices=(
+            "baseline",
+            "tracking",
+            "quality_gate",
+            "temporal_intervals",
+            "temporal_periodicity",
+            "temporal_activity",
+            "temporal_horizon",
+            "merchant_blend",
+            "catboost_v1_raw",
+            "catboost_v1_calibrated",
+            "catboost_history_raw",
+            "catboost_history_calibrated",
+            "catboost_history_temporal_blend",
+        ),
+    )
     parser.add_argument("--previous", type=float, default=REFERENCE)
     parser.add_argument("--source", default="baseline")
     parser.add_argument("--commit", default="0199a8b")
@@ -233,6 +251,7 @@ def main():
         )
 
         safe = args.candidate.startswith("catboost_history_")
+        heuristic_features = x_valid
         if safe:
             history = HistoryFeatureBuilder().fit(data.train_transactions)
             x_train = history.transform(data.train_transactions)
@@ -257,6 +276,16 @@ def main():
             np.save(path, probabilities, allow_pickle=False)
         if args.candidate.endswith("_calibrated"):
             probabilities = calibrate_probabilities(probabilities)
+        if args.candidate == "catboost_history_temporal_blend":
+            temporal = temporal_matrix(
+                heuristic_features,
+                data.valid_transactions,
+                builder,
+                cache,
+                "valid",
+                ("periodicity",),
+            )
+            probabilities = 0.75 * probabilities + 0.25 * model.predict_proba(temporal)
         prediction = pd.Series(
             np.asarray(LABELS)[probabilities.argmax(axis=1)], index=x_valid.index
         )

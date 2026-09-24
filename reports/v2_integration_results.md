@@ -12,5 +12,9 @@ Official eight-class validation; V1 reference 0.2710242658492452. Rejected trial
 | 5 | origin/features/ginestar-v2-temporal | 6ba1311 | temporal_activity | 0.264064548 | -0.008571735 | -0.006959718 | 0.261000000 | REJECT | Isolated activity vs V1; compared to provisional periodicity; not stacked. |
 | 6 | origin/features/ginestar-v2-temporal | 6ba1311 | temporal_horizon | 0.261599760 | -0.011036523 | -0.009424506 | 0.258000000 | REJECT | Isolated horizon vs V1; compared to provisional periodicity; not stacked. |
 | 7 | origin/features/javier-v2-text | f598fc3+7ef31a6 | merchant_blend | 0.243527493 | -0.029108790 | -0.027496772 | 0.300000000 | REJECT | Frozen 75/25 blend; forensic reproduction only; inherited self-label V1 columns prevent promotion. |
+| 8 | origin/esteban-v2-models | 358d604 | catboost_v1_raw | 0.192653263 | -0.079983020 | -0.078371003 | 0.292000000 | REJECT_SELF_LABEL | Forensic raw control: in-sample target-derived family features; rejected regardless of score. |
+| 9 | origin/esteban-v2-models | 358d604 | catboost_v1_calibrated | 0.350493131 | 0.077856848 | 0.079468865 | 0.340000000 | REJECT_SELF_LABEL | Reported T=2 and bias=-1.5 reproduced without tuning; rejected for training self-label features. |
+| 10 | origin/esteban-v2-models | 358d604 | catboost_history_raw | 0.383950488 | 0.111314205 | 0.112926222 | 0.424000000 | KEEP_PROVISIONAL | Same fixed model; only change is removal of all 72 supervised family features; no labels enter feature fitting. |
+| 11 | origin/esteban-v2-models | 358d604 | catboost_history_calibrated | 0.318662517 | -0.065287971 | 0.047638251 | 0.325000000 | REJECT | Only frozen T=2 and bias=-1.5 added to safe history model; no retuning. |
 
 Full per-class F1, confusion matrices, predictions and provenance: `outputs/metrics/v2_integration/results.json` (local, ignored).
