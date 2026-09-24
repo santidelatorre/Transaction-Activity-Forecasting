@@ -230,6 +230,7 @@ class QualityGateTests(unittest.TestCase):
         # Exercise real Git inventory and report writing; only missing runtime/tooling
         # are simulated. No pipeline execution or dependency installation.
         output_root = SCRIPT.parent.parent / "outputs" / "metrics"
+
         with tempfile.TemporaryDirectory(dir=output_root) as directory:
             config = {
                 "gate": {
@@ -242,15 +243,25 @@ class QualityGateTests(unittest.TestCase):
                 },
                 "thresholds": THRESHOLDS,
             }
+
+            real_git = gate.git
+
+            def git_for_test(*args):
+                if args == ("branch", "--show-current"):
+                    return "feature/test-quality-gate"
+                return real_git(*args)
+
             with (
                 patch.object(gate.sys, "version_info", (3, 11)),
                 patch.object(gate, "load_toml", return_value=config),
+                patch.object(gate, "git", side_effect=git_for_test),
                 patch.object(gate, "run_tests"),
                 patch.object(gate, "evaluate") as train,
                 redirect_stdout(io.StringIO()),
             ):
                 code = gate.main([])
                 train.assert_not_called()
+
             self.assertEqual(code, 1)
             report = json.loads(next(Path(directory).glob("*/report.json")).read_text())
             self.assertEqual(report["overall"], "WARN")
