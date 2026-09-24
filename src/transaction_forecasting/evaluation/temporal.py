@@ -13,11 +13,22 @@ def temporal_split(
         raise ValueError("test_fraction must be between 0 and 1")
     if "timestamp" not in frame:
         raise ValueError("temporal_split requires a timestamp column")
-    ordered = frame.sort_values("timestamp").reset_index(drop=True)
+    ordered = frame.copy()
+    ordered["timestamp"] = pd.to_datetime(ordered["timestamp"], errors="raise", utc=True)
+    if ordered["timestamp"].isna().any():
+        raise ValueError("timestamp cannot contain missing values")
+    ordered = ordered.sort_values("timestamp", kind="stable").reset_index(drop=True)
     test_size = max(1, int(round(len(ordered) * test_fraction)))
     if test_size >= len(ordered):
         raise ValueError("At least two rows are required for a temporal split")
-    return ordered.iloc[:-test_size].copy(), ordered.iloc[-test_size:].copy()
+    # Keep all events at the boundary on the same side. Row slicing alone can
+    # place identical timestamps in both sets, violating the strict time order.
+    boundary = ordered.iloc[-test_size]["timestamp"]
+    train = ordered[ordered["timestamp"] < boundary].copy()
+    test = ordered[ordered["timestamp"] >= boundary].copy()
+    if train.empty:
+        raise ValueError("No nonempty strictly chronological split at this boundary")
+    return train.reset_index(drop=True), test.reset_index(drop=True)
 
 
 def train_validation_test_split(

@@ -1,13 +1,45 @@
 # Swiss AI Weeks / Transaction Activity Forecasting
 
-Base de proyecto para un hackathon de AI/ML. El objetivo provisional es predecir la siguiente transacción recurrente de un cliente a partir de su historial. El esquema, el objetivo exacto y las reglas de evaluación pueden cambiar cuando recibamos el dataset y la documentación oficial.
+## Contrato oficial y trabajo actual — 24 septiembre 2026
 
-Esta fase prepara infraestructura; no incluye datos reales, no asume columnas concretas y no entrena modelos.
+El objetivo oficial ya está confirmado: predecir la próxima familia recurrente
+por cliente (`cloud`, `gym`, `insurance`, `mobile`, `music`, `software`,
+`streaming`, `none`), corte `2026-01-01`, horizonte 90 días, métrica macro-F1.
+El [contrato oficial](docs/OFFICIAL_CHALLENGE.md) sustituye las hipótesis
+provisionales de las secciones históricas siguientes. La [propuesta de producto
+e integración](docs/IDEAS_AND_INTEGRATION.md) compara las ideas del equipo y las
+dos bases de código.
+
+El smoke pipeline actual sigue siendo MOCK y no mide calidad predictiva.
+Ya se pueden puntuar predicciones oficiales y comprobar el CSV de entrega:
+
+```powershell
+python -m transaction_forecasting.evaluation.official score --labels data/raw/valid_labels.csv --predictions outputs/predictions/valid.csv
+python -m transaction_forecasting.evaluation.official validate --sample data/raw/sample_submission.csv --predictions outputs/predictions/submission.csv
+```
+
+Requiere el paquete instalado según las instrucciones de entorno de abajo.
+El adaptador y entrenamiento UBS V1 ya están implementados en `ubs/` y
+`scripts/run_ubs_baseline.py`, con configuración en `configs/ubs_v1.toml`.
+Los datos se descargan localmente y no se versionan. Conservar el split
+train/valid/test suministrado; no sustituirlo por un split de filas.
+El runner UBS y el CLI oficial comparten cálculo de métricas y validación de
+entrega; UBS conserva además su requisito de orden idéntico al sample.
+
+Acuerdo actual comunicado por Carles: cada persona trabaja en su rama
+`dev/<nombre>` y propone cambios mediante PR a `main`, sin hacer merge automáticamente.
+
+## Contexto inicial y entorno
+
+El proyecto incluye tres recorridos: smoke con datos ficticios, pipeline genérico
+configurable y clasificación UBS V1 sobre el esquema oficial. Los dos primeros
+siguen siendo herramientas de desarrollo; el runner UBS es la entrada para
+entrenar y generar predicciones del challenge.
 
 ## Hackathon quick start
 
 The repository now includes a small deterministic end-to-end smoke path that is
-safe to use while the challenge dataset and official metric are being confirmed:
+for quick development checks, separate from the official UBS training workflow:
 
 ```bash
 python -m pytest
@@ -129,16 +161,22 @@ pytest
 No trabajes directamente sobre `main`:
 
 ```bash
-git checkout main
-git pull
-git checkout -b feat/nombre-descriptivo
+git switch dev/carles
+git fetch origin
+git merge origin/main
 ```
 
-Después: `git add .`, `git commit`, `git push -u origin feat/nombre-descriptivo` y abre un Pull Request hacia `main`. Para este hackathon, usa las ramas concretas de `docs/HACKATHON_PLAN.md`.
+El ejemplo supone que tu rama personal ya existe. Usa tu nombre en lugar de `carles`.
+Añade archivos concretos con `git add`, crea un commit y usa
+`git push -u origin dev/carles`. Un PR propone cambios a `main`; no los integra
+automáticamente. Consulta [CONTRIBUTING.md](CONTRIBUTING.md) para crear o recuperar
+tu rama por primera vez.
 
 ## Notebooks y datos
 
-Los notebooks se usan para EDA y experimentos; la lógica reutilizable debe moverse a `src/` y no debe construirse el pipeline completo dentro de notebooks. No se suben datasets al repositorio. Las carpetas de datos se conservan con `.gitkeep`; cuando conozcamos el dataset definiremos un mecanismo común y seguro para compartirlo.
+Los notebooks se usan para EDA y experimentos; la lógica reutilizable vive en
+`src/`. El dataset oficial se obtiene de UBS y se conserva localmente en
+`data/raw/ubs_2026`, según `configs/ubs_v1.toml`. No se suben datasets a Git.
 
 ## Filosofía de modelado
 
@@ -150,4 +188,7 @@ La evaluación debe respetar la causalidad: historial pasado → evento futuro. 
 
 `configs/default.toml` contiene rutas y semilla inicial. Las utilidades estándar controlan logging, `random` y NumPy. Con siete desarrolladores, mantén módulos pequeños, responsabilidades separadas y Pull Requests acotados; no mezcles EDA, features y modelos en un mismo cambio.
 
-En GitHub se deberá proteger `main`, exigir Pull Requests y requerir que CI pase antes del merge. La URL real del repositorio, licencia y política definitiva de acceso a datos quedan pendientes de configuración del equipo.
+La integración en `main` se propone mediante Pull Requests y requiere revisión
+y CI. La configuración de protección de rama y los permisos los gestiona el
+propietario del repositorio. No se presupone una licencia ni permiso adicional
+de publicación de datos por disponer de este código.

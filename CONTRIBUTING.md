@@ -1,44 +1,55 @@
 # Contribuir
 
-Gracias por colaborar en el proyecto. Mantenemos `main` estable y trabajamos mediante Pull Requests.
+## Rama personal
 
-## Flujo diario
+Cada participante trabaja en `dev/<nombre>`; Carles utiliza `dev/carles`.
+Mantener `main` estable. No subir cambios directamente a `main`.
 
-Use the repository setup script for a reproducible local environment. Before opening a Pull Request, run the tests, Ruff checks, and `pre-commit run --all-files`. Keep notebooks focused and clean unnecessary outputs before committing; reusable logic belongs in `src/`.
-
-Antes de empezar:
-
-```bash
-git checkout main
-git pull origin main
-git checkout -b feature/nombre-de-la-tarea
-```
-
-Usa una rama por tarea. Prefijos recomendados: `feature/`, `experiment/`, `fix/`, `refactor/` y `docs/`. Ejemplos: `feature/recurrence-detection`, `experiment/catboost-baseline`.
-
-Antes de abrir el Pull Request:
+Si tu rama ya existe localmente:
 
 ```bash
-ruff check .
-ruff format --check .
-pytest
+git switch dev/carles
+git fetch origin
+git merge origin/main
 ```
 
-Después, crea un commit claro, sube la rama y abre un Pull Request hacia `main`:
+Si todav?a no existe ni localmente ni en el remoto, crearla una sola vez:
 
 ```bash
-git add .
-git commit -m "Descripción clara"
-git push -u origin nombre-de-la-rama
+git fetch origin
+git switch -c dev/carles origin/main
 ```
 
-Pide al menos una revisión, mantén los cambios enfocados y evita commits gigantes. No subas datasets, credenciales, `.env` ni artefactos grandes. La lógica reutilizable debe vivir en `src/`, no dentro de notebooks.
+Sustituir `carles` por tu nombre. Si ya existe en GitHub, usar
+`git switch --track origin/dev/carles` para obtenerla localmente.
+El merge de `origin/main` se hace estando en tu rama personal; no modifica main.
+Resolver conflictos y ejecutar pruebas antes de subir cambios.
 
-Actualiza tu rama con frecuencia para reducir conflictos:
+## Cambios y revisi?n
+
+Usar el script de setup del repositorio. Mantener notebooks enfocados y mover
+la l?gica reutilizable a `src/`. Antes de proponer cambios:
 
 ```bash
-git checkout main
-git pull origin main
+python -m pytest
+python -m ruff check .
+python -m ruff format --check .
+python -m pre_commit run --all-files
 ```
 
-Tras el merge, vuelve a actualizar `main` antes de comenzar la siguiente tarea.
+Revisar `git status` y a?adir ?nicamente los archivos de la aportaci?n:
+
+```bash
+git add ruta/al/archivo
+git commit -m "Descripci?n clara"
+git push -u origin dev/carles
+```
+
+Abrir un PR desde la rama personal hacia `main`. Abrir el PR no realiza el merge.
+Pedir al menos una revisi?n. La integraci?n la ejecuta la persona autorizada por
+el equipo despu?s de revisar los cambios y las comprobaciones.
+
+No subir datasets, credenciales, `.env`, directorios temporales ni artefactos
+grandes. Mantener commits acotados incluso cuando varias tareas comparten rama.
+Despu?s de un merge aprobado, actualizar la rama personal mediante
+`git fetch origin` y `git merge origin/main`.
