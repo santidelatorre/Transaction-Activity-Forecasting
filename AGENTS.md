@@ -54,8 +54,6 @@ Empezar con razonamiento `low` o `medium`; usar `high` únicamente cuando la
 dificultad lo justifique. No escalar a Astra porque una tarea sea larga: debe ser
 intelectualmente difícil o de alto riesgo.
 
-Evitar niveles superiores a `high` salvo un problema excepcional y justificado.
-
 ## Estrategia de coste
 
 Antes de escalar de Luna a Sol o de Sol a Astra:
@@ -70,16 +68,6 @@ sin pedir confirmación para cada decisión. Si no permite cambiar el modelo de
 forma autónoma, continuar con el disponible; solo ante una ventaja importante,
 indicar: `Recomiendo escalar esta tarea a [modelo] con reasoning [nivel] porque
 [motivo].`
-
-La configuración de proyecto en `.codex/config.toml` fija `gpt-6-sol` con
-razonamiento `medium` como punto de partida. Esta política guía la selección
-por tarea cuando el cliente permita cambiar de modelo o delegar; no implica
-que el archivo TOML implemente un enrutador automático. No afirmar que se ha
-cambiado el modelo si la plataforma no ha efectuado ese cambio.
-
-Al delegar, usar el modelo y razonamiento mínimos adecuados, proporcionar solo
-el contexto necesario y evitar duplicar trabajo entre agentes. No delegar una
-tarea trivial si el coste de coordinación supera el ahorro esperado.
 
 ## Prioridades del hackathon
 

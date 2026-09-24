@@ -1,3 +1,0 @@
-# Default for normal engineering work; task selection policy lives in AGENTS.md.
-model = "gpt-6-sol"
-model_reasoning_effort = "medium"

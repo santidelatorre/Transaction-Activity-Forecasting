@@ -80,19 +80,6 @@ plan are in [`docs/HACKATHON_PLAN.md`](docs/HACKATHON_PLAN.md),
 [`docs/DATA_CONTRACT.md`](docs/DATA_CONTRACT.md), and
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-## Política de modelos de Codex
-
-La política completa está en [`AGENTS.md`](AGENTS.md). El proyecto configura
-`gpt-6-sol` con razonamiento `medium` en `.codex/config.toml`: Luna con `low`
-para trabajo sencillo; Sol con `medium` para ingeniería habitual; Astra con
-`low` o `medium` únicamente para escaladas justificadas.
-
-Codex carga la configuración del proyecto cuando este se marca como confiable.
-Los parámetros explícitos de inicio pueden sobrescribir estos valores. La
-selección automática por tarea depende de las capacidades del cliente; las
-instrucciones no cambian por sí solas el modelo de una sesión activa.
-Consulta la [documentación oficial de configuración](https://learn.chatgpt.com/docs/config-file/config-basic).
-
 ## Local development setup
 
 The project targets Python 3.11. Python 3.12 is a compatible fallback when 3.11 is not available locally.
