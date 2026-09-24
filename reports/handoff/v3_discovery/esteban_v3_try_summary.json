@@ -1,0 +1,19 @@
+{
+  "model": "StreamV3Model",
+  "v2_blend": 0.85,
+  "v2_macro_f1": 0.3915494559105542,
+  "v3_macro_f1": 0.402339508886895,
+  "v3_accuracy": 0.435,
+  "delta_vs_v2": 0.0107900529763408,
+  "per_class_f1": {
+    "cloud": 0.4416,
+    "gym": 0.4727,
+    "insurance": 0.4291,
+    "mobile": 0.4426,
+    "music": 0.2063,
+    "software": 0.3786,
+    "streaming": 0.3085,
+    "none": 0.5392
+  },
+  "note": "From esteban_v3_search.py blend grid; frozen as default StreamV3Model(v2_blend=0.85)"
+}
