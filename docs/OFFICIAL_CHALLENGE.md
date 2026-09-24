@@ -129,5 +129,6 @@ y conservar el CSV de cada versión. Confirmar cualquier actualización presenci
   eventos simultáneos. Las etiquetas suministradas siguen siendo la referencia.
 - Reglas específicas sobre APIs externas y código preparado; la existencia de
   créditos o de un dataset sintético no responde por sí sola a estas preguntas.
-- Criterios y ponderaciones del jurado general, separados del ranking macro-F1
-  del challenge. La página pública consultada no permite confirmar una rúbrica.
+- Los criterios cualitativos y el proceso del jurado general están resumidos en
+  [JURY_CRITERIA.md](JURY_CRITERIA.md). La página oficial no publica ponderaciones;
+  esta evaluación es distinta del ranking macro-F1 del reto.

@@ -71,6 +71,11 @@ indicar: `Recomiendo escalar esta tarea a [modelo] con reasoning [nivel] porque
 
 ## Prioridades del hackathon
 
+- Leer `docs/JURY_CRITERIA.md` al planificar, implementar, revisar y preparar la
+  demo. Sus criterios oficiales deben guiar las decisiones de producto y la
+  presentación, junto con el contrato específico de UBS en
+  `docs/OFFICIAL_CHALLENGE.md`. La evaluación del jurado es cualitativa y distinta
+  de la clasificación del reto por macro-F1.
 - Favorecer cambios pequeños, verificables e integrables rápidamente.
 - Mantener interfaces entre componentes estables y detectar pronto bloqueos
   entre los siete miembros del equipo.
