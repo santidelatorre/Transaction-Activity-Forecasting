@@ -4,6 +4,21 @@ Base de proyecto para un hackathon de AI/ML. El objetivo provisional es predecir
 
 Esta fase prepara infraestructura; no incluye datos reales, no asume columnas concretas y no entrena modelos.
 
+## Hackathon quick start
+
+The repository now includes a small deterministic end-to-end smoke path that is
+safe to use while the challenge dataset and official metric are being confirmed:
+
+```bash
+python -m pytest
+python -c "from transaction_forecasting.pipeline import run_smoke_pipeline; print(run_smoke_pipeline()[1])"
+```
+
+The shared contracts, workstream split, temporal evaluation rules, and milestone
+plan are in [`docs/HACKATHON_PLAN.md`](docs/HACKATHON_PLAN.md),
+[`docs/DATA_CONTRACT.md`](docs/DATA_CONTRACT.md), and
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
 ## Local development setup
 
 The project targets Python 3.11. Python 3.12 is a compatible fallback when 3.11 is not available locally.
@@ -86,10 +101,10 @@ No trabajes directamente sobre `main`:
 ```bash
 git checkout main
 git pull
-git checkout -b feature/nombre-descriptivo
+git checkout -b feat/nombre-descriptivo
 ```
 
-Después: `git add .`, `git commit`, `git push -u origin feature/nombre-descriptivo` y abre un Pull Request hacia `main`. Convenciones: `feature/`, `fix/`, `experiment/`, `docs/`, `refactor/`.
+Después: `git add .`, `git commit`, `git push -u origin feat/nombre-descriptivo` y abre un Pull Request hacia `main`. Para este hackathon, usa las ramas concretas de `docs/HACKATHON_PLAN.md`.
 
 ## Notebooks y datos
 
