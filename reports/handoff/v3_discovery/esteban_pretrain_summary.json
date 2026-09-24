@@ -1,0 +1,316 @@
+{
+  "A_v2_baseline_valid": {
+    "accuracy": 0.424,
+    "macro_f1": 0.3915494559105542,
+    "per_class": {
+      "cloud": {
+        "f1-score": 0.45,
+        "precision": 0.5070422535211268,
+        "recall": 0.4044943820224719
+      },
+      "gym": {
+        "f1-score": 0.48727272727272725,
+        "precision": 0.43506493506493504,
+        "recall": 0.5537190082644629
+      },
+      "insurance": {
+        "f1-score": 0.4291497975708502,
+        "precision": 0.3581081081081081,
+        "recall": 0.5353535353535354
+      },
+      "mobile": {
+        "f1-score": 0.45267489711934156,
+        "precision": 0.39568345323741005,
+        "recall": 0.5288461538461539
+      },
+      "music": {
+        "f1-score": 0.16993464052287582,
+        "precision": 0.21666666666666667,
+        "recall": 0.13978494623655913
+      },
+      "none": {
+        "f1-score": 0.5193798449612403,
+        "precision": 0.600896860986547,
+        "recall": 0.45733788395904434
+      },
+      "software": {
+        "f1-score": 0.37398373983739835,
+        "precision": 0.323943661971831,
+        "recall": 0.4423076923076923
+      },
+      "streaming": {
+        "f1-score": 0.25,
+        "precision": 0.31746031746031744,
+        "recall": 0.20618556701030927
+      }
+    },
+    "prediction_distribution": {
+      "cloud": 71,
+      "gym": 154,
+      "insurance": 148,
+      "mobile": 139,
+      "music": 60,
+      "none": 223,
+      "software": 142,
+      "streaming": 63
+    }
+  },
+  "B_train_priors": {
+    "includes_unlabeled": false,
+    "mean_trust_periodicity": 0.1517198838734846,
+    "prior_source_clients": 2000,
+    "valid": {
+      "accuracy": 0.428,
+      "macro_f1": 0.3978184548669569,
+      "per_class": {
+        "cloud": {
+          "f1-score": 0.45962732919254656,
+          "precision": 0.5138888888888888,
+          "recall": 0.4157303370786517
+        },
+        "gym": {
+          "f1-score": 0.48727272727272725,
+          "precision": 0.43506493506493504,
+          "recall": 0.5537190082644629
+        },
+        "insurance": {
+          "f1-score": 0.44,
+          "precision": 0.36423841059602646,
+          "recall": 0.5555555555555556
+        },
+        "mobile": {
+          "f1-score": 0.45081967213114754,
+          "precision": 0.39285714285714285,
+          "recall": 0.5288461538461539
+        },
+        "music": {
+          "f1-score": 0.17218543046357615,
+          "precision": 0.22413793103448276,
+          "recall": 0.13978494623655913
+        },
+        "none": {
+          "f1-score": 0.5196850393700787,
+          "precision": 0.6139534883720931,
+          "recall": 0.45051194539249145
+        },
+        "software": {
+          "f1-score": 0.3724696356275304,
+          "precision": 0.32167832167832167,
+          "recall": 0.4423076923076923
+        },
+        "streaming": {
+          "f1-score": 0.2804878048780488,
+          "precision": 0.34328358208955223,
+          "recall": 0.23711340206185566
+        }
+      },
+      "prediction_distribution": {
+        "cloud": 72,
+        "gym": 154,
+        "insurance": 151,
+        "mobile": 140,
+        "music": 58,
+        "none": 215,
+        "software": 143,
+        "streaming": 67
+      }
+    }
+  },
+  "C_train_plus_unlabeled_priors": {
+    "includes_unlabeled": true,
+    "mean_trust_periodicity": 0.13737531368806116,
+    "prior_source_clients": 12000,
+    "valid": {
+      "accuracy": 0.428,
+      "macro_f1": 0.3978343186983263,
+      "per_class": {
+        "cloud": {
+          "f1-score": 0.45962732919254656,
+          "precision": 0.5138888888888888,
+          "recall": 0.4157303370786517
+        },
+        "gym": {
+          "f1-score": 0.48727272727272725,
+          "precision": 0.43506493506493504,
+          "recall": 0.5537190082644629
+        },
+        "insurance": {
+          "f1-score": 0.44,
+          "precision": 0.36423841059602646,
+          "recall": 0.5555555555555556
+        },
+        "mobile": {
+          "f1-score": 0.45081967213114754,
+          "precision": 0.39285714285714285,
+          "recall": 0.5288461538461539
+        },
+        "music": {
+          "f1-score": 0.17333333333333334,
+          "precision": 0.22807017543859648,
+          "recall": 0.13978494623655913
+        },
+        "none": {
+          "f1-score": 0.518664047151277,
+          "precision": 0.6111111111111112,
+          "recall": 0.45051194539249145
+        },
+        "software": {
+          "f1-score": 0.3724696356275304,
+          "precision": 0.32167832167832167,
+          "recall": 0.4423076923076923
+        },
+        "streaming": {
+          "f1-score": 0.2804878048780488,
+          "precision": 0.34328358208955223,
+          "recall": 0.23711340206185566
+        }
+      },
+      "prediction_distribution": {
+        "cloud": 72,
+        "gym": 154,
+        "insurance": 151,
+        "mobile": 140,
+        "music": 57,
+        "none": 216,
+        "software": 143,
+        "streaming": 67
+      }
+    }
+  },
+  "alpha": 5.0,
+  "classes_benefited_B_to_C": [
+    "music"
+  ],
+  "classes_hurt_B_to_C": [
+    "none"
+  ],
+  "conclusion": "PRETRAIN DOES NOT IMPROVE THE CURRENT SYSTEM",
+  "delta_macro_f1_A_to_B": 0.006268998956402705,
+  "delta_macro_f1_A_to_C": 0.0062848627877721275,
+  "delta_macro_f1_B_to_C": 1.58638313694226e-05,
+  "diagnosis": "CatBoost+prior-features collapsed valid MF1 (~0.15). Anti-none logit adjustment selected beta=0 on train OOF. Adaptive blend is the evaluated unsupervised prior use; gamma frozen on train OOF with train-only priors.",
+  "experiment": "esteban_pretrain",
+  "forced_gamma_valid_grid_reporting_only": {
+    "0.0": {
+      "B_macro_f1": 0.3915494559105542,
+      "C_macro_f1": 0.3915494559105542,
+      "delta_C_minus_B": 0.0
+    },
+    "0.05": {
+      "B_macro_f1": 0.39253202311569496,
+      "C_macro_f1": 0.3915494559105542,
+      "delta_C_minus_B": -0.000982567205140783
+    },
+    "0.1": {
+      "B_macro_f1": 0.39419572646585765,
+      "C_macro_f1": 0.39485162711926625,
+      "delta_C_minus_B": 0.000655900653408592
+    },
+    "0.15": {
+      "B_macro_f1": 0.39551122109021747,
+      "C_macro_f1": 0.39551122109021747,
+      "delta_C_minus_B": 0.0
+    },
+    "0.2": {
+      "B_macro_f1": 0.3978343186983263,
+      "C_macro_f1": 0.39789645818359143,
+      "delta_C_minus_B": 6.213948526512247e-05
+    },
+    "0.25": {
+      "B_macro_f1": 0.3978184548669569,
+      "C_macro_f1": 0.3978343186983263,
+      "delta_C_minus_B": 1.58638313694226e-05
+    }
+  },
+  "gamma_selection_oof_train_only": {
+    "grid": {
+      "0.0": 0.408883545420229,
+      "0.05": 0.4100757338263029,
+      "0.1": 0.41050131521681194,
+      "0.15": 0.4130402675301803,
+      "0.2": 0.4156176672042303,
+      "0.25": 0.4189449445003144
+    },
+    "oof_macro_f1": 0.4189449445003144,
+    "selected_gamma": 0.25
+  },
+  "leakage_policy": "Priors fit without labels. Gamma chosen on train OOF with train-only priors. Candidate C swaps prior source to train+unlabeled with the same gamma and the same frozen V2 component probabilities. Validation labels used only for scoring and for a reporting-only forced-gamma grid (not selection).",
+  "music_streaming": {
+    "music_f1_A": 0.16993464052287582,
+    "music_f1_B": 0.17218543046357615,
+    "music_f1_C": 0.17333333333333334,
+    "streaming_f1_A": 0.25,
+    "streaming_f1_B": 0.2804878048780488,
+    "streaming_f1_C": 0.2804878048780488
+  },
+  "per_class_f1_delta_B_to_C": {
+    "cloud": 0.0,
+    "gym": 0.0,
+    "insurance": 0.0,
+    "mobile": 0.0,
+    "music": 0.0011479028697571891,
+    "none": -0.0010209922188016973,
+    "software": 0.0,
+    "streaming": 0.0
+  },
+  "prediction_flips_B_to_C": 1,
+  "prior_descriptions_train_only": 1475,
+  "prior_descriptions_train_plus_unlabeled": 2673,
+  "rare_unseen": {
+    "coverage_rate_of_unseen": 0.6732186732186732,
+    "covered_examples": [
+      "audio digital service",
+      "audio stream service plus",
+      "billing audio plus",
+      "billing audio streaming digital",
+      "billing bill core",
+      "billing bill digital",
+      "billing billing service",
+      "billing cloud online",
+      "billing cloud plus",
+      "billing contract",
+      "billing contract plus",
+      "billing cover monthly",
+      "billing cover plan online",
+      "billing cover plan plus",
+      "billing dgtl plus core",
+      "billing dgtl plus digital",
+      "billing digital online",
+      "billing digital plus online",
+      "billing fit online",
+      "billing fitness"
+    ],
+    "unseen_examples": [
+      "audio core service",
+      "audio digital service",
+      "audio stream service plus",
+      "audio streaming service online",
+      "audio streaming service plus",
+      "backup online service",
+      "bill plus digital",
+      "billing audio plus",
+      "billing audio stream service",
+      "billing audio streaming digital",
+      "billing bill core",
+      "billing bill digital",
+      "billing bill online",
+      "billing billing monthly",
+      "billing billing plus",
+      "billing billing service",
+      "billing booking core",
+      "billing cloud digital",
+      "billing cloud online",
+      "billing cloud plus"
+    ],
+    "unseen_vs_train_count": 407,
+    "unseen_vs_train_covered_by_pretrain": 274,
+    "valid_unique_descriptions": 1432
+  },
+  "seconds": 90.18507087510079,
+  "selected_gamma": 0.25,
+  "system": "Identical V2 history/heuristic probabilities for A/B/C. B/C adapt the per-client heuristic blend weight with unsupervised description priors. CatBoost features unchanged.",
+  "trust_abs_delta_mean": 0.014731544828474044,
+  "trust_abs_delta_p90": 0.021917108663085327,
+  "unlabeled_clients": 10000,
+  "unlabeled_transactions": 749935
+}
