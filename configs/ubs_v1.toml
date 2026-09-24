@@ -1,0 +1,24 @@
+[project]
+random_seed = 42
+
+[data]
+directory = "data/raw/ubs_2026"
+cutoff = "2026-01-01"
+target = "target_next_recurring_merchant"
+
+[features]
+recent_windows = [7, 14, 30, 60, 90, 180]
+tfidf_max_features = 2500
+
+[logistic]
+c_values = [0.3, 1.0, 3.0]
+class_weights = ["none", "balanced"]
+
+[catboost]
+iterations = 350
+depth = 6
+learning_rate = 0.05
+
+[outputs]
+metrics_directory = "outputs/metrics/ubs_v1"
+submission = "outputs/predictions/submission_v1.csv"
