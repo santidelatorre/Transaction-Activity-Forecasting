@@ -29,6 +29,35 @@ entrega; UBS conserva además su requisito de orden idéntico al sample.
 Acuerdo actual comunicado por Carles: cada persona trabaja en su rama
 `dev/<nombre>` y propone cambios mediante PR a `main`, sin hacer merge automáticamente.
 
+## Discovery V3
+
+La referencia V2 sigue disponible con `python scripts/run_ubs_v2.py`.
+La auditoría de las siete ramas, los resultados comparables y la decisión de
+promoción están en [v3_discovery_synthesis.md](reports/v3_discovery_synthesis.md).
+El [protocolo](reports/v3_experiment_protocol.md) fija las ablations antes de
+medir las nuevas predicciones oficiales.
+
+```powershell
+python scripts/run_ubs_v3.py --phase oof
+python scripts/run_ubs_v3.py --phase valid
+python scripts/run_ubs_v3.py --phase submission
+```
+
+El candidato se selecciona con cinco folds por cliente dentro de TRAIN;
+los mappings supervisados de entrenamiento se calculan con otros cinco folds
+internos. La fase VALID conserva esa selección. La submission reajusta el
+candidato con TRAIN+VALID y valida sus 1.000 filas, sin enviar archivos.
+Predicciones, probabilidades, métricas, fingerprints y submission quedan en
+`outputs/metrics/ubs_v3/`, ignorado por Git. Un cambio de código o datos exige
+un directorio nuevo mediante `--output-dir`; los folds completos permiten
+reanudar una ejecución interrumpida con la misma fuente.
+
+Para reproducir una rama original sin fusionarla:
+`python scripts/reproduce_v3_discovery.py NOMBRE`, donde NOMBRE es `v2`,
+`santiago`, `ginestar`, `javier`, `christian`, `jaime`, `esteban` o `laura`.
+Ejecutar `v2` primero para las comparaciones que necesitan sus predicciones.
+Los snapshots y sus copias locales de datos también permanecen ignorados.
+
 ## Contexto inicial y entorno
 
 El proyecto incluye tres recorridos: smoke con datos ficticios, pipeline genérico
