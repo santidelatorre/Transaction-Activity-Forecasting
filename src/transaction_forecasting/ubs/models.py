@@ -54,7 +54,11 @@ class RecurrenceHeuristic:
                 self.none_bias = float(none_bias)
                 predicted = self.predict(features)
                 score = f1_score(target, predicted, labels=LABELS, average="macro")
-                candidate = (float(score), -abs(none_bias), -abs(temperature - 1.0))
+                candidate = (
+                    float(score),
+                    -abs(float(none_bias)),
+                    -abs(float(temperature) - 1.0),
+                )
                 if best is None or candidate > best:
                     best = candidate
                     best_parameters = (float(none_bias), float(temperature))

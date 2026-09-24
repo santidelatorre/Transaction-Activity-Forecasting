@@ -72,8 +72,9 @@ python scripts/run_ubs_baseline.py --config configs/ubs_v1.toml
 
 El comando usa train para todos los ajustes supervisados, valid para evaluación y
 selección, y test únicamente para generar
-`outputs/predictions/submission_v1.csv`. Los resultados detallados quedan en
-`outputs/metrics/ubs_v1/`; datos y outputs permanecen ignorados por Git.
+`outputs/predictions/submission_v1.csv`. Después de seleccionar el enfoque, lo
+reajusta con train+valid para producir la submission. Los resultados detallados
+quedan en `outputs/metrics/ubs_v1/`; datos y outputs permanecen ignorados por Git.
 
 The shared contracts, workstream split, temporal evaluation rules, and milestone
 plan are in [`docs/HACKATHON_PLAN.md`](docs/HACKATHON_PLAN.md),

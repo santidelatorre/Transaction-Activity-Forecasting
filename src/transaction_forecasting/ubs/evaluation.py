@@ -9,10 +9,29 @@ from transaction_forecasting.evaluation.official import classification_metrics
 from transaction_forecasting.ubs.data import LABELS
 
 
-def evaluate_predictions(target: pd.Series, prediction: np.ndarray) -> dict[str, object]:
-    """Return the complete validation metric contract with all classes present."""
-    # Preserve the UBS runner's output keys; compute metrics in one shared core.
-    report = classification_metrics(target, pd.Series(prediction))
+def evaluate_predictions(
+    target: pd.Series, prediction: pd.Series | np.ndarray
+) -> dict[str, object]:
+    """Return official fixed-class metrics, aligning indexed predictions by client."""
+    if not target.index.is_unique:
+        raise ValueError("Target client IDs must be unique")
+    if isinstance(prediction, pd.Series):
+        if not prediction.index.is_unique:
+            raise ValueError("Prediction client IDs must be unique")
+        missing = target.index.difference(prediction.index)
+        unexpected = prediction.index.difference(target.index)
+        if len(missing) or len(unexpected):
+            raise ValueError(
+                f"Prediction client mismatch: {len(missing)} missing, {len(unexpected)} unexpected"
+            )
+        aligned_prediction = prediction.reindex(target.index)
+    else:
+        aligned_prediction = pd.Series(np.asarray(prediction))
+        if len(aligned_prediction) != len(target):
+            raise ValueError("Target and prediction lengths must match")
+
+    # Preserve the UBS runner's output keys while sharing the official metric core.
+    report = classification_metrics(target, aligned_prediction)
     per_class = report["per_class"]
     return {
         "macro_f1": report["macro_f1"],
