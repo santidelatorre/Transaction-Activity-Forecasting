@@ -337,7 +337,8 @@ No V1 production modules were modified for this diagnosis.
 
 | commit_hash | description | recommendation |
 |---|---|---|
-|  | analysis: add reproducible V1 error diagnostics and Reports handoff | CHERRY-PICK RECOMMENDED (script + Reports) |
+| `fcc7a6b` | analysis: add reproducible V1 error diagnostics and Reports handoff | CHERRY-PICK RECOMMENDED (script + Reports) |
+| `a056ebd` | docs: record error-analysis commit hash in Reports handoff | ANALYSIS ONLY |
 
 ## 15. Dependencies and conflicts
 
