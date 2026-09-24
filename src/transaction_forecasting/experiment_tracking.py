@@ -20,12 +20,18 @@ CREATE TABLE IF NOT EXISTS experiments (
     recorded_at_utc TEXT NOT NULL,
     git_commit TEXT,
     git_dirty INTEGER,
+    description TEXT NOT NULL,
     model_name TEXT NOT NULL,
     model_version TEXT NOT NULL,
     features_json TEXT NOT NULL,
     hyperparameters_json TEXT NOT NULL,
     metrics_json TEXT NOT NULL,
+    baseline_macro_f1 REAL,
+    delta_vs_baseline REAL,
+    compute_seconds REAL,
+    result TEXT NOT NULL,
     notes TEXT NOT NULL,
+    risk_notes TEXT NOT NULL,
     python_version TEXT NOT NULL
 )
 """
@@ -67,12 +73,17 @@ class ExperimentLogger:
     def log_experiment(
         self,
         *,
+        description: str,
         model_name: str,
         model_version: str,
         features: list[str],
         hyperparameters: dict[str, Any],
         metrics: dict[str, Any],
+        result: str = "not_evaluated",
+        baseline_macro_f1: float | None = None,
+        compute_seconds: float | None = None,
         notes: str = "",
+        risk_notes: str = "",
     ) -> str:
         """Validate and save an experiment, returning its unique record ID.
 
@@ -80,8 +91,10 @@ class ExperimentLogger:
         ``f1_per_class``. All score values must be finite and between 0 and 1.
         Input dictionaries must contain JSON-serializable values.
         """
+        self._require_text(description, "description")
         self._require_text(model_name, "model_name")
         self._require_text(model_version, "model_version")
+        self._require_text(result, "result")
         if not isinstance(features, list) or any(not isinstance(item, str) for item in features):
             raise TypeError("features must be a list of strings")
         if not isinstance(hyperparameters, dict):
@@ -90,29 +103,48 @@ class ExperimentLogger:
             raise TypeError("metrics must be a dictionary")
         if not isinstance(notes, str):
             raise TypeError("notes must be a string")
+        if not isinstance(risk_notes, str):
+            raise TypeError("risk_notes must be a string")
 
         normalized_metrics = self._validate_metrics(metrics)
+        normalized_baseline = (
+            None
+            if baseline_macro_f1 is None
+            else self._score(baseline_macro_f1, "baseline_macro_f1")
+        )
+        normalized_compute_seconds = self._compute_seconds(compute_seconds)
         git_commit, git_dirty = self._git_metadata()
         record = (
             str(uuid.uuid4()),
             datetime.now(UTC).isoformat(),
             git_commit,
             None if git_dirty is None else int(git_dirty),
+            description,
             model_name,
             model_version,
             self._json(features),
             self._json(hyperparameters),
             self._json(normalized_metrics),
+            normalized_baseline,
+            (
+                None
+                if normalized_baseline is None
+                else normalized_metrics["macro_f1"] - normalized_baseline
+            ),
+            normalized_compute_seconds,
+            result,
             notes,
+            risk_notes,
             platform.python_version(),
         )
 
         query = """
         INSERT INTO experiments (
-            experiment_id, recorded_at_utc, git_commit, git_dirty, model_name,
-            model_version, features_json, hyperparameters_json, metrics_json,
-            notes, python_version
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            experiment_id, recorded_at_utc, git_commit, git_dirty, description,
+            model_name, model_version, features_json, hyperparameters_json,
+            metrics_json, baseline_macro_f1, delta_vs_baseline, compute_seconds,
+            result, notes, risk_notes, python_version
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         with closing(self._connect()) as connection, connection:
             connection.execute(query, record)
@@ -175,6 +207,17 @@ class ExperimentLogger:
         if not math.isfinite(score) or not 0.0 <= score <= 1.0:
             raise ValueError(f"{name} must be finite and between 0 and 1")
         return score
+
+    @staticmethod
+    def _compute_seconds(value: Any) -> float | None:
+        if value is None:
+            return None
+        if isinstance(value, bool) or not isinstance(value, numbers.Real):
+            raise TypeError("compute_seconds must be a number or None")
+        seconds = float(value)
+        if not math.isfinite(seconds) or seconds < 0:
+            raise ValueError("compute_seconds must be finite and non-negative")
+        return seconds
 
     @staticmethod
     def _json(value: Any) -> str:
