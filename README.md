@@ -76,6 +76,27 @@ selección, y test únicamente para generar
 reajusta con train+valid para producir la submission. Los resultados detallados
 quedan en `outputs/metrics/ubs_v1/`; datos y outputs permanecen ignorados por Git.
 
+## Dashboard React local
+
+El dashboard lee la submission validada y las métricas generadas por UBS V1;
+no entrena otro modelo ni duplica la lógica de predicción. Primero genera los
+artefactos con el comando anterior. Instala la API opcional con
+`python -m pip install -e ".[web]"`.
+
+Para desarrollo, inicia la API y el frontend en dos terminales desde la raíz:
+
+```powershell
+python -m uvicorn transaction_forecasting.api.main:app --app-dir src --reload
+cd frontend
+npm install
+npm run dev
+```
+
+Abre `http://127.0.0.1:5173`. La documentación de FastAPI queda en
+`http://127.0.0.1:8000/docs`. Para servir la versión compilada a través de
+FastAPI, ejecuta `npm run build` desde `frontend` y abre
+`http://127.0.0.1:8000`.
+
 The shared contracts, workstream split, temporal evaluation rules, and milestone
 plan are in [`docs/HACKATHON_PLAN.md`](docs/HACKATHON_PLAN.md),
 [`docs/DATA_CONTRACT.md`](docs/DATA_CONTRACT.md), and

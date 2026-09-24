@@ -60,3 +60,4 @@ checkpoints/
 *.swp
 dist/
 build/
+frontend/node_modules/
