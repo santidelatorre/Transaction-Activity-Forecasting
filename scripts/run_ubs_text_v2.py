@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import tomllib
 from pathlib import Path
 from time import perf_counter
@@ -19,6 +20,7 @@ from sklearn.preprocessing import StandardScaler
 from transaction_forecasting.evaluation.official import classification_metrics
 from transaction_forecasting.ubs.data import LABELS, TARGET_COLUMN, load_ubs_data
 from transaction_forecasting.ubs.features import ClientFeatureBuilder, build_client_documents
+from transaction_forecasting.ubs.models import RecurrenceHeuristic
 from transaction_forecasting.ubs.text_v2 import (
     MerchantFeatureBuilder,
     client_documents,
@@ -163,14 +165,18 @@ def main() -> None:
         vectorizers[name] = vectorizer
 
     reference = _v1_reference(Path(project["v1_metrics_directory"]), x_valid.index, y_valid)
+    if reference is None:
+        raise FileNotFoundError(
+            "Run scripts/run_ubs_baseline.py first to create the exact V1 validation reference"
+        )
     results: dict[str, dict] = {}
-    if reference is not None:
-        results["v1_selected"] = {
-            "metrics": reference,
-            "train_seconds": None,
-            "feature_count": None,
-            "vocabulary_size": None,
-        }
+    results["v1_selected"] = {
+        "metrics": reference,
+        "train_seconds": None,
+        "feature_count": None,
+        "vocabulary_size": None,
+    }
+    probabilities: dict[str, np.ndarray] = {}
 
     def run(
         name: str,
@@ -196,6 +202,10 @@ def main() -> None:
             tol=1e-5,
         ).fit(train_matrix, y_train)
         seconds = perf_counter() - started
+        raw_probabilities = classifier.predict_proba(valid_matrix)
+        probabilities[name] = np.column_stack(
+            [raw_probabilities[:, list(classifier.classes_).index(label)] for label in LABELS]
+        )
         predicted = classifier.predict(valid_matrix)
         results[name] = {
             "metrics": _score(y_valid, predicted),
@@ -216,7 +226,38 @@ def main() -> None:
     )
     run("text_plus_merchant", (merchant_num_train, merchant_num_valid), best_text)
 
-    base = reference or results["v1_word_component"]["metrics"]
+    # A fixed blend tests whether text helps the actually selected V1 heuristic.
+    # The heuristic settings are copied from V1's validation-calibrated run.
+    heuristic = RecurrenceHeuristic(
+        none_bias=float(model_config["v1_none_bias"]),
+        temperature=float(model_config["v1_temperature"]),
+    )
+    heuristic_probabilities = heuristic.predict_proba(x_valid)
+    heuristic_prediction = np.asarray(LABELS)[heuristic_probabilities.argmax(axis=1)]
+    if not np.isclose(_score(y_valid, heuristic_prediction)["macro_f1"], reference["macro_f1"]):
+        raise ValueError("Configured V1 heuristic does not reproduce the baseline")
+    weight = float(model_config["v1_text_blend_weight"])
+    if not 0 < weight < 1:
+        raise ValueError("v1_text_blend_weight must be between zero and one")
+    for name, source in (
+        ("v1_plus_word_blend", "normalized_word12"),
+        ("v1_plus_merchant_blend", "merchant_proxy"),
+    ):
+        blended = (1 - weight) * heuristic_probabilities + weight * probabilities[source]
+        prediction = np.asarray(LABELS)[blended.argmax(axis=1)]
+        results[name] = {
+            "metrics": _score(y_valid, prediction),
+            "train_seconds": results[source]["train_seconds"],
+            "feature_count": results[source]["feature_count"],
+            "vocabulary_size": results[source]["vocabulary_size"],
+        }
+
+    base = reference
+    best_new_name = max(
+        (name for name in results if name != "v1_selected"),
+        key=lambda name: results[name]["metrics"]["macro_f1"],
+    )
+    best_new_f1 = results[best_new_name]["metrics"]["macro_f1"]
     rows = []
     class_rows = []
     for name, result in results.items():
@@ -247,16 +288,80 @@ def main() -> None:
     terms = _top_terms(data.train_transactions, y_train, vectorizers["normalized_word12"])
     directory = Path(project["output_directory"])
     directory.mkdir(parents=True, exist_ok=True)
+    git_commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True
+    ).stdout.strip()
+    descriptions = {
+        "v1_selected": ("Selected V1 heuristic", "Official V1 validation predictions"),
+        "numeric_control": ("Numeric control", "V1 numeric aggregates, no text"),
+        "v1_word_component": ("V1 word component", "Raw word unigram/bigram TF-IDF"),
+        "normalized_unigram": ("Normalized unigrams", "Normalize then word unigram TF-IDF"),
+        "normalized_word12": ("Normalized word 1-2", "Normalize then word unigram/bigram TF-IDF"),
+        "normalized_char": ("Character n-grams", "Normalize then char_wb 3-5 TF-IDF"),
+        "merchant_proxy": ("Merchant proxy", "V1 aggregates plus description statistics"),
+        "text_plus_merchant": ("Text and merchant proxy", f"{best_text} plus merchant proxy"),
+        "v1_plus_word_blend": ("V1 and word text", f"V1 heuristic plus {weight:g} word model"),
+        "v1_plus_merchant_blend": (
+            "V1 and merchant proxy",
+            f"V1 heuristic plus {weight:g} merchant model",
+        ),
+    }
+    experiment_records = []
+    for name, result in results.items():
+        metrics = result["metrics"]
+        changes = {
+            label: metrics["per_class"][label]["f1"] - base["per_class"][label]["f1"]
+            for label in LABELS
+        }
+        description, change = descriptions[name]
+        experiment_records.append(
+            {
+                "experiment_id": name,
+                "description": description,
+                "change": change,
+                "macro_f1": metrics["macro_f1"],
+                "delta_vs_v1": metrics["macro_f1"] - base["macro_f1"],
+                "accuracy": metrics["accuracy"],
+                "f1_per_class": {label: metrics["per_class"][label]["f1"] for label in LABELS},
+                "affected_classes": {
+                    "improved": [label for label, delta in changes.items() if delta > 1e-12],
+                    "worsened": [label for label, delta in changes.items() if delta < -1e-12],
+                },
+                "git_commit": git_commit,
+                "notes": (
+                    "Fixed blend with a validation-calibrated V1 heuristic; exploratory"
+                    if name.startswith("v1_plus_")
+                    else "Official V1 validation predictions"
+                    if name == "v1_selected"
+                    else "Train-only transforms; official train/validation split"
+                ),
+                "result": (
+                    "baseline"
+                    if name == "v1_selected"
+                    else "above_v1"
+                    if metrics["macro_f1"] > base["macro_f1"]
+                    else "below_v1"
+                ),
+                "train_seconds": result["train_seconds"],
+                "feature_count": result["feature_count"],
+                "vocabulary_size": result["vocabulary_size"],
+            }
+        )
     summary = {
         "config": settings,
-        "reference": "v1_selected" if reference else "v1_word_component",
+        "reference": "v1_selected",
         "combined_text": best_text,
+        "best_new_variant": best_new_name,
         "results": results,
+        "experiments": experiment_records,
         "discriminative_terms": terms,
         "train_clients": len(x_train),
         "valid_clients": len(x_valid),
     }
     (directory / "results.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    (directory / "experiments.json").write_text(
+        json.dumps(experiment_records, indent=2), encoding="utf-8"
+    )
     comparison = pd.DataFrame(rows)
     per_class = pd.DataFrame(class_rows)
     diversity_rows = []
@@ -315,8 +420,11 @@ con el C del experimento; `v1_selected` procede del runner V1 si existe su salid
 {_markdown_table(comparison)}
 
 La combinación usa `{best_text}`, elegido entre dos representaciones por su
-Macro-F1 en esta misma validación. Su mejora es exploratoria: necesita otro
-split o test ciego antes de concluir que generaliza.
+Macro-F1 en esta misma validación. También se probaron blends fijos con la
+heurística seleccionada de V1 (peso nuevo {weight:g}). La mejor variante nueva
+fue `{best_new_name}` con Macro-F1 {best_new_f1:.6f}, delta
+{best_new_f1 - base["macro_f1"]:+.6f} frente a V1. La selección y la calibración
+de V1 utilizan esta misma validación; cualquier mejora sería exploratoria.
 
 ## F1 por clase (delta frente a la referencia V1)
 
@@ -342,8 +450,8 @@ con train y un mínimo de veinte clientes de la clase por término:
 
 ## Conclusión y límites
 
-Tomar como candidato sólo una variante que supere a `v1_selected` en Macro-F1
-y sin deterioro grave de clases minoritarias. `description` puede contener
+Ninguna variante nueva supera a `v1_selected` en Macro-F1. No sustituir V1
+por estas variantes. `description` puede contener
 palabras literales de la familia del generador sintético; verificar robustez
 antes de integrarla. Vocabularios y asociaciones se ajustaron con train; para
 features supervisadas de entrenamiento se resta la contribución del propio

@@ -8,6 +8,9 @@ output_directory = "outputs/metrics/ubs_text_v2"
 c = 0.3
 class_weight = "balanced"
 max_iter = 2000
+v1_text_blend_weight = 0.25
+v1_none_bias = -1.0
+v1_temperature = 1.0
 
 [tfidf]
 min_df = 2
