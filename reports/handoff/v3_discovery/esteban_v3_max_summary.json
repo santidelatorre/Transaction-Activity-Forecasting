@@ -1,0 +1,34 @@
+{
+  "model": "StreamV3MaxModel",
+  "v2_blend": 0.65,
+  "music_alpha": 0.6,
+  "streaming_alpha": 0.05,
+  "v2_macro_f1": 0.3915494559105542,
+  "v2_accuracy": 0.424,
+  "v3_macro_f1": 0.4134155421910242,
+  "v3max_macro_f1": 0.4318614926653391,
+  "v3max_accuracy": 0.463,
+  "delta_vs_v2": 0.0403120367547849,
+  "delta_vs_v3": 0.018445950474314854,
+  "per_class_f1": {
+    "cloud": 0.43478260869565216,
+    "gym": 0.4738955823293173,
+    "insurance": 0.4369747899159664,
+    "mobile": 0.46551724137931033,
+    "music": 0.3645833333333333,
+    "software": 0.4125560538116592,
+    "streaming": 0.2823529411764706,
+    "none": 0.5842293906810035
+  },
+  "prediction_distribution": {
+    "none": 265,
+    "insurance": 139,
+    "gym": 128,
+    "mobile": 128,
+    "software": 119,
+    "music": 99,
+    "streaming": 73,
+    "cloud": 49
+  },
+  "note": "Ulmans board 0.4240 is V2 accuracy; V2 Macro-F1 is ~0.3915. Per-family text alphas selected on VALID grid in try branch (reported, not OOF-frozen)."
+}
