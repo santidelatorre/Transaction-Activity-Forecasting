@@ -6,6 +6,9 @@ directory = "data/raw/ubs_2026"
 cutoff = "2026-01-01"
 target = "target_next_recurring_merchant"
 
+[selection]
+holdout_fraction = 0.25
+
 [features]
 recent_windows = [7, 14, 30, 60, 90, 180]
 tfidf_max_features = 2500

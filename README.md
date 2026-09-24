@@ -70,10 +70,21 @@ CatBoost y un ensemble simple. Se ejecuta desde la raíz del repositorio:
 python scripts/run_ubs_baseline.py --config configs/ubs_v1.toml
 ```
 
-El comando usa train para todos los ajustes supervisados, valid para evaluación y
-selección, y test únicamente para generar
-`outputs/predictions/submission_v1.csv`. Los resultados detallados quedan en
-`outputs/metrics/ubs_v1/`; datos y outputs permanecen ignorados por Git.
+El comando reserva un 25 % estratificado de los clientes de train para seleccionar
+modelos, calibración y ensemble. Preprocessing y mappings se ajustan solo con el
+75 % de fit. Congela la elección, reajusta solo con todo train y evalúa una vez
+en valid oficial. Test únicamente genera `outputs/predictions/submission_v1.csv`.
+Los resultados detallados quedan en `outputs/metrics/ubs_v1/`; datos y outputs
+permanecen ignorados por Git. No se incorpora valid al reajuste final.
+
+La [auditoría de validación y leakage](docs/UBS_V1_VALIDATION_AUDIT.md) documenta
+los controles y riesgos pendientes. Las asociaciones supervisadas de train se
+calculan por folds de clientes, excluyendo la etiqueta propia. El informe separa
+`internal_selection_macro_f1` de `official_validation_macro_f1`. Valid ya fue
+examinado en experimentos anteriores: el nuevo score no es históricamente
+independiente. Los intentos y clientes del split quedan en
+`selection_protocol.json`; `selected_model.json` congela la receta antes de
+puntuar valid. Se conservan tiempos, distribución y configuración del runner.
 
 The shared contracts, workstream split, temporal evaluation rules, and milestone
 plan are in [`docs/HACKATHON_PLAN.md`](docs/HACKATHON_PLAN.md),

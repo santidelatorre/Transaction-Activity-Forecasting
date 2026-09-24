@@ -11,16 +11,32 @@ from scipy import sparse
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import f1_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.class_weight import compute_class_weight
 
 from transaction_forecasting.ubs.data import LABELS
+from transaction_forecasting.ubs.evaluation import evaluate_predictions
+
+
+def _align_clients(features: pd.DataFrame, values: pd.Series) -> pd.Series:
+    """Align documents/targets by client ID; never silently pair different clients."""
+    if not features.index.is_unique or not values.index.is_unique:
+        raise ValueError("Feature and value client IDs must be unique")
+    if set(features.index) != set(values.index):
+        raise ValueError("Feature and value client IDs must match")
+    return values.reindex(features.index)
 
 
 def _reorder_probabilities(probabilities: np.ndarray, classes: np.ndarray) -> np.ndarray:
     positions = {str(label): position for position, label in enumerate(classes)}
-    return np.column_stack([probabilities[:, positions[label]] for label in LABELS])
+    return np.column_stack(
+        [
+            probabilities[:, positions[label]]
+            if label in positions
+            else np.zeros(len(probabilities))
+            for label in LABELS
+        ]
+    )
 
 
 @dataclass
@@ -29,6 +45,7 @@ class RecurrenceHeuristic:
 
     none_bias: float = 0.0
     temperature: float = 1.0
+    tuning_results_: list[dict[str, float]] = field(default_factory=list, init=False)
 
     def _raw_scores(self, features: pd.DataFrame) -> np.ndarray:
         scores: list[np.ndarray] = []
@@ -47,21 +64,25 @@ class RecurrenceHeuristic:
 
     def tune(self, features: pd.DataFrame, target: pd.Series) -> RecurrenceHeuristic:
         """Select only calibration parameters on validation macro-F1."""
-        best: tuple[float, float, float] | None = None
-        for temperature in (0.5, 0.75, 1.0, 1.5, 2.0):
-            for none_bias in np.arange(-2.0, 2.51, 0.25):
-                self.temperature = float(temperature)
-                self.none_bias = float(none_bias)
-                predicted = self.predict(features)
-                score = f1_score(target, predicted, labels=LABELS, average="macro")
-                candidate = (float(score), -abs(none_bias), -abs(temperature - 1.0))
-                if best is None or candidate > best:
-                    best = candidate
-                    best_parameters = (float(none_bias), float(temperature))
-        self.none_bias, self.temperature = best_parameters
+        target = _align_clients(features, target)
+        best: tuple[float, float] | None = None
+        self.tuning_results_ = []
+        # Positive temperature cannot change argmax, so F1 cannot calibrate it.
+        self.temperature = 1.0
+        for none_bias in np.arange(-2.0, 2.51, 0.25):
+            self.none_bias = float(none_bias)
+            score = float(evaluate_predictions(target, self.predict(features))["macro_f1"])
+            self.tuning_results_.append({"none_bias": self.none_bias, "macro_f1": score})
+            candidate = (score, -abs(none_bias))
+            if best is None or candidate > best:
+                best = candidate
+                best_bias = self.none_bias
+        self.none_bias = best_bias
         return self
 
     def predict_proba(self, features: pd.DataFrame) -> np.ndarray:
+        if not np.isfinite(self.temperature) or self.temperature <= 0:
+            raise ValueError("temperature must be finite and positive")
         scores = self._raw_scores(features) / self.temperature
         scores -= scores.max(axis=1, keepdims=True)
         probabilities = np.exp(scores)
@@ -88,8 +109,10 @@ class ClientTextLogistic:
     def fit(
         self, features: pd.DataFrame, documents: pd.Series, target: pd.Series
     ) -> ClientTextLogistic:
+        documents = _align_clients(features, documents)
+        target = _align_clients(features, target)
         self.numeric_columns_ = features.columns.tolist()
-        self.imputer = SimpleImputer(strategy="median")
+        self.imputer = SimpleImputer(strategy="median", keep_empty_features=True)
         self.scaler = StandardScaler()
         numeric = self.imputer.fit_transform(features)
         numeric = self.scaler.fit_transform(numeric)
@@ -115,6 +138,7 @@ class ClientTextLogistic:
         return self
 
     def _transform(self, features: pd.DataFrame, documents: pd.Series) -> sparse.csr_matrix:
+        documents = _align_clients(features, documents)
         numeric = self.imputer.transform(features[self.numeric_columns_])
         numeric = self.scaler.transform(numeric)
         text = self.vectorizer.transform(documents)
@@ -150,16 +174,18 @@ class CatBoostClientModel:
     medians_: pd.Series = field(default_factory=pd.Series, init=False)
 
     def fit(self, features: pd.DataFrame, target: pd.Series) -> CatBoostClientModel:
+        target = _align_clients(features, target)
         self.columns_ = features.columns.tolist()
         self.medians_ = features.median().fillna(0.0)
         train = features.fillna(self.medians_)
         class_weights = None
         if self.balanced:
+            present_classes = np.asarray(sorted(target.unique()))
             weights = compute_class_weight(
-                class_weight="balanced", classes=np.asarray(LABELS), y=target.to_numpy()
+                class_weight="balanced", classes=present_classes, y=target.to_numpy()
             )
             class_weights = {
-                label: float(weight) for label, weight in zip(LABELS, weights, strict=True)
+                label: float(weight) for label, weight in zip(present_classes, weights, strict=True)
             }
         self.model = CatBoostClassifier(
             iterations=self.iterations,

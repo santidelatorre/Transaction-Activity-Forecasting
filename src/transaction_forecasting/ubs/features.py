@@ -6,8 +6,10 @@ from dataclasses import dataclass, field
 
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import KFold
 
-from transaction_forecasting.ubs.data import CUTOFF, LABELS, TARGET_COLUMN
+from transaction_forecasting.evaluation.official import validate_client_ids
+from transaction_forecasting.ubs.data import CUTOFF, LABELS, TARGET_COLUMN, validate_history
 
 RECENT_WINDOWS = (7, 14, 30, 60, 90, 180)
 PERIODICITY_BINS = {
@@ -26,14 +28,16 @@ def _safe_cv(values: pd.Series) -> float:
 
 def build_client_documents(transactions: pd.DataFrame, client_ids: pd.Index) -> pd.Series:
     """Create train-fittable text documents while preserving repeated descriptions."""
+    validate_history(transactions)
     documents = transactions.groupby("client_id", sort=False)["description"].agg(" ".join)
     return documents.reindex(client_ids, fill_value="")
 
 
 def build_recurrence_streams(transactions: pd.DataFrame) -> pd.DataFrame:
     """Summarize repeated merchant-like descriptions per client."""
-    ordered = transactions.sort_values(["client_id", "description", "timestamp"]).copy()
-    keys = ["client_id", "description"]
+    validate_history(transactions)
+    keys = ["client_id", "description", "currency", "direction"]
+    ordered = transactions.sort_values([*keys, "timestamp"]).copy()
     ordered["interval_days"] = (
         ordered.groupby(keys, sort=False)["timestamp"].diff().dt.total_seconds().div(86400)
     )
@@ -80,6 +84,10 @@ class ClientFeatureBuilder:
 
     def fit(self, transactions: pd.DataFrame, labels: pd.DataFrame) -> ClientFeatureBuilder:
         """Learn only vocabulary/category levels and smoothed family-description lift."""
+        validate_history(transactions)
+        validate_client_ids(labels, "training labels")
+        if not labels[TARGET_COLUMN].isin(LABELS).all():
+            raise ValueError("Invalid training target labels")
         label_series = labels.set_index("client_id")[TARGET_COLUMN]
         if set(transactions["client_id"]) != set(label_series.index):
             raise ValueError("Training transactions and labels must contain the same clients")
@@ -89,9 +97,13 @@ class ClientFeatureBuilder:
         }
         present = transactions[["client_id", "description"]].drop_duplicates()
         present = present.join(label_series, on="client_id")
-        class_sizes = label_series.value_counts().reindex(LABELS).astype(float)
+        class_sizes = label_series.value_counts().reindex(LABELS, fill_value=0).astype(float)
         lifts: dict[str, pd.Series] = {}
         for label in LABELS:
+            if class_sizes[label] == 0:
+                # Smoothing must not invent positive evidence for an unseen class.
+                lifts[label] = pd.Series(0.0, index=present["description"].unique())
+                continue
             in_counts = present.loc[present[TARGET_COLUMN].eq(label), "description"].value_counts()
             out_counts = present.loc[
                 ~present[TARGET_COLUMN].eq(label), "description"
@@ -115,12 +127,42 @@ class ClientFeatureBuilder:
         self.fitted_ = True
         return self
 
+    def fit_transform(
+        self, transactions: pd.DataFrame, labels: pd.DataFrame, *, n_splits: int = 5, seed: int = 42
+    ) -> pd.DataFrame:
+        """Cross-fit target-derived train features, retaining full-train state for inference.
+
+        Folds contain whole clients and do not depend on labels. Every family's
+        training feature excludes that client's entire fold from its lift table.
+        Category levels (unsupervised) are learned from train only.
+        """
+        self.fit(transactions, labels)
+        clients = pd.Index(sorted(labels["client_id"]), name="client_id")
+        if len(clients) < 2:
+            raise ValueError("Cross-fitting needs at least two training clients")
+        folds = KFold(n_splits=min(n_splits, len(clients)), shuffle=True, random_state=seed)
+        features = self.transform(transactions)
+        family_columns = features.columns[features.columns.str.startswith("family_")]
+        for train_positions, held_positions in folds.split(clients):
+            train_ids, held_ids = clients[train_positions], clients[held_positions]
+            fold_builder = ClientFeatureBuilder().fit(
+                transactions[transactions["client_id"].isin(train_ids)],
+                labels[labels["client_id"].isin(train_ids)],
+            )
+            held_streams = build_recurrence_streams(
+                transactions[transactions["client_id"].isin(held_ids)]
+            )
+            held_features = fold_builder._add_recurrence_features(
+                pd.DataFrame(index=held_ids), held_streams
+            )
+            features.loc[held_ids, family_columns] = held_features[family_columns]
+        return features
+
     def transform(self, transactions: pd.DataFrame) -> pd.DataFrame:
         """Return deterministic numeric features indexed by client_id."""
         if not self.fitted_:
             raise RuntimeError("ClientFeatureBuilder.fit must be called before transform")
-        if (transactions["timestamp"] >= CUTOFF).any():
-            raise ValueError("Feature input contains transactions at/after cutoff")
+        validate_history(transactions)
         clients = pd.Index(sorted(transactions["client_id"].unique()), name="client_id")
         features = pd.DataFrame(index=clients)
         ordered = transactions.sort_values(["client_id", "timestamp"], kind="stable").copy()
@@ -130,10 +172,6 @@ class ClientFeatureBuilder:
         features["n_out"] = grouped["direction"].apply(lambda x: int(x.eq("out").sum()))
         features["n_in"] = grouped["direction"].apply(lambda x: int(x.eq("in").sum()))
         features["out_share"] = features["n_out"] / features["n_transactions"]
-        for statistic in ("sum", "mean", "median", "std", "min", "max"):
-            features[f"amount_{statistic}"] = grouped["amount"].agg(statistic)
-        features["fee_sum"] = grouped["fee"].sum()
-        features["fee_mean"] = grouped["fee"].mean()
         features["fee_positive_share"] = grouped["fee"].apply(lambda x: float(x.gt(0).mean()))
         for column in ("mcc", "description", "type", "currency"):
             features[f"n_unique_{column}"] = grouped[column].nunique()
@@ -195,11 +233,12 @@ class ClientFeatureBuilder:
 
         for currency in self.categorical_levels_["currency"]:
             currency_rows = ordered[ordered["currency"].eq(currency)]
-            currency_grouped = currency_rows.groupby("client_id")["amount"]
-            for statistic in ("sum", "mean", "median", "std"):
-                extra_features[f"amount_{currency}_{statistic}"] = currency_grouped.agg(
-                    statistic
-                ).reindex(clients)
+            for column in ("amount", "fee"):
+                currency_grouped = currency_rows.groupby("client_id")[column]
+                for statistic in ("sum", "mean", "median", "std", "min", "max"):
+                    extra_features[f"{column}_{currency}_{statistic}"] = currency_grouped.agg(
+                        statistic
+                    ).reindex(clients)
 
         features = pd.concat([features, pd.DataFrame(extra_features, index=clients)], axis=1)
 
@@ -211,8 +250,6 @@ class ClientFeatureBuilder:
         self, features: pd.DataFrame, streams: pd.DataFrame
     ) -> pd.DataFrame:
         clients = features.index
-        if streams.empty:
-            return features.fillna(0.0)
         grouped = streams.groupby("client_id", sort=False)
         recurrence_features: dict[str, pd.Series] = {}
         recurrence_features["repeated_description_count"] = grouped.size()
@@ -265,7 +302,6 @@ class ClientFeatureBuilder:
             family_features[f"{prefix}_recency"] = evidence_grouped["days_since_last"].min()
             family_features[f"{prefix}_frequency"] = evidence_grouped["appearances"].max()
             family_features[f"{prefix}_regularity"] = evidence_grouped["regularity"].max()
-            family_features[f"{prefix}_typical_amount"] = evidence_grouped["amount_median"].median()
             family_features[f"{prefix}_amount_similarity"] = 1.0 / (
                 1.0 + evidence_grouped["amount_cv"].min()
             )

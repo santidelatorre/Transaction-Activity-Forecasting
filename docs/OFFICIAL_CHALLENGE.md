@@ -59,6 +59,14 @@ producir predicciones; sus etiquetas no están disponibles. Comprobar el
 solapamiento de clientes entre archivos al auditar los datos. El ID sirve para
 unir tablas, no debe entrar como característica por defecto.
 
+Protocolo local reforzado para Milestone 2: reservar un holdout estratificado de
+clientes dentro de train para todas las decisiones de configuración, calibración
+y ensemble. Ajustar preprocessing y mappings solo en los clientes de fit;
+reajustar la receta elegida con train completo, sin valid. El runner puntúa
+valid oficial una vez, después de congelar la elección, y distingue ese score
+del de selección interna. Esto no revierte la exposición de valid en runs
+anteriores. Es una decisión experimental local, no una nueva regla de UBS.
+
 Todos los features proceden del historial disponible al corte. Ajustar
 vocabularios, imputaciones, escalados y otros componentes aprendidos con train,
 sin usar las etiquetas de valid. El enunciado permite historias sin etiquetas

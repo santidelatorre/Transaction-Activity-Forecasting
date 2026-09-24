@@ -20,7 +20,7 @@ HORIZON_DAYS = 90
 SUBMISSION_COLUMNS = ("client_id", PREDICTION)
 
 
-def _check_ids(frame: pd.DataFrame, name: str) -> None:
+def validate_client_ids(frame: pd.DataFrame, name: str) -> None:
     if "client_id" not in frame.columns:
         raise ValueError(f"{name}: missing client_id")
     if frame.empty:
@@ -48,7 +48,7 @@ def validate_submission(predictions: pd.DataFrame, sample: pd.DataFrame) -> pd.D
     for name, frame in (("predictions", predictions), ("sample", sample)):
         if tuple(frame.columns) != SUBMISSION_COLUMNS:
             raise ValueError(f"{name}: expected columns {SUBMISSION_COLUMNS}")
-        _check_ids(frame, name)
+        validate_client_ids(frame, name)
     _check_classes(predictions, PREDICTION, "predictions")
     expected = set(sample["client_id"])
     actual = set(predictions["client_id"])
@@ -60,18 +60,23 @@ def validate_submission(predictions: pd.DataFrame, sample: pd.DataFrame) -> pd.D
     return predictions.set_index("client_id").loc[sample["client_id"]].reset_index()
 
 
+def validate_labels(labels: pd.DataFrame) -> None:
+    """Check the official labelled-client contract, shared with the UBS loader."""
+    if not labels.columns.is_unique:
+        raise ValueError("labels: duplicate column names")
+    validate_client_ids(labels, "labels")
+    _check_classes(labels, TARGET, "labels")
+    if "cutoff_date" not in labels or not labels["cutoff_date"].eq(CUTOFF_DATE).all():
+        raise ValueError(f"labels: cutoff_date must be {CUTOFF_DATE}")
+
+
 def score_predictions(labels: pd.DataFrame, predictions: pd.DataFrame) -> dict[str, object]:
     """Score every labelled client exactly once, aligning by ID rather than row.
 
     No inner join or missing-prediction fallback: incomplete coverage is an error.
     This is local validation, not a claim about the hidden-test leaderboard.
     """
-    if not labels.columns.is_unique:
-        raise ValueError("labels: duplicate column names")
-    _check_ids(labels, "labels")
-    _check_classes(labels, TARGET, "labels")
-    if "cutoff_date" not in labels or not labels["cutoff_date"].eq(CUTOFF_DATE).all():
-        raise ValueError(f"labels: cutoff_date must be {CUTOFF_DATE}")
+    validate_labels(labels)
     sample = labels[["client_id"]].assign(**{PREDICTION: "none"})
     aligned = validate_submission(predictions, sample)
     return classification_metrics(labels[TARGET], aligned[PREDICTION])
