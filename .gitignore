@@ -29,11 +29,16 @@ data/external/*
 !data/external/.gitkeep
 outputs/models/*
 outputs/predictions/*
+outputs/metrics/*
+outputs/figures/*
 !outputs/models/.gitkeep
 !outputs/predictions/.gitkeep
+!outputs/metrics/.gitkeep
+!outputs/figures/.gitkeep
 *.csv
 *.tsv
 *.parquet
+*.zip
 *.pickle
 *.pkl
 *.joblib
