@@ -37,12 +37,18 @@ de texto elegida en validación.
 | Normalizado, char 3–5 | 0.196875 | -0.074149 | 0.281 | 1.123 | 905 | 2.85 |
 | Agregados V1 + descripción como comercio | 0.169151 | -0.101873 | 0.285 | 245 | 0 | 0.80 |
 | Word 1–2 + comercio aproximado | 0.169339 | -0.101685 | 0.287 | 2.565 | 2.320 | 1.97 |
+| V1 + 25% modelo word 1–2 | 0.232839 | -0.038186 | 0.276 | 2.538 | 2.320 | ≈1.7 |
+| V1 + 25% modelo merchant proxy | 0.243527 | -0.027497 | 0.300 | 245 | 0 | ≈0.8 |
 
 La normalización no alteró la representación word 1–2 en estos datos: el
 lector V1 ya convierte las descripciones a minúsculas y no se observaron
 referencias variables que cambiasen el vocabulario. Los n-grams de caracteres
-tampoco aportaron mejora. Las cifras de entrenamiento excluyen construcción
-de features y lectura del dataset; son tiempos aproximados del clasificador.
+tampoco aportaron mejora. Los dos blends usan el peso fijo 0.25 y los parámetros
+de la heurística V1 (`none_bias=-1`, `temperature=1`). El blend con merchant
+proxy es la mejor variante nueva, pero sigue por debajo del baseline. Las
+cifras de entrenamiento excluyen construcción de features y lectura del dataset;
+son tiempos aproximados del clasificador, y para blends representan sólo su
+componente ML.
 
 ## Clases y cobertura
 
@@ -56,6 +62,10 @@ de features y lectura del dataset; son tiempos aproximados del clasificador.
 | software | 104 | 0.2714 | 0.2166 | -0.0548 | 0.1765 | -0.0949 |
 | streaming | 97 | 0.2473 | 0.1486 | -0.0987 | 0.1447 | -0.1026 |
 | none | 293 | 0.0942 | 0.3891 | +0.2949 | 0.4277 | +0.3336 |
+
+El blend V1 + merchant proxy alcanza F1 `0.3143` en cloud (+0.0259) y
+`0.3969` en none (+0.3027), pero empeora gym, insurance, mobile, music,
+software y streaming. Su Macro-F1 de `0.243527` no justifica integrarlo.
 
 Todos los clientes tienen algún texto, pero disponer de texto no garantiza
 que identifique la siguiente familia recurrente. El clasificador textual
@@ -92,6 +102,11 @@ locales al *stream* recurrente, en lugar de todo el documento del cliente,
 ayudan a separar la siguiente familia de `none`. Validar esa hipótesis con
 otro corte o test ciego antes de adoptar un cambio.
 
+El tracking por ejecución está en `outputs/metrics/ubs_text_v2/experiments.json`:
+identificador, cambio, métricas, F1 por clase, clases afectadas, commit y notas.
+El detalle de los experimentos e instrucciones para la IA integradora se
+encuentran en `reports/handoff/javier_text_merchants.md`.
+
 ```powershell
 .venv\Scripts\python.exe scripts/run_ubs_baseline.py --config configs/ubs_v1.toml
 .venv\Scripts\python.exe scripts/run_ubs_text_v2.py --config configs/ubs_text_v2.toml
@@ -102,6 +117,6 @@ otro corte o test ciego antes de adoptar un cambio.
 ```
 
 La V1 se ejecuta primero para guardar su predicción de validación como
-referencia exacta. Si no está disponible, el runner V2 usa el componente
-logístico V1 como referencia temporal e indica ese cambio en `results.json`.
+referencia exacta. El runner V2 exige ese archivo y comprueba que la
+heurística configurada reproduce el Macro-F1 de V1.
 El experimento V2 no genera un CSV de entrega.
