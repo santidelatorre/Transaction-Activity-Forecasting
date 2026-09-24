@@ -1,0 +1,18 @@
+[project]
+random_seed = 42
+data_directory = "data/raw/ubs_2026"
+v1_metrics_directory = "outputs/metrics/ubs_v1"
+output_directory = "outputs/metrics/ubs_text_v2"
+
+[model]
+c = 0.3
+class_weight = "balanced"
+max_iter = 2000
+
+[tfidf]
+min_df = 2
+max_df = 0.98
+max_features = 2500
+char_max_features = 3500
+char_ngram_min = 3
+char_ngram_max = 5
