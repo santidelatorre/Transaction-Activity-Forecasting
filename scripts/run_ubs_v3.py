@@ -1,7 +1,7 @@
-"""Reproduce fixed V3 ablations with nested client isolation and untouched V2.
+"""Run the promoted V3-A baseline and historical V3 diagnostics with client isolation.
 
 Run phases in order: oof, valid, submission (or all). Outputs remain local.
-VALID cannot select the submission candidate; its name is frozen by TRAIN OOF.
+V3-A is frozen for VALID and submission; neither OOF nor VALID selects a candidate.
 """
 
 from __future__ import annotations
@@ -150,7 +150,7 @@ def main():
             raise ValueError("OOF predictions are not complete/disjoint")
         report = metrics(target, oof)
         candidates = ("A", "B", "full", "ensemble", "focused")
-        selected = max(candidates, key=lambda name: report[name]["macro_f1"])
+        selected = "A"
         write_json(
             out / "oof_results.json",
             {
@@ -167,7 +167,10 @@ def main():
             out / "frozen_selection.json",
             {
                 "candidate": selected,
-                "criterion": "maximum fixed-eight-class TRAIN OOF Macro-F1",
+                "criterion": (
+                    "frozen promoted V3-A baseline; family identity is the best currently "
+                    "supported transferable model"
+                ),
                 "fingerprints": stamps,
                 "valid_labels_used_for_this_selection": False,
             },
@@ -175,6 +178,8 @@ def main():
     frozen = json.loads((out / "frozen_selection.json").read_text())
     if frozen["fingerprints"] != stamps:
         raise ValueError("Source or data differs from frozen OOF selection")
+    if frozen["candidate"] != "A":
+        raise ValueError("The promoted V3-A baseline requires frozen candidate A")
     if args.phase in ("valid", "all"):
         valid = read_transactions(args.data_dir / "valid_transactions.jsonl")
         if set(train.client_id).intersection(valid.client_id):

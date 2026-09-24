@@ -27,7 +27,13 @@ def arm_matrix(history, family, recurrence, arm):
 
 
 class V3Model:
-    """Full V3 is AB; optional fixed 50/50 ensemble, with all arms exposed."""
+    """V3-A (family identity) is the promoted competitive baseline.
+
+    ``predict()`` uses exclusively A: V2 history plus family identity, with the
+    frozen 75% numeric model / 25% periodicity heuristic blend and no recurrence
+    block B. B, AB/full and ensemble remain available for historical research
+    and diagnostics through ``predict_components()``.
+    """
 
     def fit(self, transactions, labels):
         validate_history(transactions)
@@ -64,4 +70,4 @@ class V3Model:
         return results
 
     def predict(self, transactions):
-        return self.predict_components(transactions)["full"].idxmax(axis=1)
+        return self.predict_components(transactions)["A"].idxmax(axis=1)

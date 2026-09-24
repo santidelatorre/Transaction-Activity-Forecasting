@@ -31,11 +31,15 @@ Acuerdo actual comunicado por Carles: cada persona trabaja en su rama
 
 ## Discovery V3
 
-La referencia V2 sigue disponible con `python scripts/run_ubs_v2.py`.
-La auditoría de las siete ramas, los resultados comparables y la decisión de
-promoción están en [v3_discovery_synthesis.md](reports/v3_discovery_synthesis.md).
-El [protocolo](reports/v3_experiment_protocol.md) fija las ablations antes de
-medir las nuevas predicciones oficiales.
+**Current competitive baseline: V3-A (family identity).**
+TRAIN OOF Macro-F1: `0.459793826869`; VALID Macro-F1: `0.424111097737`.
+V2 es la baseline anterior (VALID: `0.391549455911`), disponible con
+`python scripts/run_ubs_v2.py`; la mejora de V3-A en VALID es `+0.032561641826`.
+Los demás brazos V3 siguen disponibles para investigación y reproducción, pero
+no son la baseline. AB/full obtuvo OOF algo superior y transfirió peor a VALID.
+La [síntesis](reports/v3_discovery_synthesis.md) y el
+[protocolo](reports/v3_experiment_protocol.md) conservan la evidencia y las
+decisiones históricas previas a esta promoción.
 
 ```powershell
 python scripts/run_ubs_v3.py --phase oof
@@ -43,10 +47,13 @@ python scripts/run_ubs_v3.py --phase valid
 python scripts/run_ubs_v3.py --phase submission
 ```
 
-El candidato se selecciona con cinco folds por cliente dentro de TRAIN;
-los mappings supervisados de entrenamiento se calculan con otros cinco folds
-internos. La fase VALID conserva esa selección. La submission reajusta el
-candidato con TRAIN+VALID y valida sus 1.000 filas, sin enviar archivos.
+A queda congelada para `V3Model.predict()`, VALID y submission, sin nueva
+selección por OOF ni VALID. La receta conserva history features de V2, family
+identity y CatBoost con la mezcla fija 75% modelo numérico + 25% periodicity
+heuristic, sin el bloque de recurrencia B. Se evalúa con cinco folds por cliente
+dentro de TRAIN; los mappings supervisados se calculan con otros cinco folds
+internos. La submission reajusta A con TRAIN+VALID y valida sus 1.000 filas,
+sin enviar archivos.
 Predicciones, probabilidades, métricas, fingerprints y submission quedan en
 `outputs/metrics/ubs_v3/`, ignorado por Git. Un cambio de código o datos exige
 un directorio nuevo mediante `--output-dir`; los folds completos permiten

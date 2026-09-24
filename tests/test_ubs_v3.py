@@ -1,11 +1,13 @@
 import importlib.util
+import json
+import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import pytest
 
-from transaction_forecasting.ubs.data import CUTOFF, LABELS, TARGET_COLUMN
+from transaction_forecasting.ubs.data import CUTOFF, LABELS, PREDICTION_COLUMN, TARGET_COLUMN
 from transaction_forecasting.ubs.v3.family_text import focused_correction
 from transaction_forecasting.ubs.v3.features import (
     FamilyMap,
@@ -140,10 +142,13 @@ def test_factorial_model_uses_crossfit_and_preserves_probability_contract(monkey
             assert "client_id" not in features and TARGET_COLUMN not in features
             assert not features.isna().any().any()
             fitted_columns.append(features.columns.tolist())
+            self.prediction = len(fitted_columns)
             return self
 
         def predict_proba(self, features):
-            return np.full((len(features), 8), 1 / 8)
+            probabilities = np.full((len(features), 8), 0.025)
+            probabilities[:, self.prediction] = 0.825
+            return probabilities
 
     monkeypatch.setattr(module, "IntegratedV2Model", V2)
     monkeypatch.setattr(module, "make_model", Classifier)
@@ -152,6 +157,11 @@ def test_factorial_model_uses_crossfit_and_preserves_probability_contract(monkey
     assert [len(columns) for columns in fitted_columns] == [22, 14, 217]
     unseen = tx.assign(client_id="new_" + tx.client_id)
     components = model.predict_components(unseen)
+    expected = components["A"].idxmax(axis=1)
+    pd.testing.assert_series_equal(model.predict(unseen), expected)
+    for name, frame in components.items():
+        if name != "A":
+            assert not frame.idxmax(axis=1).equals(expected)
     pd.testing.assert_frame_equal(components["AB"], components["full"])
     for frame in components.values():
         assert list(frame.columns) == list(LABELS)
@@ -174,3 +184,67 @@ def test_reproduction_refuses_stale_input_copy(tmp_path):
     with pytest.raises(ValueError, match="differs from source"):
         module.copy_verified_input(source, copy)
     assert copy.read_text(encoding="utf-8") == "first"
+
+
+def test_runner_freezes_a_despite_better_diagnostics_and_submits_only_a(tmp_path, monkeypatch):
+    script = Path(__file__).resolve().parents[1] / "scripts/run_ubs_v3.py"
+    spec = importlib.util.spec_from_file_location("run_ubs_v3", script)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    data, out = tmp_path / "data", tmp_path / "outputs"
+    data.mkdir()
+    tx, labels = sample()
+    for split in ("train", "valid", "test"):
+        split_tx = tx.assign(client_id=tx.client_id + f"_{split}")
+        split_tx.to_json(data / f"{split}_transactions.jsonl", orient="records", lines=True)
+        split_labels = labels.assign(client_id=labels.client_id + f"_{split}", cutoff_date=CUTOFF)
+        if split != "test":
+            split_labels.to_csv(data / f"{split}_labels.csv", index=False)
+        else:
+            sample_submission = split_labels[["client_id"]].assign(**{PREDICTION_COLUMN: "none"})
+            sample_submission.to_csv(data / "sample_submission.csv", index=False)
+
+    class DiagnosticModel:
+        def fit(self, transactions, labels):
+            self.mapper_ = self
+            self.audit_ = pd.DataFrame()
+            self.models_ = {}
+            return self
+
+    def diagnostic_predictions(model, text_model, transactions, directory, prefix):
+        clients = pd.Index(sorted(transactions.client_id.unique()), name="client_id")
+        truth = clients.str.split("_").str[0]
+        frame = pd.DataFrame(
+            {arm: truth for arm in ("V2", "B", "AB", "full", "ensemble", "focused")},
+            index=clients,
+        )
+        frame["A"] = "cloud"
+        return frame
+
+    monkeypatch.setattr(module, "V3Model", DiagnosticModel)
+    monkeypatch.setattr(module, "TextFamilyModel", DiagnosticModel)
+    monkeypatch.setattr(module, "predictions", diagnostic_predictions)
+    monkeypatch.setattr(module, "bootstrap_delta", lambda *args: {})
+    argv = [str(script), "--data-dir", str(data), "--output-dir", str(out), "--phase"]
+    monkeypatch.setattr(sys, "argv", [*argv, "all"])
+    module.main()
+    frozen = json.loads((out / "frozen_selection.json").read_text())
+    assert frozen["candidate"] == "A"
+    assert frozen["valid_labels_used_for_this_selection"] is False
+    assert "promoted V3-A baseline" in frozen["criterion"]
+    oof = json.loads((out / "oof_results.json").read_text())
+    assert oof["selected_candidate"] == "A"
+    for arm in ("B", "AB", "full", "ensemble", "focused"):
+        assert oof["metrics"][arm]["macro_f1"] > oof["metrics"]["A"]["macro_f1"]
+    valid = json.loads((out / "valid_results.json").read_text())
+    assert valid["oof_selected_candidate"] == "A"
+    submission = pd.read_csv(out / "submission_v3.csv")
+    assert submission[PREDICTION_COLUMN].eq("cloud").all()
+    assert submission.client_id.tolist() == sample_submission.client_id.tolist()
+
+    for phase in ("valid", "submission"):
+        monkeypatch.setattr(sys, "argv", [*argv, phase])
+        for arm in ("B", "AB", "full", "ensemble", "focused"):
+            module.write_json(out / "frozen_selection.json", {**frozen, "candidate": arm})
+            with pytest.raises(ValueError, match="requires frozen candidate A"):
+                module.main()
