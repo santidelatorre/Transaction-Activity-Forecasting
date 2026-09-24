@@ -15,4 +15,31 @@ models = "outputs/models"
 # Completar cuando se conozca el contrato del dataset.
 
 [training]
+ # TODO(dataset): configure target, temporal column, horizon and model parameters.
+
+[dataset]
+# TODO(dataset): path and format (csv or parquet) of the real source file.
+path = ""
+format = ""
+# TODO(dataset): raw required column names and their types.
+required_columns = []
+
+[dataset.column_types]
+# Example once known: event_time = "datetime"; value = "numeric"
+
+[split]
+# TODO(dataset): chronological column and validation/test windows.
+time_column = ""
+validation_fraction = 0.2
+test_fraction = 0.2
+# TODO(dataset): embargo / forecasting horizon, if required by the task.
+embargo_rows = 0
+
+[model]
+# TODO(dataset): target column and the candidate models/hyperparameters.
+target_column = ""
+baseline = "mean_regressor"
+
+[experiment]
+results_path = "outputs/metrics/experiments.jsonl"
 # Completar cuando se definan el objetivo y la validación temporal.
