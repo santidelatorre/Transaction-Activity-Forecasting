@@ -11,5 +11,6 @@ Official eight-class validation; V1 reference 0.2710242658492452. Rejected trial
 | 4 | origin/features/ginestar-v2-temporal | 6ba1311 | temporal_periodicity | 0.272636283 | 0.001612017 | 0.001612017 | 0.265000000 | KEEP_PROVISIONAL | Only periodicity; same V1 bias and mapping; independent of intervals trial. |
 | 5 | origin/features/ginestar-v2-temporal | 6ba1311 | temporal_activity | 0.264064548 | -0.008571735 | -0.006959718 | 0.261000000 | REJECT | Isolated activity vs V1; compared to provisional periodicity; not stacked. |
 | 6 | origin/features/ginestar-v2-temporal | 6ba1311 | temporal_horizon | 0.261599760 | -0.011036523 | -0.009424506 | 0.258000000 | REJECT | Isolated horizon vs V1; compared to provisional periodicity; not stacked. |
+| 7 | origin/features/javier-v2-text | f598fc3+7ef31a6 | merchant_blend | 0.243527493 | -0.029108790 | -0.027496772 | 0.300000000 | REJECT | Frozen 75/25 blend; forensic reproduction only; inherited self-label V1 columns prevent promotion. |
 
 Full per-class F1, confusion matrices, predictions and provenance: `outputs/metrics/v2_integration/results.json` (local, ignored).

@@ -225,9 +225,44 @@ def main():
         )
         blended = 0.75 * model.predict_proba(x_valid) + 0.25 * probabilities
         prediction = pd.Series(np.asarray(LABELS)[blended.argmax(axis=1)], index=x_valid.index)
+    elif args.candidate.startswith("catboost_"):
+        from transaction_forecasting.ubs.v2 import (
+            HistoryFeatureBuilder,
+            calibrate_probabilities,
+            make_model,
+        )
+
+        safe = args.candidate.startswith("catboost_history_")
+        if safe:
+            history = HistoryFeatureBuilder().fit(data.train_transactions)
+            x_train = history.transform(data.train_transactions)
+            x_valid = history.transform(data.valid_transactions)
+        key = hashlib.sha256(
+            json.dumps(
+                {
+                    "versions": before["versions"],
+                    "v2": digest(ROOT / "src/transaction_forecasting/ubs/v2.py"),
+                    "safe": safe,
+                    "columns": x_train.columns.tolist(),
+                    "recipe": "300/4/.05/balanced/42",
+                },
+                sort_keys=True,
+            ).encode()
+        ).hexdigest()[:20]
+        path = cache / f"catboost_{key}.npy"
+        if path.exists():
+            probabilities = np.load(path, allow_pickle=False)
+        else:
+            probabilities = make_model().fit(x_train, y_train).predict_proba(x_valid)
+            np.save(path, probabilities, allow_pickle=False)
+        if args.candidate.endswith("_calibrated"):
+            probabilities = calibrate_probabilities(probabilities)
+        prediction = pd.Series(
+            np.asarray(LABELS)[probabilities.argmax(axis=1)], index=x_valid.index
+        )
     elif args.candidate not in ("baseline", "tracking", "quality_gate"):
         raise ValueError("Unknown candidate")
-    if args.candidate != "merchant_blend":
+    if args.candidate != "merchant_blend" and not args.candidate.startswith("catboost_"):
         prediction = pd.Series(model.predict(x_valid), index=x_valid.index)
     metrics = evaluate_predictions(y_valid, prediction)
     if args.candidate in ("baseline", "tracking", "quality_gate"):
@@ -236,6 +271,8 @@ def main():
         decision = "BASELINE" if args.candidate == "baseline" else "KEEP_TOOLING"
     else:
         decision = "KEEP_PROVISIONAL" if metrics["macro_f1"] > args.previous else "REJECT"
+    if args.candidate.startswith("catboost_v1_"):
+        decision = "REJECT_SELF_LABEL"
     record(
         args.candidate,
         args.source,
