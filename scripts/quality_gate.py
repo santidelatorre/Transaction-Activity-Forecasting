@@ -88,7 +88,7 @@ def load_toml(path):
 
 def validate_thresholds(thresholds):
     for name, value in thresholds.items():
-        if not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+        if not isinstance(value, int | float) or not math.isfinite(value) or value < 0:
             raise ValueError(f"Invalid nonnegative finite threshold: {name}")
     for warning, blocking in (
         ("macro_f1_warn_drop", "macro_f1_fail_drop"),
@@ -356,7 +356,7 @@ def validate_metric_record(metrics):
             for key in ("precision", "recall", "f1")
         ],
     ]:
-        if not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 <= value <= 1:
+        if not isinstance(value, int | float) or not math.isfinite(value) or not 0 <= value <= 1:
             raise ValueError("Invalid metric value")
     if set(metrics["per_class"]) != set(LABELS):
         raise ValueError("Expected all eight classes")

@@ -33,6 +33,9 @@ def _log(logger: ExperimentLogger, run_number: int) -> str:
 def test_logs_reproducibility_metadata_and_baseline_delta(tmp_path: Path) -> None:
     database = tmp_path / "experiments.sqlite3"
     logger = ExperimentLogger(db_path=database, repo_root=tmp_path)
+    # The quality gate places pytest temporaries inside the working tree.
+    # Git metadata therefore depends on the configured temporary directory.
+    expected_commit, _ = logger._git_metadata()
 
     experiment_id = _log(logger, 1)
 
@@ -47,7 +50,7 @@ def test_logs_reproducibility_metadata_and_baseline_delta(tmp_path: Path) -> Non
 
     assert row is not None
     assert row[0] == experiment_id
-    assert row[1] is None  # tmp_path is not a Git working tree
+    assert row[1] == expected_commit
     assert row[2:5] == ("Compare run 1 against V1", "test-model", "v1")
     assert json.loads(row[5]) == ["recency", "frequency"]
     assert json.loads(row[6]) == {"seed": 1}
