@@ -1,0 +1,6240 @@
+{
+  "config": {
+    "seed": 42,
+    "folds": 5,
+    "calibration_fraction": 0.2,
+    "data_directory": "data/raw/ubs_2026",
+    "cutoff": "2026-01-01T00:00:00Z",
+    "horizon_days": 90,
+    "historical_cutoffs": [
+      "2025-07-01T00:00:00Z",
+      "2025-10-01T00:00:00Z"
+    ],
+    "output": "outputs/metrics/ubs_v2_temporal/results.json",
+    "variants": {
+      "v1": [],
+      "intervals": [
+        "intervals"
+      ],
+      "periodicity": [
+        "periodicity"
+      ],
+      "activity": [
+        "activity"
+      ],
+      "horizon": [
+        "horizon"
+      ],
+      "combined": [
+        "intervals",
+        "periodicity",
+        "activity",
+        "horizon"
+      ]
+    }
+  },
+  "train_temporal_analysis": {
+    "clients": 2000,
+    "transactions": 147459,
+    "streams": 50720,
+    "one_event": 17669,
+    "two_events": 9325,
+    "three_plus": 23726,
+    "duplicate_timestamps": 0,
+    "post_cutoff": 0,
+    "quantiles": {
+      "unique_event_count": {
+        "0.1": 1.0,
+        "0.5": 2.0,
+        "0.9": 6.0
+      },
+      "number_of_intervals": {
+        "0.1": 0.0,
+        "0.5": 1.0,
+        "0.9": 5.0
+      },
+      "interval_mean": {
+        "0.1": 29.5528125,
+        "0.5": 69.73520254629629,
+        "0.9": 161.86604166666666
+      },
+      "interval_median": {
+        "0.1": 23.877939814814816,
+        "0.5": 61.06686342592592,
+        "0.9": 162.57566550925924
+      },
+      "interval_std": {
+        "0.1": 11.506245610112355,
+        "0.5": 38.99860073873413,
+        "0.9": 85.09547208711572
+      },
+      "interval_mad": {
+        "0.1": 3.9934837962962924,
+        "0.5": 22.206221064814816,
+        "0.9": 67.02710069444444
+      },
+      "interval_cv": {
+        "0.1": 0.19924579162732406,
+        "0.5": 0.6345952330909257,
+        "0.9": 0.9961374670670946
+      },
+      "days_since_last": {
+        "0.1": 13.339640046296296,
+        "0.5": 84.04942708333334,
+        "0.9": 255.3825949074074
+      },
+      "days_until_expected_next": {
+        "0.1": -136.84334490741898,
+        "0.5": 3.637002314814815,
+        "0.9": 111.49582175925926
+      },
+      "weekday_concentration": {
+        "0.1": 0.1786636290687721,
+        "0.5": 0.41012279019050407,
+        "0.9": 0.7489932012391557
+      },
+      "monthday_concentration": {
+        "0.1": 0.17295475545745792,
+        "0.5": 0.454769000054175,
+        "0.9": 0.9064535130147044
+      },
+      "events_30d": {
+        "0.1": 0.0,
+        "0.5": 0.0,
+        "0.9": 1.0
+      },
+      "events_60d": {
+        "0.1": 0.0,
+        "0.5": 0.0,
+        "0.9": 1.0
+      },
+      "events_90d": {
+        "0.1": 0.0,
+        "0.5": 1.0,
+        "0.9": 2.0
+      },
+      "events_180d": {
+        "0.1": 0.0,
+        "0.5": 1.0,
+        "0.9": 3.0
+      },
+      "recent_to_history_rate": {
+        "0.1": 0.0,
+        "0.5": 0.5435566465192044,
+        "0.9": 1.3882710528120714
+      }
+    },
+    "by_client_target_medians_not_event_families": {
+      "cloud": {
+        "unique_event_count": 2.0,
+        "number_of_intervals": 1.0,
+        "interval_mean": 73.16137345679012,
+        "interval_median": 62.801261574074076,
+        "interval_std": 39.40843957572301,
+        "interval_mad": 21.51493634259259,
+        "interval_cv": 0.622773010461672,
+        "days_since_last": 87.56121527777779,
+        "days_until_expected_next": 4.344375000000001,
+        "weekday_concentration": 0.41480570725058535,
+        "monthday_concentration": 0.4381179069428762,
+        "events_30d": 0.0,
+        "events_60d": 0.0,
+        "events_90d": 0.5,
+        "events_180d": 1.0,
+        "recent_to_history_rate": 0.3479335776748972,
+        "total_events": 74.0,
+        "streams": 26.0
+      },
+      "gym": {
+        "unique_event_count": 2.0,
+        "number_of_intervals": 1.0,
+        "interval_mean": 69.57808786651236,
+        "interval_median": 61.271079282407406,
+        "interval_std": 39.844591870245566,
+        "interval_mad": 22.76548900462963,
+        "interval_cv": 0.6387009986522296,
+        "days_since_last": 87.14113136574073,
+        "days_until_expected_next": 2.2355960648148145,
+        "weekday_concentration": 0.40125880732848307,
+        "monthday_concentration": 0.44325977109828024,
+        "events_30d": 0.0,
+        "events_60d": 0.0,
+        "events_90d": 1.0,
+        "events_180d": 1.0,
+        "recent_to_history_rate": 0.4033133006932197,
+        "total_events": 74.5,
+        "streams": 26.0
+      },
+      "insurance": {
+        "unique_event_count": 2.5,
+        "number_of_intervals": 1.5,
+        "interval_mean": 69.26993364197531,
+        "interval_median": 60.70229745370371,
+        "interval_std": 39.55079253845879,
+        "interval_mad": 21.821467013888892,
+        "interval_cv": 0.640718304750763,
+        "days_since_last": 80.6875925925926,
+        "days_until_expected_next": 4.409888599537037,
+        "weekday_concentration": 0.40858814680102057,
+        "monthday_concentration": 0.4315430089984097,
+        "events_30d": 0.0,
+        "events_60d": 0.0,
+        "events_90d": 1.0,
+        "events_180d": 1.0,
+        "recent_to_history_rate": 0.5808295642575446,
+        "total_events": 79.5,
+        "streams": 26.0
+      },
+      "mobile": {
+        "unique_event_count": 2.5,
+        "number_of_intervals": 1.5,
+        "interval_mean": 71.73850115740741,
+        "interval_median": 61.19707465277777,
+        "interval_std": 40.6438796008003,
+        "interval_mad": 23.095596064814817,
+        "interval_cv": 0.6368144448770698,
+        "days_since_last": 84.50123842592592,
+        "days_until_expected_next": 0.9337037037037037,
+        "weekday_concentration": 0.4326317830672859,
+        "monthday_concentration": 0.4624978924916473,
+        "events_30d": 0.0,
+        "events_60d": 0.0,
+        "events_90d": 1.0,
+        "events_180d": 1.0,
+        "recent_to_history_rate": 0.5258453161743093,
+        "total_events": 75.0,
+        "streams": 25.0
+      },
+      "music": {
+        "unique_event_count": 2.5,
+        "number_of_intervals": 1.5,
+        "interval_mean": 69.2127349537037,
+        "interval_median": 60.35398726851852,
+        "interval_std": 38.129871420638054,
+        "interval_mad": 21.27810474537037,
+        "interval_cv": 0.6463161325609749,
+        "days_since_last": 85.24202835648148,
+        "days_until_expected_next": 2.969748263888889,
+        "weekday_concentration": 0.4143231288717993,
+        "monthday_concentration": 0.4438321582331049,
+        "events_30d": 0.0,
+        "events_60d": 0.0,
+        "events_90d": 1.0,
+        "events_180d": 1.0,
+        "recent_to_history_rate": 0.5003327996399177,
+        "total_events": 77.0,
+        "streams": 25.0
+      },
+      "none": {
+        "unique_event_count": 2.0,
+        "number_of_intervals": 1.0,
+        "interval_mean": 70.35849189814816,
+        "interval_median": 62.526759259259265,
+        "interval_std": 37.395233254323315,
+        "interval_mad": 21.953914930555555,
+        "interval_cv": 0.617504406477621,
+        "days_since_last": 86.23380787037037,
+        "days_until_expected_next": 1.5023061342592594,
+        "weekday_concentration": 0.4302481804476386,
+        "monthday_concentration": 0.47787252515586126,
+        "events_30d": 0.0,
+        "events_60d": 0.0,
+        "events_90d": 1.0,
+        "events_180d": 1.0,
+        "recent_to_history_rate": 0.42682368827160494,
+        "total_events": 64.0,
+        "streams": 24.0
+      },
+      "software": {
+        "unique_event_count": 2.0,
+        "number_of_intervals": 1.0,
+        "interval_mean": 70.07786458333334,
+        "interval_median": 61.423356481481484,
+        "interval_std": 38.41145236248588,
+        "interval_mad": 21.518136574074084,
+        "interval_cv": 0.6288329135722097,
+        "days_since_last": 85.10171296296296,
+        "days_until_expected_next": 4.10287037037037,
+        "weekday_concentration": 0.4,
+        "monthday_concentration": 0.45810147447018307,
+        "events_30d": 0.0,
+        "events_60d": 0.0,
+        "events_90d": 1.0,
+        "events_180d": 1.0,
+        "recent_to_history_rate": 0.4961075415196943,
+        "total_events": 74.0,
+        "streams": 26.0
+      },
+      "streaming": {
+        "unique_event_count": 2.0,
+        "number_of_intervals": 1.0,
+        "interval_mean": 73.2850536265432,
+        "interval_median": 61.06478009259259,
+        "interval_std": 40.916875,
+        "interval_mad": 24.16840856481481,
+        "interval_cv": 0.6435537803239064,
+        "days_since_last": 81.07534143518518,
+        "days_until_expected_next": 7.588151041666667,
+        "weekday_concentration": 0.41480570725058524,
+        "monthday_concentration": 0.43918203999296207,
+        "events_30d": 0.0,
+        "events_60d": 0.0,
+        "events_90d": 1.0,
+        "events_180d": 1.0,
+        "recent_to_history_rate": 0.5558822016460905,
+        "total_events": 74.0,
+        "streams": 25.0
+      }
+    },
+    "supported_cycle_closeness_ge_0_5": {
+      "7": 4,
+      "14": 21,
+      "28": 558,
+      "30": 776,
+      "31": 754,
+      "90": 300,
+      "180": 118,
+      "365": 0
+    },
+    "calendar_adjusted_streams": 342,
+    "expected_in_horizon_streams": 12640
+  },
+  "label_order": [
+    "cloud",
+    "gym",
+    "insurance",
+    "mobile",
+    "music",
+    "software",
+    "streaming",
+    "none"
+  ],
+  "selected": "v1",
+  "selection_rule": "mean gain and positive gain in every outer fold; otherwise keep V1",
+  "internal_selection": {
+    "v1": {
+      "mean_macro_f1": 0.4618845847883506,
+      "std_macro_f1": 0.026419507696933613,
+      "delta_vs_v1_by_fold": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "beats_v1_every_fold": false,
+      "pooled_oof": {
+        "macro_f1": 0.46275766330110674,
+        "accuracy": 0.5015,
+        "per_class": {
+          "cloud": {
+            "precision": 0.4090909090909091,
+            "recall": 0.5684210526315789,
+            "f1-score": 0.47577092511013214
+          },
+          "gym": {
+            "precision": 0.41198501872659177,
+            "recall": 0.5789473684210527,
+            "f1-score": 0.4814004376367615
+          },
+          "insurance": {
+            "precision": 0.4197080291970803,
+            "recall": 0.5373831775700935,
+            "f1-score": 0.4713114754098361
+          },
+          "mobile": {
+            "precision": 0.3953488372093023,
+            "recall": 0.44502617801047123,
+            "f1-score": 0.4187192118226601
+          },
+          "music": {
+            "precision": 0.42105263157894735,
+            "recall": 0.24242424242424243,
+            "f1-score": 0.3076923076923077
+          },
+          "software": {
+            "precision": 0.4362745098039216,
+            "recall": 0.4564102564102564,
+            "f1-score": 0.44611528822055135
+          },
+          "streaming": {
+            "precision": 0.49714285714285716,
+            "recall": 0.38666666666666666,
+            "f1-score": 0.435
+          },
+          "none": {
+            "precision": 0.7412731006160165,
+            "recall": 0.6046901172529313,
+            "f1-score": 0.6660516605166051
+          }
+        },
+        "confusion_matrix": [
+          [
+            108,
+            16,
+            20,
+            16,
+            3,
+            9,
+            6,
+            12
+          ],
+          [
+            14,
+            110,
+            11,
+            14,
+            5,
+            13,
+            12,
+            11
+          ],
+          [
+            24,
+            17,
+            115,
+            11,
+            5,
+            13,
+            13,
+            16
+          ],
+          [
+            20,
+            20,
+            15,
+            85,
+            9,
+            22,
+            6,
+            14
+          ],
+          [
+            22,
+            27,
+            26,
+            14,
+            48,
+            15,
+            12,
+            34
+          ],
+          [
+            15,
+            16,
+            24,
+            17,
+            9,
+            89,
+            7,
+            18
+          ],
+          [
+            16,
+            27,
+            28,
+            19,
+            11,
+            16,
+            87,
+            21
+          ],
+          [
+            45,
+            34,
+            35,
+            39,
+            24,
+            27,
+            32,
+            361
+          ]
+        ],
+        "prediction_distribution": {
+          "cloud": 264,
+          "gym": 267,
+          "insurance": 274,
+          "mobile": 215,
+          "music": 114,
+          "software": 204,
+          "streaming": 175,
+          "none": 487
+        }
+      },
+      "folds": [
+        {
+          "fold": 0,
+          "none_bias": 1.0,
+          "temperature": 1.0,
+          "macro_f1": 0.4428776056705813,
+          "accuracy": 0.4975,
+          "per_class": {
+            "cloud": {
+              "precision": 0.4772727272727273,
+              "recall": 0.5526315789473685,
+              "f1-score": 0.5121951219512195
+            },
+            "gym": {
+              "precision": 0.36065573770491804,
+              "recall": 0.5789473684210527,
+              "f1-score": 0.4444444444444444
+            },
+            "insurance": {
+              "precision": 0.423728813559322,
+              "recall": 0.5813953488372093,
+              "f1-score": 0.49019607843137253
+            },
+            "mobile": {
+              "precision": 0.4,
+              "recall": 0.46153846153846156,
+              "f1-score": 0.42857142857142855
+            },
+            "music": {
+              "precision": 0.4166666666666667,
+              "recall": 0.1282051282051282,
+              "f1-score": 0.19607843137254902
+            },
+            "software": {
+              "precision": 0.4166666666666667,
+              "recall": 0.38461538461538464,
+              "f1-score": 0.4
+            },
+            "streaming": {
+              "precision": 0.41025641025641024,
+              "recall": 0.35555555555555557,
+              "f1-score": 0.38095238095238093
+            },
+            "none": {
+              "precision": 0.7403846153846154,
+              "recall": 0.6470588235294118,
+              "f1-score": 0.6905829596412556
+            }
+          },
+          "confusion_matrix": [
+            [
+              21,
+              0,
+              4,
+              2,
+              2,
+              1,
+              4,
+              4
+            ],
+            [
+              2,
+              22,
+              1,
+              3,
+              0,
+              3,
+              4,
+              3
+            ],
+            [
+              3,
+              5,
+              25,
+              1,
+              0,
+              2,
+              3,
+              4
+            ],
+            [
+              5,
+              4,
+              1,
+              18,
+              2,
+              6,
+              2,
+              1
+            ],
+            [
+              3,
+              11,
+              7,
+              2,
+              5,
+              1,
+              4,
+              6
+            ],
+            [
+              3,
+              2,
+              6,
+              6,
+              0,
+              15,
+              2,
+              5
+            ],
+            [
+              2,
+              7,
+              8,
+              4,
+              0,
+              4,
+              16,
+              4
+            ],
+            [
+              5,
+              10,
+              7,
+              9,
+              3,
+              4,
+              4,
+              77
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 44,
+            "gym": 61,
+            "insurance": 59,
+            "mobile": 45,
+            "music": 12,
+            "software": 36,
+            "streaming": 39,
+            "none": 104
+          }
+        },
+        {
+          "fold": 1,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.4261003660734106,
+          "accuracy": 0.465,
+          "per_class": {
+            "cloud": {
+              "precision": 0.40425531914893614,
+              "recall": 0.5,
+              "f1-score": 0.4470588235294118
+            },
+            "gym": {
+              "precision": 0.3620689655172414,
+              "recall": 0.5526315789473685,
+              "f1-score": 0.4375
+            },
+            "insurance": {
+              "precision": 0.40350877192982454,
+              "recall": 0.5348837209302325,
+              "f1-score": 0.46
+            },
+            "mobile": {
+              "precision": 0.3409090909090909,
+              "recall": 0.39473684210526316,
+              "f1-score": 0.36585365853658536
+            },
+            "music": {
+              "precision": 0.2916666666666667,
+              "recall": 0.1794871794871795,
+              "f1-score": 0.2222222222222222
+            },
+            "software": {
+              "precision": 0.4146341463414634,
+              "recall": 0.4358974358974359,
+              "f1-score": 0.425
+            },
+            "streaming": {
+              "precision": 0.4857142857142857,
+              "recall": 0.37777777777777777,
+              "f1-score": 0.425
+            },
+            "none": {
+              "precision": 0.7127659574468085,
+              "recall": 0.5583333333333333,
+              "f1-score": 0.6261682242990654
+            }
+          },
+          "confusion_matrix": [
+            [
+              19,
+              4,
+              4,
+              5,
+              1,
+              2,
+              1,
+              2
+            ],
+            [
+              2,
+              21,
+              4,
+              3,
+              1,
+              2,
+              3,
+              2
+            ],
+            [
+              4,
+              3,
+              23,
+              2,
+              1,
+              4,
+              2,
+              4
+            ],
+            [
+              5,
+              3,
+              5,
+              15,
+              2,
+              5,
+              1,
+              2
+            ],
+            [
+              5,
+              7,
+              2,
+              3,
+              7,
+              4,
+              3,
+              8
+            ],
+            [
+              3,
+              5,
+              6,
+              3,
+              0,
+              17,
+              1,
+              4
+            ],
+            [
+              2,
+              6,
+              4,
+              4,
+              4,
+              3,
+              17,
+              5
+            ],
+            [
+              7,
+              9,
+              9,
+              9,
+              8,
+              4,
+              7,
+              67
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 47,
+            "gym": 58,
+            "insurance": 57,
+            "mobile": 44,
+            "music": 24,
+            "software": 41,
+            "streaming": 35,
+            "none": 94
+          }
+        },
+        {
+          "fold": 2,
+          "none_bias": 1.0,
+          "temperature": 1.0,
+          "macro_f1": 0.48508602847336185,
+          "accuracy": 0.5125,
+          "per_class": {
+            "cloud": {
+              "precision": 0.38333333333333336,
+              "recall": 0.6052631578947368,
+              "f1-score": 0.46938775510204084
+            },
+            "gym": {
+              "precision": 0.3877551020408163,
+              "recall": 0.5,
+              "f1-score": 0.4367816091954023
+            },
+            "insurance": {
+              "precision": 0.46296296296296297,
+              "recall": 0.5952380952380952,
+              "f1-score": 0.5208333333333334
+            },
+            "mobile": {
+              "precision": 0.3695652173913043,
+              "recall": 0.4473684210526316,
+              "f1-score": 0.40476190476190477
+            },
+            "music": {
+              "precision": 0.48,
+              "recall": 0.3,
+              "f1-score": 0.36923076923076925
+            },
+            "software": {
+              "precision": 0.4897959183673469,
+              "recall": 0.6153846153846154,
+              "f1-score": 0.5454545454545454
+            },
+            "streaming": {
+              "precision": 0.5757575757575758,
+              "recall": 0.4222222222222222,
+              "f1-score": 0.48717948717948717
+            },
+            "none": {
+              "precision": 0.7857142857142857,
+              "recall": 0.55,
+              "f1-score": 0.6470588235294118
+            }
+          },
+          "confusion_matrix": [
+            [
+              23,
+              3,
+              4,
+              3,
+              0,
+              2,
+              1,
+              2
+            ],
+            [
+              4,
+              19,
+              4,
+              3,
+              2,
+              3,
+              2,
+              1
+            ],
+            [
+              6,
+              3,
+              25,
+              2,
+              1,
+              1,
+              2,
+              2
+            ],
+            [
+              1,
+              6,
+              4,
+              17,
+              3,
+              3,
+              0,
+              4
+            ],
+            [
+              4,
+              4,
+              6,
+              3,
+              12,
+              3,
+              2,
+              6
+            ],
+            [
+              4,
+              2,
+              0,
+              4,
+              4,
+              24,
+              0,
+              1
+            ],
+            [
+              6,
+              4,
+              4,
+              6,
+              2,
+              2,
+              19,
+              2
+            ],
+            [
+              12,
+              8,
+              7,
+              8,
+              1,
+              11,
+              7,
+              66
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 60,
+            "gym": 49,
+            "insurance": 54,
+            "mobile": 46,
+            "music": 25,
+            "software": 49,
+            "streaming": 33,
+            "none": 84
+          }
+        },
+        {
+          "fold": 3,
+          "none_bias": 1.0,
+          "temperature": 1.0,
+          "macro_f1": 0.48519353901600276,
+          "accuracy": 0.5225,
+          "per_class": {
+            "cloud": {
+              "precision": 0.3793103448275862,
+              "recall": 0.5789473684210527,
+              "f1-score": 0.4583333333333333
+            },
+            "gym": {
+              "precision": 0.5348837209302325,
+              "recall": 0.6052631578947368,
+              "f1-score": 0.5679012345679012
+            },
+            "insurance": {
+              "precision": 0.3958333333333333,
+              "recall": 0.4418604651162791,
+              "f1-score": 0.4175824175824176
+            },
+            "mobile": {
+              "precision": 0.42857142857142855,
+              "recall": 0.47368421052631576,
+              "f1-score": 0.45
+            },
+            "music": {
+              "precision": 0.5172413793103449,
+              "recall": 0.375,
+              "f1-score": 0.43478260869565216
+            },
+            "software": {
+              "precision": 0.38461538461538464,
+              "recall": 0.38461538461538464,
+              "f1-score": 0.38461538461538464
+            },
+            "streaming": {
+              "precision": 0.5428571428571428,
+              "recall": 0.4222222222222222,
+              "f1-score": 0.475
+            },
+            "none": {
+              "precision": 0.7358490566037735,
+              "recall": 0.6554621848739496,
+              "f1-score": 0.6933333333333334
+            }
+          },
+          "confusion_matrix": [
+            [
+              22,
+              3,
+              3,
+              4,
+              0,
+              3,
+              0,
+              3
+            ],
+            [
+              4,
+              23,
+              2,
+              2,
+              2,
+              4,
+              0,
+              1
+            ],
+            [
+              8,
+              4,
+              19,
+              2,
+              0,
+              4,
+              3,
+              3
+            ],
+            [
+              4,
+              2,
+              4,
+              18,
+              1,
+              3,
+              2,
+              4
+            ],
+            [
+              5,
+              1,
+              4,
+              3,
+              15,
+              4,
+              1,
+              7
+            ],
+            [
+              4,
+              3,
+              7,
+              2,
+              3,
+              15,
+              1,
+              4
+            ],
+            [
+              3,
+              3,
+              4,
+              4,
+              3,
+              3,
+              19,
+              6
+            ],
+            [
+              8,
+              4,
+              5,
+              7,
+              5,
+              3,
+              9,
+              78
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 58,
+            "gym": 43,
+            "insurance": 48,
+            "mobile": 42,
+            "music": 29,
+            "software": 39,
+            "streaming": 35,
+            "none": 106
+          }
+        },
+        {
+          "fold": 4,
+          "none_bias": 1.0,
+          "temperature": 1.0,
+          "macro_f1": 0.4701653847083962,
+          "accuracy": 0.51,
+          "per_class": {
+            "cloud": {
+              "precision": 0.41818181818181815,
+              "recall": 0.6052631578947368,
+              "f1-score": 0.4946236559139785
+            },
+            "gym": {
+              "precision": 0.44642857142857145,
+              "recall": 0.6578947368421053,
+              "f1-score": 0.5319148936170213
+            },
+            "insurance": {
+              "precision": 0.4107142857142857,
+              "recall": 0.5348837209302325,
+              "f1-score": 0.46464646464646464
+            },
+            "mobile": {
+              "precision": 0.4473684210526316,
+              "recall": 0.4473684210526316,
+              "f1-score": 0.4473684210526316
+            },
+            "music": {
+              "precision": 0.375,
+              "recall": 0.225,
+              "f1-score": 0.28125
+            },
+            "software": {
+              "precision": 0.46153846153846156,
+              "recall": 0.46153846153846156,
+              "f1-score": 0.46153846153846156
+            },
+            "streaming": {
+              "precision": 0.48484848484848486,
+              "recall": 0.35555555555555557,
+              "f1-score": 0.41025641025641024
+            },
+            "none": {
+              "precision": 0.7373737373737373,
+              "recall": 0.6134453781512605,
+              "f1-score": 0.6697247706422018
+            }
+          },
+          "confusion_matrix": [
+            [
+              23,
+              6,
+              5,
+              2,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              2,
+              25,
+              0,
+              3,
+              0,
+              1,
+              3,
+              4
+            ],
+            [
+              3,
+              2,
+              23,
+              4,
+              3,
+              2,
+              3,
+              3
+            ],
+            [
+              5,
+              5,
+              1,
+              17,
+              1,
+              5,
+              1,
+              3
+            ],
+            [
+              5,
+              4,
+              7,
+              3,
+              9,
+              3,
+              2,
+              7
+            ],
+            [
+              1,
+              4,
+              5,
+              2,
+              2,
+              18,
+              3,
+              4
+            ],
+            [
+              3,
+              7,
+              8,
+              1,
+              2,
+              4,
+              16,
+              4
+            ],
+            [
+              13,
+              3,
+              7,
+              6,
+              7,
+              5,
+              5,
+              73
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 55,
+            "gym": 56,
+            "insurance": 56,
+            "mobile": 38,
+            "music": 24,
+            "software": 39,
+            "streaming": 33,
+            "none": 99
+          }
+        }
+      ]
+    },
+    "intervals": {
+      "mean_macro_f1": 0.4721581487735886,
+      "std_macro_f1": 0.0231454583067763,
+      "delta_vs_v1_by_fold": [
+        0.012321055165561756,
+        0.02139531845954573,
+        -0.0007365637529367919,
+        0.019918324573555968,
+        -0.001530314519536724
+      ],
+      "beats_v1_every_fold": false,
+      "pooled_oof": {
+        "macro_f1": 0.4727177008222939,
+        "accuracy": 0.5035,
+        "per_class": {
+          "cloud": {
+            "precision": 0.4128787878787879,
+            "recall": 0.5736842105263158,
+            "f1-score": 0.4801762114537445
+          },
+          "gym": {
+            "precision": 0.41379310344827586,
+            "recall": 0.5684210526315789,
+            "f1-score": 0.4789356984478936
+          },
+          "insurance": {
+            "precision": 0.4419475655430712,
+            "recall": 0.5514018691588785,
+            "f1-score": 0.49064449064449067
+          },
+          "mobile": {
+            "precision": 0.4043478260869565,
+            "recall": 0.4869109947643979,
+            "f1-score": 0.4418052256532066
+          },
+          "music": {
+            "precision": 0.4125874125874126,
+            "recall": 0.29797979797979796,
+            "f1-score": 0.3460410557184751
+          },
+          "software": {
+            "precision": 0.4433497536945813,
+            "recall": 0.46153846153846156,
+            "f1-score": 0.45226130653266333
+          },
+          "streaming": {
+            "precision": 0.4603960396039604,
+            "recall": 0.41333333333333333,
+            "f1-score": 0.43559718969555034
+          },
+          "none": {
+            "precision": 0.7837209302325582,
+            "recall": 0.5644891122278057,
+            "f1-score": 0.6562804284323271
+          }
+        },
+        "confusion_matrix": [
+          [
+            109,
+            15,
+            13,
+            19,
+            5,
+            11,
+            9,
+            9
+          ],
+          [
+            14,
+            108,
+            10,
+            13,
+            5,
+            16,
+            14,
+            10
+          ],
+          [
+            21,
+            17,
+            118,
+            13,
+            10,
+            10,
+            13,
+            12
+          ],
+          [
+            18,
+            18,
+            15,
+            93,
+            11,
+            17,
+            10,
+            9
+          ],
+          [
+            22,
+            29,
+            24,
+            13,
+            59,
+            11,
+            16,
+            24
+          ],
+          [
+            18,
+            13,
+            22,
+            18,
+            9,
+            90,
+            10,
+            15
+          ],
+          [
+            17,
+            24,
+            26,
+            22,
+            13,
+            16,
+            93,
+            14
+          ],
+          [
+            45,
+            37,
+            39,
+            39,
+            31,
+            32,
+            37,
+            337
+          ]
+        ],
+        "prediction_distribution": {
+          "cloud": 264,
+          "gym": 261,
+          "insurance": 267,
+          "mobile": 230,
+          "music": 143,
+          "software": 203,
+          "streaming": 202,
+          "none": 430
+        }
+      },
+      "folds": [
+        {
+          "fold": 0,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.4551986608361431,
+          "accuracy": 0.4925,
+          "per_class": {
+            "cloud": {
+              "precision": 0.4782608695652174,
+              "recall": 0.5789473684210527,
+              "f1-score": 0.5238095238095238
+            },
+            "gym": {
+              "precision": 0.38181818181818183,
+              "recall": 0.5526315789473685,
+              "f1-score": 0.45161290322580644
+            },
+            "insurance": {
+              "precision": 0.44642857142857145,
+              "recall": 0.5813953488372093,
+              "f1-score": 0.5050505050505051
+            },
+            "mobile": {
+              "precision": 0.4,
+              "recall": 0.5128205128205128,
+              "f1-score": 0.449438202247191
+            },
+            "music": {
+              "precision": 0.45,
+              "recall": 0.23076923076923078,
+              "f1-score": 0.3050847457627119
+            },
+            "software": {
+              "precision": 0.41025641025641024,
+              "recall": 0.41025641025641024,
+              "f1-score": 0.41025641025641024
+            },
+            "streaming": {
+              "precision": 0.32608695652173914,
+              "recall": 0.3333333333333333,
+              "f1-score": 0.32967032967032966
+            },
+            "none": {
+              "precision": 0.7840909090909091,
+              "recall": 0.5798319327731093,
+              "f1-score": 0.6666666666666666
+            }
+          },
+          "confusion_matrix": [
+            [
+              22,
+              0,
+              2,
+              4,
+              2,
+              1,
+              4,
+              3
+            ],
+            [
+              2,
+              21,
+              1,
+              4,
+              0,
+              3,
+              4,
+              3
+            ],
+            [
+              4,
+              4,
+              25,
+              1,
+              1,
+              1,
+              3,
+              4
+            ],
+            [
+              3,
+              4,
+              2,
+              20,
+              2,
+              4,
+              4,
+              0
+            ],
+            [
+              2,
+              9,
+              6,
+              2,
+              9,
+              2,
+              6,
+              3
+            ],
+            [
+              5,
+              0,
+              5,
+              7,
+              0,
+              16,
+              3,
+              3
+            ],
+            [
+              2,
+              7,
+              7,
+              5,
+              1,
+              5,
+              15,
+              3
+            ],
+            [
+              6,
+              10,
+              8,
+              7,
+              5,
+              7,
+              7,
+              69
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 46,
+            "gym": 55,
+            "insurance": 56,
+            "mobile": 50,
+            "music": 20,
+            "software": 39,
+            "streaming": 46,
+            "none": 88
+          }
+        },
+        {
+          "fold": 1,
+          "none_bias": 0.5,
+          "temperature": 1.0,
+          "macro_f1": 0.44749568453295635,
+          "accuracy": 0.475,
+          "per_class": {
+            "cloud": {
+              "precision": 0.3829787234042553,
+              "recall": 0.47368421052631576,
+              "f1-score": 0.4235294117647059
+            },
+            "gym": {
+              "precision": 0.3793103448275862,
+              "recall": 0.5789473684210527,
+              "f1-score": 0.4583333333333333
+            },
+            "insurance": {
+              "precision": 0.42857142857142855,
+              "recall": 0.5581395348837209,
+              "f1-score": 0.48484848484848486
+            },
+            "mobile": {
+              "precision": 0.32653061224489793,
+              "recall": 0.42105263157894735,
+              "f1-score": 0.367816091954023
+            },
+            "music": {
+              "precision": 0.3793103448275862,
+              "recall": 0.28205128205128205,
+              "f1-score": 0.3235294117647059
+            },
+            "software": {
+              "precision": 0.3902439024390244,
+              "recall": 0.41025641025641024,
+              "f1-score": 0.4
+            },
+            "streaming": {
+              "precision": 0.5238095238095238,
+              "recall": 0.4888888888888889,
+              "f1-score": 0.5057471264367817
+            },
+            "none": {
+              "precision": 0.782051282051282,
+              "recall": 0.5083333333333333,
+              "f1-score": 0.6161616161616161
+            }
+          },
+          "confusion_matrix": [
+            [
+              18,
+              4,
+              3,
+              6,
+              1,
+              2,
+              2,
+              2
+            ],
+            [
+              2,
+              22,
+              3,
+              3,
+              1,
+              2,
+              3,
+              2
+            ],
+            [
+              3,
+              3,
+              24,
+              3,
+              2,
+              5,
+              1,
+              2
+            ],
+            [
+              6,
+              2,
+              5,
+              16,
+              2,
+              4,
+              1,
+              2
+            ],
+            [
+              5,
+              8,
+              2,
+              4,
+              11,
+              3,
+              3,
+              3
+            ],
+            [
+              4,
+              4,
+              6,
+              3,
+              0,
+              16,
+              3,
+              3
+            ],
+            [
+              2,
+              5,
+              3,
+              4,
+              4,
+              2,
+              22,
+              3
+            ],
+            [
+              7,
+              10,
+              10,
+              10,
+              8,
+              7,
+              7,
+              61
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 47,
+            "gym": 58,
+            "insurance": 56,
+            "mobile": 49,
+            "music": 29,
+            "software": 41,
+            "streaming": 42,
+            "none": 78
+          }
+        },
+        {
+          "fold": 2,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.48434946472042506,
+          "accuracy": 0.5075,
+          "per_class": {
+            "cloud": {
+              "precision": 0.38333333333333336,
+              "recall": 0.6052631578947368,
+              "f1-score": 0.46938775510204084
+            },
+            "gym": {
+              "precision": 0.36363636363636365,
+              "recall": 0.42105263157894735,
+              "f1-score": 0.3902439024390244
+            },
+            "insurance": {
+              "precision": 0.49056603773584906,
+              "recall": 0.6190476190476191,
+              "f1-score": 0.5473684210526316
+            },
+            "mobile": {
+              "precision": 0.3877551020408163,
+              "recall": 0.5,
+              "f1-score": 0.4367816091954023
+            },
+            "music": {
+              "precision": 0.45161290322580644,
+              "recall": 0.35,
+              "f1-score": 0.39436619718309857
+            },
+            "software": {
+              "precision": 0.5102040816326531,
+              "recall": 0.6410256410256411,
+              "f1-score": 0.5681818181818182
+            },
+            "streaming": {
+              "precision": 0.4864864864864865,
+              "recall": 0.4,
+              "f1-score": 0.43902439024390244
+            },
+            "none": {
+              "precision": 0.8051948051948052,
+              "recall": 0.5166666666666667,
+              "f1-score": 0.6294416243654822
+            }
+          },
+          "confusion_matrix": [
+            [
+              23,
+              2,
+              3,
+              3,
+              1,
+              3,
+              1,
+              2
+            ],
+            [
+              4,
+              16,
+              4,
+              3,
+              3,
+              4,
+              3,
+              1
+            ],
+            [
+              6,
+              4,
+              26,
+              1,
+              1,
+              0,
+              2,
+              2
+            ],
+            [
+              2,
+              6,
+              2,
+              19,
+              3,
+              3,
+              1,
+              2
+            ],
+            [
+              5,
+              4,
+              6,
+              3,
+              14,
+              0,
+              3,
+              5
+            ],
+            [
+              3,
+              1,
+              1,
+              4,
+              4,
+              25,
+              0,
+              1
+            ],
+            [
+              6,
+              3,
+              4,
+              7,
+              3,
+              2,
+              18,
+              2
+            ],
+            [
+              11,
+              8,
+              7,
+              9,
+              2,
+              12,
+              9,
+              62
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 60,
+            "gym": 44,
+            "insurance": 53,
+            "mobile": 49,
+            "music": 31,
+            "software": 49,
+            "streaming": 37,
+            "none": 77
+          }
+        },
+        {
+          "fold": 3,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.5051118635895587,
+          "accuracy": 0.54,
+          "per_class": {
+            "cloud": {
+              "precision": 0.4,
+              "recall": 0.5789473684210527,
+              "f1-score": 0.4731182795698925
+            },
+            "gym": {
+              "precision": 0.5555555555555556,
+              "recall": 0.6578947368421053,
+              "f1-score": 0.6024096385542169
+            },
+            "insurance": {
+              "precision": 0.42857142857142855,
+              "recall": 0.4883720930232558,
+              "f1-score": 0.45652173913043476
+            },
+            "mobile": {
+              "precision": 0.4444444444444444,
+              "recall": 0.5263157894736842,
+              "f1-score": 0.4819277108433735
+            },
+            "music": {
+              "precision": 0.4444444444444444,
+              "recall": 0.4,
+              "f1-score": 0.42105263157894735
+            },
+            "software": {
+              "precision": 0.47058823529411764,
+              "recall": 0.41025641025641024,
+              "f1-score": 0.4383561643835616
+            },
+            "streaming": {
+              "precision": 0.5,
+              "recall": 0.4222222222222222,
+              "f1-score": 0.4578313253012048
+            },
+            "none": {
+              "precision": 0.7857142857142857,
+              "recall": 0.6470588235294118,
+              "f1-score": 0.7096774193548387
+            }
+          },
+          "confusion_matrix": [
+            [
+              22,
+              3,
+              2,
+              4,
+              1,
+              3,
+              1,
+              2
+            ],
+            [
+              4,
+              25,
+              2,
+              2,
+              1,
+              4,
+              0,
+              0
+            ],
+            [
+              6,
+              4,
+              21,
+              4,
+              1,
+              2,
+              3,
+              2
+            ],
+            [
+              2,
+              2,
+              5,
+              20,
+              3,
+              1,
+              3,
+              2
+            ],
+            [
+              5,
+              1,
+              4,
+              2,
+              16,
+              3,
+              2,
+              7
+            ],
+            [
+              5,
+              3,
+              5,
+              2,
+              3,
+              16,
+              1,
+              4
+            ],
+            [
+              4,
+              3,
+              4,
+              5,
+              3,
+              3,
+              19,
+              4
+            ],
+            [
+              7,
+              4,
+              6,
+              6,
+              8,
+              2,
+              9,
+              77
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 55,
+            "gym": 45,
+            "insurance": 49,
+            "mobile": 45,
+            "music": 36,
+            "software": 34,
+            "streaming": 38,
+            "none": 98
+          }
+        },
+        {
+          "fold": 4,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.46863507018885947,
+          "accuracy": 0.5025,
+          "per_class": {
+            "cloud": {
+              "precision": 0.42857142857142855,
+              "recall": 0.631578947368421,
+              "f1-score": 0.5106382978723404
+            },
+            "gym": {
+              "precision": 0.4067796610169492,
+              "recall": 0.631578947368421,
+              "f1-score": 0.4948453608247423
+            },
+            "insurance": {
+              "precision": 0.41509433962264153,
+              "recall": 0.5116279069767442,
+              "f1-score": 0.4583333333333333
+            },
+            "mobile": {
+              "precision": 0.4864864864864865,
+              "recall": 0.47368421052631576,
+              "f1-score": 0.48
+            },
+            "music": {
+              "precision": 0.3333333333333333,
+              "recall": 0.225,
+              "f1-score": 0.26865671641791045
+            },
+            "software": {
+              "precision": 0.425,
+              "recall": 0.4358974358974359,
+              "f1-score": 0.43037974683544306
+            },
+            "streaming": {
+              "precision": 0.48717948717948717,
+              "recall": 0.4222222222222222,
+              "f1-score": 0.4523809523809524
+            },
+            "none": {
+              "precision": 0.7640449438202247,
+              "recall": 0.5714285714285714,
+              "f1-score": 0.6538461538461539
+            }
+          },
+          "confusion_matrix": [
+            [
+              24,
+              6,
+              3,
+              2,
+              0,
+              2,
+              1,
+              0
+            ],
+            [
+              2,
+              24,
+              0,
+              1,
+              0,
+              3,
+              4,
+              4
+            ],
+            [
+              2,
+              2,
+              22,
+              4,
+              5,
+              2,
+              4,
+              2
+            ],
+            [
+              5,
+              4,
+              1,
+              18,
+              1,
+              5,
+              1,
+              3
+            ],
+            [
+              5,
+              7,
+              6,
+              2,
+              9,
+              3,
+              2,
+              6
+            ],
+            [
+              1,
+              5,
+              5,
+              2,
+              2,
+              17,
+              3,
+              4
+            ],
+            [
+              3,
+              6,
+              8,
+              1,
+              2,
+              4,
+              19,
+              2
+            ],
+            [
+              14,
+              5,
+              8,
+              7,
+              8,
+              4,
+              5,
+              68
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 56,
+            "gym": 59,
+            "insurance": 53,
+            "mobile": 37,
+            "music": 27,
+            "software": 40,
+            "streaming": 39,
+            "none": 89
+          }
+        }
+      ]
+    },
+    "periodicity": {
+      "mean_macro_f1": 0.47232656161274456,
+      "std_macro_f1": 0.024254521829595418,
+      "delta_vs_v1_by_fold": [
+        0.020227407323408997,
+        0.019577152687623944,
+        -0.007802087993543927,
+        0.025562764415014316,
+        -0.005355352310533301
+      ],
+      "beats_v1_every_fold": false,
+      "pooled_oof": {
+        "macro_f1": 0.47259146768255744,
+        "accuracy": 0.5055,
+        "per_class": {
+          "cloud": {
+            "precision": 0.4263565891472868,
+            "recall": 0.5789473684210527,
+            "f1-score": 0.49107142857142855
+          },
+          "gym": {
+            "precision": 0.41923076923076924,
+            "recall": 0.5736842105263158,
+            "f1-score": 0.48444444444444446
+          },
+          "insurance": {
+            "precision": 0.4290909090909091,
+            "recall": 0.5514018691588785,
+            "f1-score": 0.48261758691206547
+          },
+          "mobile": {
+            "precision": 0.4026548672566372,
+            "recall": 0.47643979057591623,
+            "f1-score": 0.4364508393285372
+          },
+          "music": {
+            "precision": 0.4117647058823529,
+            "recall": 0.2828282828282828,
+            "f1-score": 0.33532934131736525
+          },
+          "software": {
+            "precision": 0.42924528301886794,
+            "recall": 0.4666666666666667,
+            "f1-score": 0.44717444717444715
+          },
+          "streaming": {
+            "precision": 0.47668393782383417,
+            "recall": 0.4088888888888889,
+            "f1-score": 0.44019138755980863
+          },
+          "none": {
+            "precision": 0.7818181818181819,
+            "recall": 0.576214405360134,
+            "f1-score": 0.6634522661523626
+          }
+        },
+        "confusion_matrix": [
+          [
+            110,
+            13,
+            15,
+            20,
+            3,
+            10,
+            9,
+            10
+          ],
+          [
+            14,
+            109,
+            10,
+            13,
+            7,
+            15,
+            13,
+            9
+          ],
+          [
+            21,
+            17,
+            118,
+            12,
+            6,
+            13,
+            14,
+            13
+          ],
+          [
+            17,
+            19,
+            16,
+            91,
+            10,
+            21,
+            8,
+            9
+          ],
+          [
+            22,
+            27,
+            26,
+            13,
+            56,
+            15,
+            14,
+            25
+          ],
+          [
+            18,
+            14,
+            23,
+            16,
+            9,
+            91,
+            9,
+            15
+          ],
+          [
+            15,
+            26,
+            26,
+            20,
+            15,
+            16,
+            92,
+            15
+          ],
+          [
+            41,
+            35,
+            41,
+            41,
+            30,
+            31,
+            34,
+            344
+          ]
+        ],
+        "prediction_distribution": {
+          "cloud": 258,
+          "gym": 260,
+          "insurance": 275,
+          "mobile": 226,
+          "music": 136,
+          "software": 212,
+          "streaming": 193,
+          "none": 440
+        }
+      },
+      "folds": [
+        {
+          "fold": 0,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.4631050129939903,
+          "accuracy": 0.5075,
+          "per_class": {
+            "cloud": {
+              "precision": 0.5238095238095238,
+              "recall": 0.5789473684210527,
+              "f1-score": 0.55
+            },
+            "gym": {
+              "precision": 0.38181818181818183,
+              "recall": 0.5526315789473685,
+              "f1-score": 0.45161290322580644
+            },
+            "insurance": {
+              "precision": 0.44642857142857145,
+              "recall": 0.5813953488372093,
+              "f1-score": 0.5050505050505051
+            },
+            "mobile": {
+              "precision": 0.3877551020408163,
+              "recall": 0.48717948717948717,
+              "f1-score": 0.4318181818181818
+            },
+            "music": {
+              "precision": 0.36363636363636365,
+              "recall": 0.20512820512820512,
+              "f1-score": 0.26229508196721313
+            },
+            "software": {
+              "precision": 0.42105263157894735,
+              "recall": 0.41025641025641024,
+              "f1-score": 0.4155844155844156
+            },
+            "streaming": {
+              "precision": 0.40476190476190477,
+              "recall": 0.37777777777777777,
+              "f1-score": 0.39080459770114945
+            },
+            "none": {
+              "precision": 0.78125,
+              "recall": 0.6302521008403361,
+              "f1-score": 0.6976744186046512
+            }
+          },
+          "confusion_matrix": [
+            [
+              22,
+              0,
+              2,
+              3,
+              2,
+              1,
+              4,
+              4
+            ],
+            [
+              2,
+              21,
+              1,
+              4,
+              0,
+              3,
+              4,
+              3
+            ],
+            [
+              3,
+              6,
+              25,
+              1,
+              0,
+              2,
+              2,
+              4
+            ],
+            [
+              5,
+              3,
+              2,
+              19,
+              3,
+              5,
+              2,
+              0
+            ],
+            [
+              2,
+              9,
+              7,
+              3,
+              8,
+              2,
+              4,
+              4
+            ],
+            [
+              5,
+              1,
+              4,
+              7,
+              0,
+              16,
+              3,
+              3
+            ],
+            [
+              0,
+              7,
+              7,
+              4,
+              4,
+              3,
+              17,
+              3
+            ],
+            [
+              3,
+              8,
+              8,
+              8,
+              5,
+              6,
+              6,
+              75
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 42,
+            "gym": 55,
+            "insurance": 56,
+            "mobile": 49,
+            "music": 22,
+            "software": 38,
+            "streaming": 42,
+            "none": 96
+          }
+        },
+        {
+          "fold": 1,
+          "none_bias": 0.5,
+          "temperature": 1.0,
+          "macro_f1": 0.44567751876103456,
+          "accuracy": 0.4775,
+          "per_class": {
+            "cloud": {
+              "precision": 0.3829787234042553,
+              "recall": 0.47368421052631576,
+              "f1-score": 0.4235294117647059
+            },
+            "gym": {
+              "precision": 0.3684210526315789,
+              "recall": 0.5526315789473685,
+              "f1-score": 0.4421052631578947
+            },
+            "insurance": {
+              "precision": 0.42105263157894735,
+              "recall": 0.5581395348837209,
+              "f1-score": 0.48
+            },
+            "mobile": {
+              "precision": 0.34782608695652173,
+              "recall": 0.42105263157894735,
+              "f1-score": 0.38095238095238093
+            },
+            "music": {
+              "precision": 0.3793103448275862,
+              "recall": 0.28205128205128205,
+              "f1-score": 0.3235294117647059
+            },
+            "software": {
+              "precision": 0.3953488372093023,
+              "recall": 0.4358974358974359,
+              "f1-score": 0.4146341463414634
+            },
+            "streaming": {
+              "precision": 0.5135135135135135,
+              "recall": 0.4222222222222222,
+              "f1-score": 0.4634146341463415
+            },
+            "none": {
+              "precision": 0.7738095238095238,
+              "recall": 0.5416666666666666,
+              "f1-score": 0.6372549019607843
+            }
+          },
+          "confusion_matrix": [
+            [
+              18,
+              4,
+              4,
+              6,
+              1,
+              2,
+              1,
+              2
+            ],
+            [
+              2,
+              21,
+              3,
+              3,
+              2,
+              2,
+              3,
+              2
+            ],
+            [
+              5,
+              2,
+              24,
+              2,
+              1,
+              5,
+              2,
+              2
+            ],
+            [
+              4,
+              3,
+              5,
+              16,
+              2,
+              5,
+              1,
+              2
+            ],
+            [
+              6,
+              7,
+              2,
+              4,
+              11,
+              2,
+              3,
+              4
+            ],
+            [
+              4,
+              4,
+              6,
+              3,
+              0,
+              17,
+              2,
+              3
+            ],
+            [
+              2,
+              6,
+              4,
+              4,
+              3,
+              3,
+              19,
+              4
+            ],
+            [
+              6,
+              10,
+              9,
+              8,
+              9,
+              7,
+              6,
+              65
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 47,
+            "gym": 57,
+            "insurance": 57,
+            "mobile": 46,
+            "music": 29,
+            "software": 43,
+            "streaming": 37,
+            "none": 84
+          }
+        },
+        {
+          "fold": 2,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.4772839404798179,
+          "accuracy": 0.5025,
+          "per_class": {
+            "cloud": {
+              "precision": 0.38333333333333336,
+              "recall": 0.6052631578947368,
+              "f1-score": 0.46938775510204084
+            },
+            "gym": {
+              "precision": 0.391304347826087,
+              "recall": 0.47368421052631576,
+              "f1-score": 0.42857142857142855
+            },
+            "insurance": {
+              "precision": 0.4528301886792453,
+              "recall": 0.5714285714285714,
+              "f1-score": 0.5052631578947369
+            },
+            "mobile": {
+              "precision": 0.38,
+              "recall": 0.5,
+              "f1-score": 0.4318181818181818
+            },
+            "music": {
+              "precision": 0.4444444444444444,
+              "recall": 0.3,
+              "f1-score": 0.3582089552238806
+            },
+            "software": {
+              "precision": 0.48,
+              "recall": 0.6153846153846154,
+              "f1-score": 0.5393258426966292
+            },
+            "streaming": {
+              "precision": 0.5294117647058824,
+              "recall": 0.4,
+              "f1-score": 0.45569620253164556
+            },
+            "none": {
+              "precision": 0.7875,
+              "recall": 0.525,
+              "f1-score": 0.63
+            }
+          },
+          "confusion_matrix": [
+            [
+              23,
+              2,
+              3,
+              5,
+              0,
+              2,
+              1,
+              2
+            ],
+            [
+              4,
+              18,
+              4,
+              3,
+              3,
+              3,
+              2,
+              1
+            ],
+            [
+              6,
+              4,
+              24,
+              2,
+              0,
+              1,
+              3,
+              2
+            ],
+            [
+              2,
+              6,
+              2,
+              19,
+              3,
+              3,
+              1,
+              2
+            ],
+            [
+              4,
+              4,
+              6,
+              2,
+              12,
+              3,
+              2,
+              7
+            ],
+            [
+              4,
+              2,
+              1,
+              3,
+              4,
+              24,
+              0,
+              1
+            ],
+            [
+              6,
+              3,
+              4,
+              7,
+              3,
+              2,
+              18,
+              2
+            ],
+            [
+              11,
+              7,
+              9,
+              9,
+              2,
+              12,
+              7,
+              63
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 60,
+            "gym": 46,
+            "insurance": 53,
+            "mobile": 50,
+            "music": 27,
+            "software": 50,
+            "streaming": 34,
+            "none": 80
+          }
+        },
+        {
+          "fold": 3,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.5107563034310171,
+          "accuracy": 0.545,
+          "per_class": {
+            "cloud": {
+              "precision": 0.41509433962264153,
+              "recall": 0.5789473684210527,
+              "f1-score": 0.4835164835164835
+            },
+            "gym": {
+              "precision": 0.5714285714285714,
+              "recall": 0.631578947368421,
+              "f1-score": 0.6
+            },
+            "insurance": {
+              "precision": 0.42592592592592593,
+              "recall": 0.5348837209302325,
+              "f1-score": 0.4742268041237113
+            },
+            "mobile": {
+              "precision": 0.4523809523809524,
+              "recall": 0.5,
+              "f1-score": 0.475
+            },
+            "music": {
+              "precision": 0.5,
+              "recall": 0.4,
+              "f1-score": 0.4444444444444444
+            },
+            "software": {
+              "precision": 0.43243243243243246,
+              "recall": 0.41025641025641024,
+              "f1-score": 0.42105263157894735
+            },
+            "streaming": {
+              "precision": 0.5263157894736842,
+              "recall": 0.4444444444444444,
+              "f1-score": 0.4819277108433735
+            },
+            "none": {
+              "precision": 0.7647058823529411,
+              "recall": 0.6554621848739496,
+              "f1-score": 0.7058823529411765
+            }
+          },
+          "confusion_matrix": [
+            [
+              22,
+              3,
+              3,
+              4,
+              0,
+              3,
+              1,
+              2
+            ],
+            [
+              4,
+              24,
+              2,
+              2,
+              2,
+              3,
+              0,
+              1
+            ],
+            [
+              5,
+              3,
+              23,
+              3,
+              1,
+              2,
+              3,
+              3
+            ],
+            [
+              2,
+              2,
+              5,
+              19,
+              1,
+              3,
+              3,
+              3
+            ],
+            [
+              5,
+              1,
+              4,
+              2,
+              16,
+              4,
+              1,
+              7
+            ],
+            [
+              4,
+              3,
+              7,
+              1,
+              3,
+              16,
+              1,
+              4
+            ],
+            [
+              4,
+              3,
+              4,
+              3,
+              3,
+              4,
+              20,
+              4
+            ],
+            [
+              7,
+              3,
+              6,
+              8,
+              6,
+              2,
+              9,
+              78
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 53,
+            "gym": 42,
+            "insurance": 54,
+            "mobile": 42,
+            "music": 32,
+            "software": 37,
+            "streaming": 38,
+            "none": 102
+          }
+        },
+        {
+          "fold": 4,
+          "none_bias": 0.5,
+          "temperature": 1.0,
+          "macro_f1": 0.4648100323978629,
+          "accuracy": 0.495,
+          "per_class": {
+            "cloud": {
+              "precision": 0.44642857142857145,
+              "recall": 0.6578947368421053,
+              "f1-score": 0.5319148936170213
+            },
+            "gym": {
+              "precision": 0.4166666666666667,
+              "recall": 0.6578947368421053,
+              "f1-score": 0.5102040816326531
+            },
+            "insurance": {
+              "precision": 0.4,
+              "recall": 0.5116279069767442,
+              "f1-score": 0.4489795918367347
+            },
+            "mobile": {
+              "precision": 0.46153846153846156,
+              "recall": 0.47368421052631576,
+              "f1-score": 0.4675324675324675
+            },
+            "music": {
+              "precision": 0.34615384615384615,
+              "recall": 0.225,
+              "f1-score": 0.2727272727272727
+            },
+            "software": {
+              "precision": 0.4090909090909091,
+              "recall": 0.46153846153846156,
+              "f1-score": 0.43373493975903615
+            },
+            "streaming": {
+              "precision": 0.42857142857142855,
+              "recall": 0.4,
+              "f1-score": 0.41379310344827586
+            },
+            "none": {
+              "precision": 0.8076923076923077,
+              "recall": 0.5294117647058824,
+              "f1-score": 0.6395939086294417
+            }
+          },
+          "confusion_matrix": [
+            [
+              25,
+              4,
+              3,
+              2,
+              0,
+              2,
+              2,
+              0
+            ],
+            [
+              2,
+              25,
+              0,
+              1,
+              0,
+              4,
+              4,
+              2
+            ],
+            [
+              2,
+              2,
+              22,
+              4,
+              4,
+              3,
+              4,
+              2
+            ],
+            [
+              4,
+              5,
+              2,
+              18,
+              1,
+              5,
+              1,
+              2
+            ],
+            [
+              5,
+              6,
+              7,
+              2,
+              9,
+              4,
+              4,
+              3
+            ],
+            [
+              1,
+              4,
+              5,
+              2,
+              2,
+              18,
+              3,
+              4
+            ],
+            [
+              3,
+              7,
+              7,
+              2,
+              2,
+              4,
+              18,
+              2
+            ],
+            [
+              14,
+              7,
+              9,
+              8,
+              8,
+              4,
+              6,
+              63
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 56,
+            "gym": 60,
+            "insurance": 55,
+            "mobile": 39,
+            "music": 26,
+            "software": 44,
+            "streaming": 42,
+            "none": 78
+          }
+        }
+      ]
+    },
+    "activity": {
+      "mean_macro_f1": 0.46869865592414106,
+      "std_macro_f1": 0.025962052765689747,
+      "delta_vs_v1_by_fold": [
+        0.010093036982663672,
+        0.009217770500074995,
+        -0.010417692498073283,
+        0.018645944764406452,
+        0.006531295929880776
+      ],
+      "beats_v1_every_fold": false,
+      "pooled_oof": {
+        "macro_f1": 0.4692116446117614,
+        "accuracy": 0.5035,
+        "per_class": {
+          "cloud": {
+            "precision": 0.41379310344827586,
+            "recall": 0.5684210526315789,
+            "f1-score": 0.4789356984478936
+          },
+          "gym": {
+            "precision": 0.42366412213740456,
+            "recall": 0.5842105263157895,
+            "f1-score": 0.4911504424778761
+          },
+          "insurance": {
+            "precision": 0.41911764705882354,
+            "recall": 0.5327102803738317,
+            "f1-score": 0.4691358024691358
+          },
+          "mobile": {
+            "precision": 0.41964285714285715,
+            "recall": 0.49214659685863876,
+            "f1-score": 0.4530120481927711
+          },
+          "music": {
+            "precision": 0.3851851851851852,
+            "recall": 0.26262626262626265,
+            "f1-score": 0.3123123123123123
+          },
+          "software": {
+            "precision": 0.4423076923076923,
+            "recall": 0.4717948717948718,
+            "f1-score": 0.456575682382134
+          },
+          "streaming": {
+            "precision": 0.4915254237288136,
+            "recall": 0.38666666666666666,
+            "f1-score": 0.43283582089552236
+          },
+          "none": {
+            "precision": 0.7570498915401301,
+            "recall": 0.5845896147403685,
+            "f1-score": 0.6597353497164461
+          }
+        },
+        "confusion_matrix": [
+          [
+            108,
+            15,
+            20,
+            16,
+            4,
+            8,
+            9,
+            10
+          ],
+          [
+            14,
+            111,
+            10,
+            14,
+            5,
+            15,
+            11,
+            10
+          ],
+          [
+            23,
+            16,
+            114,
+            8,
+            14,
+            12,
+            12,
+            15
+          ],
+          [
+            18,
+            19,
+            17,
+            94,
+            10,
+            19,
+            5,
+            9
+          ],
+          [
+            18,
+            28,
+            25,
+            15,
+            52,
+            15,
+            13,
+            32
+          ],
+          [
+            16,
+            16,
+            21,
+            16,
+            10,
+            92,
+            7,
+            17
+          ],
+          [
+            18,
+            27,
+            26,
+            19,
+            12,
+            17,
+            87,
+            19
+          ],
+          [
+            46,
+            30,
+            39,
+            42,
+            28,
+            30,
+            33,
+            349
+          ]
+        ],
+        "prediction_distribution": {
+          "cloud": 261,
+          "gym": 262,
+          "insurance": 272,
+          "mobile": 224,
+          "music": 135,
+          "software": 208,
+          "streaming": 177,
+          "none": 461
+        }
+      },
+      "folds": [
+        {
+          "fold": 0,
+          "none_bias": 1.0,
+          "temperature": 1.0,
+          "macro_f1": 0.452970642653245,
+          "accuracy": 0.505,
+          "per_class": {
+            "cloud": {
+              "precision": 0.46511627906976744,
+              "recall": 0.5263157894736842,
+              "f1-score": 0.49382716049382713
+            },
+            "gym": {
+              "precision": 0.38181818181818183,
+              "recall": 0.5526315789473685,
+              "f1-score": 0.45161290322580644
+            },
+            "insurance": {
+              "precision": 0.45454545454545453,
+              "recall": 0.5813953488372093,
+              "f1-score": 0.5102040816326531
+            },
+            "mobile": {
+              "precision": 0.40425531914893614,
+              "recall": 0.48717948717948717,
+              "f1-score": 0.4418604651162791
+            },
+            "music": {
+              "precision": 0.4444444444444444,
+              "recall": 0.20512820512820512,
+              "f1-score": 0.2807017543859649
+            },
+            "software": {
+              "precision": 0.42857142857142855,
+              "recall": 0.38461538461538464,
+              "f1-score": 0.40540540540540543
+            },
+            "streaming": {
+              "precision": 0.3783783783783784,
+              "recall": 0.3111111111111111,
+              "f1-score": 0.34146341463414637
+            },
+            "none": {
+              "precision": 0.7272727272727273,
+              "recall": 0.6722689075630253,
+              "f1-score": 0.6986899563318777
+            }
+          },
+          "confusion_matrix": [
+            [
+              20,
+              0,
+              4,
+              2,
+              3,
+              1,
+              4,
+              4
+            ],
+            [
+              2,
+              21,
+              1,
+              4,
+              0,
+              3,
+              3,
+              4
+            ],
+            [
+              3,
+              5,
+              25,
+              1,
+              1,
+              1,
+              3,
+              4
+            ],
+            [
+              4,
+              4,
+              1,
+              19,
+              2,
+              5,
+              2,
+              2
+            ],
+            [
+              2,
+              9,
+              6,
+              2,
+              8,
+              1,
+              4,
+              7
+            ],
+            [
+              4,
+              2,
+              5,
+              7,
+              0,
+              15,
+              2,
+              4
+            ],
+            [
+              4,
+              7,
+              5,
+              4,
+              1,
+              5,
+              14,
+              5
+            ],
+            [
+              4,
+              7,
+              8,
+              8,
+              3,
+              4,
+              5,
+              80
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 43,
+            "gym": 55,
+            "insurance": 55,
+            "mobile": 47,
+            "music": 18,
+            "software": 35,
+            "streaming": 37,
+            "none": 110
+          }
+        },
+        {
+          "fold": 1,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.4353181365734856,
+          "accuracy": 0.4775,
+          "per_class": {
+            "cloud": {
+              "precision": 0.4444444444444444,
+              "recall": 0.5263157894736842,
+              "f1-score": 0.4819277108433735
+            },
+            "gym": {
+              "precision": 0.36666666666666664,
+              "recall": 0.5789473684210527,
+              "f1-score": 0.4489795918367347
+            },
+            "insurance": {
+              "precision": 0.4,
+              "recall": 0.5116279069767442,
+              "f1-score": 0.4489795918367347
+            },
+            "mobile": {
+              "precision": 0.35714285714285715,
+              "recall": 0.39473684210526316,
+              "f1-score": 0.375
+            },
+            "music": {
+              "precision": 0.2692307692307692,
+              "recall": 0.1794871794871795,
+              "f1-score": 0.2153846153846154
+            },
+            "software": {
+              "precision": 0.4146341463414634,
+              "recall": 0.4358974358974359,
+              "f1-score": 0.425
+            },
+            "streaming": {
+              "precision": 0.5151515151515151,
+              "recall": 0.37777777777777777,
+              "f1-score": 0.4358974358974359
+            },
+            "none": {
+              "precision": 0.7244897959183674,
+              "recall": 0.5916666666666667,
+              "f1-score": 0.6513761467889908
+            }
+          },
+          "confusion_matrix": [
+            [
+              20,
+              4,
+              4,
+              4,
+              0,
+              2,
+              2,
+              2
+            ],
+            [
+              2,
+              22,
+              3,
+              3,
+              1,
+              2,
+              3,
+              2
+            ],
+            [
+              3,
+              3,
+              22,
+              1,
+              4,
+              4,
+              2,
+              4
+            ],
+            [
+              6,
+              3,
+              5,
+              15,
+              2,
+              5,
+              0,
+              2
+            ],
+            [
+              3,
+              9,
+              2,
+              3,
+              7,
+              4,
+              3,
+              8
+            ],
+            [
+              3,
+              5,
+              6,
+              3,
+              0,
+              17,
+              1,
+              4
+            ],
+            [
+              2,
+              6,
+              4,
+              4,
+              4,
+              3,
+              17,
+              5
+            ],
+            [
+              6,
+              8,
+              9,
+              9,
+              8,
+              4,
+              5,
+              71
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 45,
+            "gym": 60,
+            "insurance": 55,
+            "mobile": 42,
+            "music": 26,
+            "software": 41,
+            "streaming": 33,
+            "none": 98
+          }
+        },
+        {
+          "fold": 2,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.47466833597528857,
+          "accuracy": 0.495,
+          "per_class": {
+            "cloud": {
+              "precision": 0.3548387096774194,
+              "recall": 0.5789473684210527,
+              "f1-score": 0.44
+            },
+            "gym": {
+              "precision": 0.4,
+              "recall": 0.5263157894736842,
+              "f1-score": 0.45454545454545453
+            },
+            "insurance": {
+              "precision": 0.45454545454545453,
+              "recall": 0.5952380952380952,
+              "f1-score": 0.5154639175257731
+            },
+            "mobile": {
+              "precision": 0.375,
+              "recall": 0.47368421052631576,
+              "f1-score": 0.4186046511627907
+            },
+            "music": {
+              "precision": 0.42857142857142855,
+              "recall": 0.3,
+              "f1-score": 0.35294117647058826
+            },
+            "software": {
+              "precision": 0.48,
+              "recall": 0.6153846153846154,
+              "f1-score": 0.5393258426966292
+            },
+            "streaming": {
+              "precision": 0.5277777777777778,
+              "recall": 0.4222222222222222,
+              "f1-score": 0.4691358024691358
+            },
+            "none": {
+              "precision": 0.8169014084507042,
+              "recall": 0.48333333333333334,
+              "f1-score": 0.6073298429319371
+            }
+          },
+          "confusion_matrix": [
+            [
+              22,
+              3,
+              4,
+              4,
+              1,
+              1,
+              1,
+              2
+            ],
+            [
+              4,
+              20,
+              4,
+              3,
+              2,
+              3,
+              2,
+              0
+            ],
+            [
+              7,
+              4,
+              25,
+              0,
+              1,
+              1,
+              2,
+              2
+            ],
+            [
+              2,
+              6,
+              5,
+              18,
+              3,
+              3,
+              0,
+              1
+            ],
+            [
+              4,
+              4,
+              6,
+              3,
+              12,
+              3,
+              3,
+              5
+            ],
+            [
+              4,
+              2,
+              0,
+              3,
+              5,
+              24,
+              0,
+              1
+            ],
+            [
+              6,
+              4,
+              4,
+              6,
+              2,
+              2,
+              19,
+              2
+            ],
+            [
+              13,
+              7,
+              7,
+              11,
+              2,
+              13,
+              9,
+              58
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 62,
+            "gym": 50,
+            "insurance": 55,
+            "mobile": 48,
+            "music": 28,
+            "software": 50,
+            "streaming": 36,
+            "none": 71
+          }
+        },
+        {
+          "fold": 3,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.5038394837804092,
+          "accuracy": 0.5325,
+          "per_class": {
+            "cloud": {
+              "precision": 0.39655172413793105,
+              "recall": 0.6052631578947368,
+              "f1-score": 0.4791666666666667
+            },
+            "gym": {
+              "precision": 0.5853658536585366,
+              "recall": 0.631578947368421,
+              "f1-score": 0.6075949367088608
+            },
+            "insurance": {
+              "precision": 0.39215686274509803,
+              "recall": 0.46511627906976744,
+              "f1-score": 0.425531914893617
+            },
+            "mobile": {
+              "precision": 0.4888888888888889,
+              "recall": 0.5789473684210527,
+              "f1-score": 0.5301204819277109
+            },
+            "music": {
+              "precision": 0.45714285714285713,
+              "recall": 0.4,
+              "f1-score": 0.4266666666666667
+            },
+            "software": {
+              "precision": 0.41025641025641024,
+              "recall": 0.41025641025641024,
+              "f1-score": 0.41025641025641024
+            },
+            "streaming": {
+              "precision": 0.5277777777777778,
+              "recall": 0.4222222222222222,
+              "f1-score": 0.4691358024691358
+            },
+            "none": {
+              "precision": 0.7684210526315789,
+              "recall": 0.6134453781512605,
+              "f1-score": 0.6822429906542056
+            }
+          },
+          "confusion_matrix": [
+            [
+              23,
+              2,
+              3,
+              4,
+              0,
+              3,
+              1,
+              2
+            ],
+            [
+              4,
+              24,
+              2,
+              2,
+              1,
+              4,
+              1,
+              0
+            ],
+            [
+              7,
+              2,
+              20,
+              2,
+              3,
+              4,
+              2,
+              3
+            ],
+            [
+              2,
+              2,
+              5,
+              22,
+              2,
+              2,
+              2,
+              1
+            ],
+            [
+              5,
+              1,
+              4,
+              3,
+              16,
+              3,
+              1,
+              7
+            ],
+            [
+              4,
+              3,
+              7,
+              1,
+              3,
+              16,
+              1,
+              4
+            ],
+            [
+              3,
+              4,
+              4,
+              4,
+              3,
+              3,
+              19,
+              5
+            ],
+            [
+              10,
+              3,
+              6,
+              7,
+              7,
+              4,
+              9,
+              73
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 58,
+            "gym": 41,
+            "insurance": 51,
+            "mobile": 45,
+            "music": 35,
+            "software": 39,
+            "streaming": 36,
+            "none": 95
+          }
+        },
+        {
+          "fold": 4,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.47669668063827697,
+          "accuracy": 0.5075,
+          "per_class": {
+            "cloud": {
+              "precision": 0.4339622641509434,
+              "recall": 0.6052631578947368,
+              "f1-score": 0.5054945054945055
+            },
+            "gym": {
+              "precision": 0.42857142857142855,
+              "recall": 0.631578947368421,
+              "f1-score": 0.5106382978723404
+            },
+            "insurance": {
+              "precision": 0.39285714285714285,
+              "recall": 0.5116279069767442,
+              "f1-score": 0.4444444444444444
+            },
+            "mobile": {
+              "precision": 0.47619047619047616,
+              "recall": 0.5263157894736842,
+              "f1-score": 0.5
+            },
+            "music": {
+              "precision": 0.32142857142857145,
+              "recall": 0.225,
+              "f1-score": 0.2647058823529412
+            },
+            "software": {
+              "precision": 0.46511627906976744,
+              "recall": 0.5128205128205128,
+              "f1-score": 0.4878048780487805
+            },
+            "streaming": {
+              "precision": 0.5142857142857142,
+              "recall": 0.4,
+              "f1-score": 0.45
+            },
+            "none": {
+              "precision": 0.7701149425287356,
+              "recall": 0.5630252100840336,
+              "f1-score": 0.6504854368932039
+            }
+          },
+          "confusion_matrix": [
+            [
+              23,
+              6,
+              5,
+              2,
+              0,
+              1,
+              1,
+              0
+            ],
+            [
+              2,
+              24,
+              0,
+              2,
+              1,
+              3,
+              2,
+              4
+            ],
+            [
+              3,
+              2,
+              22,
+              4,
+              5,
+              2,
+              3,
+              2
+            ],
+            [
+              4,
+              4,
+              1,
+              20,
+              1,
+              4,
+              1,
+              3
+            ],
+            [
+              4,
+              5,
+              7,
+              4,
+              9,
+              4,
+              2,
+              5
+            ],
+            [
+              1,
+              4,
+              3,
+              2,
+              2,
+              20,
+              3,
+              4
+            ],
+            [
+              3,
+              6,
+              9,
+              1,
+              2,
+              4,
+              18,
+              2
+            ],
+            [
+              13,
+              5,
+              9,
+              7,
+              8,
+              5,
+              5,
+              67
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 53,
+            "gym": 56,
+            "insurance": 56,
+            "mobile": 42,
+            "music": 28,
+            "software": 43,
+            "streaming": 35,
+            "none": 87
+          }
+        }
+      ]
+    },
+    "horizon": {
+      "mean_macro_f1": 0.46723954510162524,
+      "std_macro_f1": 0.02104715347525909,
+      "delta_vs_v1_by_fold": [
+        0.0063442501218532454,
+        0.018193922259963413,
+        -0.018796425163699226,
+        0.00756102804730735,
+        0.013472026300948958
+      ],
+      "beats_v1_every_fold": false,
+      "pooled_oof": {
+        "macro_f1": 0.4683134766829973,
+        "accuracy": 0.5025,
+        "per_class": {
+          "cloud": {
+            "precision": 0.40234375,
+            "recall": 0.5421052631578948,
+            "f1-score": 0.4618834080717489
+          },
+          "gym": {
+            "precision": 0.43089430894308944,
+            "recall": 0.5578947368421052,
+            "f1-score": 0.48623853211009177
+          },
+          "insurance": {
+            "precision": 0.4496124031007752,
+            "recall": 0.5420560747663551,
+            "f1-score": 0.4915254237288136
+          },
+          "mobile": {
+            "precision": 0.4,
+            "recall": 0.4816753926701571,
+            "f1-score": 0.43705463182897863
+          },
+          "music": {
+            "precision": 0.41007194244604317,
+            "recall": 0.2878787878787879,
+            "f1-score": 0.33827893175074186
+          },
+          "software": {
+            "precision": 0.43564356435643564,
+            "recall": 0.4512820512820513,
+            "f1-score": 0.4433249370277078
+          },
+          "streaming": {
+            "precision": 0.47593582887700536,
+            "recall": 0.39555555555555555,
+            "f1-score": 0.4320388349514563
+          },
+          "none": {
+            "precision": 0.7344398340248963,
+            "recall": 0.592964824120603,
+            "f1-score": 0.6561631139944393
+          }
+        },
+        "confusion_matrix": [
+          [
+            103,
+            15,
+            15,
+            20,
+            4,
+            11,
+            9,
+            13
+          ],
+          [
+            14,
+            106,
+            10,
+            13,
+            7,
+            15,
+            14,
+            11
+          ],
+          [
+            19,
+            13,
+            116,
+            13,
+            10,
+            13,
+            14,
+            16
+          ],
+          [
+            18,
+            19,
+            14,
+            92,
+            10,
+            17,
+            7,
+            14
+          ],
+          [
+            22,
+            26,
+            22,
+            15,
+            57,
+            13,
+            12,
+            31
+          ],
+          [
+            17,
+            14,
+            22,
+            16,
+            11,
+            88,
+            8,
+            19
+          ],
+          [
+            17,
+            25,
+            23,
+            18,
+            14,
+            15,
+            89,
+            24
+          ],
+          [
+            46,
+            28,
+            36,
+            43,
+            26,
+            30,
+            34,
+            354
+          ]
+        ],
+        "prediction_distribution": {
+          "cloud": 256,
+          "gym": 246,
+          "insurance": 258,
+          "mobile": 230,
+          "music": 139,
+          "software": 202,
+          "streaming": 187,
+          "none": 482
+        }
+      },
+      "folds": [
+        {
+          "fold": 0,
+          "none_bias": 1.0,
+          "temperature": 1.0,
+          "macro_f1": 0.44922185579243457,
+          "accuracy": 0.5025,
+          "per_class": {
+            "cloud": {
+              "precision": 0.47619047619047616,
+              "recall": 0.5263157894736842,
+              "f1-score": 0.5
+            },
+            "gym": {
+              "precision": 0.37735849056603776,
+              "recall": 0.5263157894736842,
+              "f1-score": 0.43956043956043955
+            },
+            "insurance": {
+              "precision": 0.45454545454545453,
+              "recall": 0.5813953488372093,
+              "f1-score": 0.5102040816326531
+            },
+            "mobile": {
+              "precision": 0.41304347826086957,
+              "recall": 0.48717948717948717,
+              "f1-score": 0.4470588235294118
+            },
+            "music": {
+              "precision": 0.4,
+              "recall": 0.15384615384615385,
+              "f1-score": 0.2222222222222222
+            },
+            "software": {
+              "precision": 0.45714285714285713,
+              "recall": 0.41025641025641024,
+              "f1-score": 0.43243243243243246
+            },
+            "streaming": {
+              "precision": 0.39473684210526316,
+              "recall": 0.3333333333333333,
+              "f1-score": 0.3614457831325301
+            },
+            "none": {
+              "precision": 0.6896551724137931,
+              "recall": 0.6722689075630253,
+              "f1-score": 0.6808510638297872
+            }
+          },
+          "confusion_matrix": [
+            [
+              20,
+              0,
+              3,
+              3,
+              2,
+              2,
+              4,
+              4
+            ],
+            [
+              2,
+              20,
+              1,
+              4,
+              0,
+              3,
+              4,
+              4
+            ],
+            [
+              3,
+              4,
+              25,
+              1,
+              0,
+              2,
+              3,
+              5
+            ],
+            [
+              4,
+              3,
+              2,
+              19,
+              2,
+              4,
+              1,
+              4
+            ],
+            [
+              2,
+              10,
+              5,
+              2,
+              6,
+              1,
+              5,
+              8
+            ],
+            [
+              4,
+              2,
+              5,
+              5,
+              0,
+              16,
+              2,
+              5
+            ],
+            [
+              3,
+              7,
+              6,
+              3,
+              2,
+              3,
+              15,
+              6
+            ],
+            [
+              4,
+              7,
+              8,
+              9,
+              3,
+              4,
+              4,
+              80
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 42,
+            "gym": 53,
+            "insurance": 55,
+            "mobile": 46,
+            "music": 15,
+            "software": 35,
+            "streaming": 38,
+            "none": 116
+          }
+        },
+        {
+          "fold": 1,
+          "none_bias": 0.5,
+          "temperature": 1.0,
+          "macro_f1": 0.44429428833337403,
+          "accuracy": 0.47,
+          "per_class": {
+            "cloud": {
+              "precision": 0.3877551020408163,
+              "recall": 0.5,
+              "f1-score": 0.4367816091954023
+            },
+            "gym": {
+              "precision": 0.375,
+              "recall": 0.5526315789473685,
+              "f1-score": 0.44680851063829785
+            },
+            "insurance": {
+              "precision": 0.43636363636363634,
+              "recall": 0.5581395348837209,
+              "f1-score": 0.4897959183673469
+            },
+            "mobile": {
+              "precision": 0.34,
+              "recall": 0.4473684210526316,
+              "f1-score": 0.38636363636363635
+            },
+            "music": {
+              "precision": 0.36666666666666664,
+              "recall": 0.28205128205128205,
+              "f1-score": 0.3188405797101449
+            },
+            "software": {
+              "precision": 0.37209302325581395,
+              "recall": 0.41025641025641024,
+              "f1-score": 0.3902439024390244
+            },
+            "streaming": {
+              "precision": 0.4883720930232558,
+              "recall": 0.4666666666666667,
+              "f1-score": 0.4772727272727273
+            },
+            "none": {
+              "precision": 0.7972972972972973,
+              "recall": 0.49166666666666664,
+              "f1-score": 0.6082474226804123
+            }
+          },
+          "confusion_matrix": [
+            [
+              19,
+              4,
+              3,
+              5,
+              1,
+              2,
+              2,
+              2
+            ],
+            [
+              2,
+              21,
+              4,
+              3,
+              1,
+              3,
+              3,
+              1
+            ],
+            [
+              3,
+              1,
+              24,
+              2,
+              2,
+              6,
+              3,
+              2
+            ],
+            [
+              5,
+              3,
+              5,
+              17,
+              2,
+              3,
+              1,
+              2
+            ],
+            [
+              6,
+              8,
+              1,
+              4,
+              11,
+              3,
+              3,
+              3
+            ],
+            [
+              4,
+              4,
+              6,
+              3,
+              0,
+              16,
+              3,
+              3
+            ],
+            [
+              2,
+              6,
+              3,
+              4,
+              4,
+              3,
+              21,
+              2
+            ],
+            [
+              8,
+              9,
+              9,
+              12,
+              9,
+              7,
+              7,
+              59
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 49,
+            "gym": 56,
+            "insurance": 55,
+            "mobile": 50,
+            "music": 30,
+            "software": 43,
+            "streaming": 43,
+            "none": 74
+          }
+        },
+        {
+          "fold": 2,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.4662896033096626,
+          "accuracy": 0.4875,
+          "per_class": {
+            "cloud": {
+              "precision": 0.3559322033898305,
+              "recall": 0.5526315789473685,
+              "f1-score": 0.4329896907216495
+            },
+            "gym": {
+              "precision": 0.35555555555555557,
+              "recall": 0.42105263157894735,
+              "f1-score": 0.3855421686746988
+            },
+            "insurance": {
+              "precision": 0.46153846153846156,
+              "recall": 0.5714285714285714,
+              "f1-score": 0.5106382978723404
+            },
+            "mobile": {
+              "precision": 0.37735849056603776,
+              "recall": 0.5263157894736842,
+              "f1-score": 0.43956043956043955
+            },
+            "music": {
+              "precision": 0.4375,
+              "recall": 0.35,
+              "f1-score": 0.3888888888888889
+            },
+            "software": {
+              "precision": 0.46,
+              "recall": 0.5897435897435898,
+              "f1-score": 0.5168539325842697
+            },
+            "streaming": {
+              "precision": 0.5,
+              "recall": 0.4,
+              "f1-score": 0.4444444444444444
+            },
+            "none": {
+              "precision": 0.8082191780821918,
+              "recall": 0.49166666666666664,
+              "f1-score": 0.6113989637305699
+            }
+          },
+          "confusion_matrix": [
+            [
+              21,
+              2,
+              4,
+              5,
+              0,
+              3,
+              1,
+              2
+            ],
+            [
+              4,
+              16,
+              3,
+              3,
+              4,
+              4,
+              3,
+              1
+            ],
+            [
+              5,
+              5,
+              24,
+              2,
+              1,
+              1,
+              2,
+              2
+            ],
+            [
+              2,
+              7,
+              2,
+              20,
+              2,
+              3,
+              1,
+              1
+            ],
+            [
+              4,
+              4,
+              6,
+              3,
+              14,
+              2,
+              2,
+              5
+            ],
+            [
+              4,
+              1,
+              1,
+              3,
+              6,
+              23,
+              0,
+              1
+            ],
+            [
+              6,
+              4,
+              4,
+              6,
+              3,
+              2,
+              18,
+              2
+            ],
+            [
+              13,
+              6,
+              8,
+              11,
+              2,
+              12,
+              9,
+              59
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 59,
+            "gym": 45,
+            "insurance": 52,
+            "mobile": 53,
+            "music": 32,
+            "software": 50,
+            "streaming": 36,
+            "none": 73
+          }
+        },
+        {
+          "fold": 3,
+          "none_bias": 1.0,
+          "temperature": 1.0,
+          "macro_f1": 0.4927545670633101,
+          "accuracy": 0.53,
+          "per_class": {
+            "cloud": {
+              "precision": 0.40384615384615385,
+              "recall": 0.5526315789473685,
+              "f1-score": 0.4666666666666667
+            },
+            "gym": {
+              "precision": 0.6,
+              "recall": 0.631578947368421,
+              "f1-score": 0.6153846153846154
+            },
+            "insurance": {
+              "precision": 0.45652173913043476,
+              "recall": 0.4883720930232558,
+              "f1-score": 0.47191011235955055
+            },
+            "mobile": {
+              "precision": 0.4090909090909091,
+              "recall": 0.47368421052631576,
+              "f1-score": 0.43902439024390244
+            },
+            "music": {
+              "precision": 0.4444444444444444,
+              "recall": 0.4,
+              "f1-score": 0.42105263157894735
+            },
+            "software": {
+              "precision": 0.42857142857142855,
+              "recall": 0.38461538461538464,
+              "f1-score": 0.40540540540540543
+            },
+            "streaming": {
+              "precision": 0.5151515151515151,
+              "recall": 0.37777777777777777,
+              "f1-score": 0.4358974358974359
+            },
+            "none": {
+              "precision": 0.7017543859649122,
+              "recall": 0.6722689075630253,
+              "f1-score": 0.6866952789699571
+            }
+          },
+          "confusion_matrix": [
+            [
+              21,
+              3,
+              1,
+              5,
+              1,
+              3,
+              1,
+              3
+            ],
+            [
+              4,
+              24,
+              2,
+              2,
+              2,
+              3,
+              0,
+              1
+            ],
+            [
+              6,
+              2,
+              21,
+              4,
+              3,
+              2,
+              2,
+              3
+            ],
+            [
+              2,
+              2,
+              4,
+              18,
+              3,
+              2,
+              3,
+              4
+            ],
+            [
+              5,
+              0,
+              4,
+              3,
+              16,
+              4,
+              0,
+              8
+            ],
+            [
+              4,
+              3,
+              6,
+              2,
+              3,
+              15,
+              1,
+              5
+            ],
+            [
+              3,
+              2,
+              3,
+              4,
+              3,
+              3,
+              17,
+              10
+            ],
+            [
+              7,
+              4,
+              5,
+              6,
+              5,
+              3,
+              9,
+              80
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 52,
+            "gym": 40,
+            "insurance": 46,
+            "mobile": 44,
+            "music": 36,
+            "software": 35,
+            "streaming": 33,
+            "none": 114
+          }
+        },
+        {
+          "fold": 4,
+          "none_bias": 1.0,
+          "temperature": 1.0,
+          "macro_f1": 0.48363741100934515,
+          "accuracy": 0.5225,
+          "per_class": {
+            "cloud": {
+              "precision": 0.4074074074074074,
+              "recall": 0.5789473684210527,
+              "f1-score": 0.4782608695652174
+            },
+            "gym": {
+              "precision": 0.4807692307692308,
+              "recall": 0.6578947368421053,
+              "f1-score": 0.5555555555555556
+            },
+            "insurance": {
+              "precision": 0.44,
+              "recall": 0.5116279069767442,
+              "f1-score": 0.4731182795698925
+            },
+            "mobile": {
+              "precision": 0.4864864864864865,
+              "recall": 0.47368421052631576,
+              "f1-score": 0.48
+            },
+            "music": {
+              "precision": 0.38461538461538464,
+              "recall": 0.25,
+              "f1-score": 0.30303030303030304
+            },
+            "software": {
+              "precision": 0.46153846153846156,
+              "recall": 0.46153846153846156,
+              "f1-score": 0.46153846153846156
+            },
+            "streaming": {
+              "precision": 0.4864864864864865,
+              "recall": 0.4,
+              "f1-score": 0.43902439024390244
+            },
+            "none": {
+              "precision": 0.7238095238095238,
+              "recall": 0.6386554621848739,
+              "f1-score": 0.6785714285714286
+            }
+          },
+          "confusion_matrix": [
+            [
+              22,
+              6,
+              4,
+              2,
+              0,
+              1,
+              1,
+              2
+            ],
+            [
+              2,
+              25,
+              0,
+              1,
+              0,
+              2,
+              4,
+              4
+            ],
+            [
+              2,
+              1,
+              22,
+              4,
+              4,
+              2,
+              4,
+              4
+            ],
+            [
+              5,
+              4,
+              1,
+              18,
+              1,
+              5,
+              1,
+              3
+            ],
+            [
+              5,
+              4,
+              6,
+              3,
+              10,
+              3,
+              2,
+              7
+            ],
+            [
+              1,
+              4,
+              4,
+              3,
+              2,
+              18,
+              2,
+              5
+            ],
+            [
+              3,
+              6,
+              7,
+              1,
+              2,
+              4,
+              18,
+              4
+            ],
+            [
+              14,
+              2,
+              6,
+              5,
+              7,
+              4,
+              5,
+              76
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 54,
+            "gym": 52,
+            "insurance": 50,
+            "mobile": 37,
+            "music": 26,
+            "software": 39,
+            "streaming": 37,
+            "none": 105
+          }
+        }
+      ]
+    },
+    "combined": {
+      "mean_macro_f1": 0.46975028232361965,
+      "std_macro_f1": 0.01760024524673754,
+      "delta_vs_v1_by_fold": [
+        0.020939160380765265,
+        0.020527275960240843,
+        -0.007869407533340922,
+        0.00914304615219863,
+        -0.0034115872835182026
+      ],
+      "beats_v1_every_fold": false,
+      "pooled_oof": {
+        "macro_f1": 0.4702324101745552,
+        "accuracy": 0.506,
+        "per_class": {
+          "cloud": {
+            "precision": 0.41472868217054265,
+            "recall": 0.5631578947368421,
+            "f1-score": 0.47767857142857145
+          },
+          "gym": {
+            "precision": 0.4189723320158103,
+            "recall": 0.5578947368421052,
+            "f1-score": 0.4785553047404063
+          },
+          "insurance": {
+            "precision": 0.4344569288389513,
+            "recall": 0.5420560747663551,
+            "f1-score": 0.48232848232848236
+          },
+          "mobile": {
+            "precision": 0.415929203539823,
+            "recall": 0.49214659685863876,
+            "f1-score": 0.45083932853717024
+          },
+          "music": {
+            "precision": 0.40601503759398494,
+            "recall": 0.2727272727272727,
+            "f1-score": 0.32628398791540786
+          },
+          "software": {
+            "precision": 0.4587628865979381,
+            "recall": 0.4564102564102564,
+            "f1-score": 0.45758354755784064
+          },
+          "streaming": {
+            "precision": 0.4702702702702703,
+            "recall": 0.38666666666666666,
+            "f1-score": 0.424390243902439
+          },
+          "none": {
+            "precision": 0.7417355371900827,
+            "recall": 0.6013400335008375,
+            "f1-score": 0.6641998149861239
+          }
+        },
+        "confusion_matrix": [
+          [
+            107,
+            15,
+            15,
+            18,
+            5,
+            8,
+            8,
+            14
+          ],
+          [
+            14,
+            106,
+            10,
+            13,
+            7,
+            14,
+            15,
+            11
+          ],
+          [
+            20,
+            17,
+            116,
+            12,
+            8,
+            11,
+            14,
+            16
+          ],
+          [
+            17,
+            18,
+            13,
+            94,
+            11,
+            16,
+            8,
+            14
+          ],
+          [
+            21,
+            26,
+            25,
+            14,
+            54,
+            14,
+            13,
+            31
+          ],
+          [
+            16,
+            13,
+            25,
+            17,
+            9,
+            89,
+            8,
+            18
+          ],
+          [
+            18,
+            27,
+            26,
+            20,
+            12,
+            14,
+            87,
+            21
+          ],
+          [
+            45,
+            31,
+            37,
+            38,
+            27,
+            28,
+            32,
+            359
+          ]
+        ],
+        "prediction_distribution": {
+          "cloud": 258,
+          "gym": 253,
+          "insurance": 267,
+          "mobile": 226,
+          "music": 133,
+          "software": 194,
+          "streaming": 185,
+          "none": 484
+        }
+      },
+      "folds": [
+        {
+          "fold": 0,
+          "none_bias": 1.0,
+          "temperature": 1.0,
+          "macro_f1": 0.4638167660513466,
+          "accuracy": 0.515,
+          "per_class": {
+            "cloud": {
+              "precision": 0.5121951219512195,
+              "recall": 0.5526315789473685,
+              "f1-score": 0.5316455696202531
+            },
+            "gym": {
+              "precision": 0.38461538461538464,
+              "recall": 0.5263157894736842,
+              "f1-score": 0.4444444444444444
+            },
+            "insurance": {
+              "precision": 0.44642857142857145,
+              "recall": 0.5813953488372093,
+              "f1-score": 0.5050505050505051
+            },
+            "mobile": {
+              "precision": 0.391304347826087,
+              "recall": 0.46153846153846156,
+              "f1-score": 0.4235294117647059
+            },
+            "music": {
+              "precision": 0.5333333333333333,
+              "recall": 0.20512820512820512,
+              "f1-score": 0.2962962962962963
+            },
+            "software": {
+              "precision": 0.5151515151515151,
+              "recall": 0.4358974358974359,
+              "f1-score": 0.4722222222222222
+            },
+            "streaming": {
+              "precision": 0.3888888888888889,
+              "recall": 0.3111111111111111,
+              "f1-score": 0.345679012345679
+            },
+            "none": {
+              "precision": 0.6859504132231405,
+              "recall": 0.6974789915966386,
+              "f1-score": 0.6916666666666667
+            }
+          },
+          "confusion_matrix": [
+            [
+              21,
+              0,
+              2,
+              3,
+              2,
+              1,
+              4,
+              5
+            ],
+            [
+              2,
+              20,
+              1,
+              4,
+              0,
+              3,
+              4,
+              4
+            ],
+            [
+              3,
+              5,
+              25,
+              1,
+              0,
+              1,
+              3,
+              5
+            ],
+            [
+              3,
+              3,
+              2,
+              18,
+              2,
+              4,
+              2,
+              5
+            ],
+            [
+              2,
+              9,
+              6,
+              1,
+              8,
+              1,
+              4,
+              8
+            ],
+            [
+              3,
+              0,
+              5,
+              7,
+              0,
+              17,
+              2,
+              5
+            ],
+            [
+              3,
+              8,
+              7,
+              4,
+              0,
+              3,
+              14,
+              6
+            ],
+            [
+              4,
+              7,
+              8,
+              8,
+              3,
+              3,
+              3,
+              83
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 41,
+            "gym": 52,
+            "insurance": 56,
+            "mobile": 46,
+            "music": 15,
+            "software": 33,
+            "streaming": 36,
+            "none": 121
+          }
+        },
+        {
+          "fold": 1,
+          "none_bias": 0.5,
+          "temperature": 1.0,
+          "macro_f1": 0.44662764203365146,
+          "accuracy": 0.475,
+          "per_class": {
+            "cloud": {
+              "precision": 0.40425531914893614,
+              "recall": 0.5,
+              "f1-score": 0.4470588235294118
+            },
+            "gym": {
+              "precision": 0.36666666666666664,
+              "recall": 0.5789473684210527,
+              "f1-score": 0.4489795918367347
+            },
+            "insurance": {
+              "precision": 0.41379310344827586,
+              "recall": 0.5581395348837209,
+              "f1-score": 0.4752475247524752
+            },
+            "mobile": {
+              "precision": 0.3617021276595745,
+              "recall": 0.4473684210526316,
+              "f1-score": 0.4
+            },
+            "music": {
+              "precision": 0.36666666666666664,
+              "recall": 0.28205128205128205,
+              "f1-score": 0.3188405797101449
+            },
+            "software": {
+              "precision": 0.4,
+              "recall": 0.41025641025641024,
+              "f1-score": 0.4050632911392405
+            },
+            "streaming": {
+              "precision": 0.5,
+              "recall": 0.4222222222222222,
+              "f1-score": 0.4578313253012048
+            },
+            "none": {
+              "precision": 0.775,
+              "recall": 0.5166666666666667,
+              "f1-score": 0.62
+            }
+          },
+          "confusion_matrix": [
+            [
+              19,
+              4,
+              4,
+              5,
+              1,
+              2,
+              1,
+              2
+            ],
+            [
+              2,
+              22,
+              3,
+              3,
+              1,
+              2,
+              3,
+              2
+            ],
+            [
+              3,
+              3,
+              24,
+              2,
+              2,
+              5,
+              2,
+              2
+            ],
+            [
+              5,
+              3,
+              5,
+              17,
+              2,
+              3,
+              1,
+              2
+            ],
+            [
+              5,
+              8,
+              2,
+              4,
+              11,
+              3,
+              3,
+              3
+            ],
+            [
+              4,
+              4,
+              7,
+              3,
+              0,
+              16,
+              2,
+              3
+            ],
+            [
+              2,
+              6,
+              4,
+              4,
+              4,
+              2,
+              19,
+              4
+            ],
+            [
+              7,
+              10,
+              9,
+              9,
+              9,
+              7,
+              7,
+              62
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 47,
+            "gym": 60,
+            "insurance": 58,
+            "mobile": 47,
+            "music": 30,
+            "software": 40,
+            "streaming": 38,
+            "none": 80
+          }
+        },
+        {
+          "fold": 2,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.47721662094002093,
+          "accuracy": 0.5,
+          "per_class": {
+            "cloud": {
+              "precision": 0.39344262295081966,
+              "recall": 0.631578947368421,
+              "f1-score": 0.48484848484848486
+            },
+            "gym": {
+              "precision": 0.3404255319148936,
+              "recall": 0.42105263157894735,
+              "f1-score": 0.3764705882352941
+            },
+            "insurance": {
+              "precision": 0.46153846153846156,
+              "recall": 0.5714285714285714,
+              "f1-score": 0.5106382978723404
+            },
+            "mobile": {
+              "precision": 0.4,
+              "recall": 0.5263157894736842,
+              "f1-score": 0.45454545454545453
+            },
+            "music": {
+              "precision": 0.41935483870967744,
+              "recall": 0.325,
+              "f1-score": 0.36619718309859156
+            },
+            "software": {
+              "precision": 0.5106382978723404,
+              "recall": 0.6153846153846154,
+              "f1-score": 0.5581395348837209
+            },
+            "streaming": {
+              "precision": 0.5,
+              "recall": 0.4,
+              "f1-score": 0.4444444444444444
+            },
+            "none": {
+              "precision": 0.8026315789473685,
+              "recall": 0.5083333333333333,
+              "f1-score": 0.6224489795918368
+            }
+          },
+          "confusion_matrix": [
+            [
+              24,
+              2,
+              3,
+              4,
+              1,
+              1,
+              1,
+              2
+            ],
+            [
+              4,
+              16,
+              4,
+              3,
+              4,
+              3,
+              3,
+              1
+            ],
+            [
+              6,
+              4,
+              24,
+              2,
+              1,
+              1,
+              2,
+              2
+            ],
+            [
+              2,
+              6,
+              2,
+              20,
+              3,
+              2,
+              1,
+              2
+            ],
+            [
+              4,
+              4,
+              6,
+              3,
+              13,
+              2,
+              3,
+              5
+            ],
+            [
+              4,
+              2,
+              1,
+              3,
+              4,
+              24,
+              0,
+              1
+            ],
+            [
+              6,
+              4,
+              4,
+              6,
+              3,
+              2,
+              18,
+              2
+            ],
+            [
+              11,
+              9,
+              8,
+              9,
+              2,
+              12,
+              8,
+              61
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 61,
+            "gym": 47,
+            "insurance": 52,
+            "mobile": 50,
+            "music": 31,
+            "software": 47,
+            "streaming": 36,
+            "none": 76
+          }
+        },
+        {
+          "fold": 3,
+          "none_bias": 0.75,
+          "temperature": 1.0,
+          "macro_f1": 0.4943365851682014,
+          "accuracy": 0.53,
+          "per_class": {
+            "cloud": {
+              "precision": 0.39285714285714285,
+              "recall": 0.5789473684210527,
+              "f1-score": 0.46808510638297873
+            },
+            "gym": {
+              "precision": 0.5714285714285714,
+              "recall": 0.631578947368421,
+              "f1-score": 0.6
+            },
+            "insurance": {
+              "precision": 0.4230769230769231,
+              "recall": 0.5116279069767442,
+              "f1-score": 0.4631578947368421
+            },
+            "mobile": {
+              "precision": 0.43478260869565216,
+              "recall": 0.5263157894736842,
+              "f1-score": 0.47619047619047616
+            },
+            "music": {
+              "precision": 0.42424242424242425,
+              "recall": 0.35,
+              "f1-score": 0.3835616438356164
+            },
+            "software": {
+              "precision": 0.42857142857142855,
+              "recall": 0.38461538461538464,
+              "f1-score": 0.40540540540540543
+            },
+            "streaming": {
+              "precision": 0.5,
+              "recall": 0.4222222222222222,
+              "f1-score": 0.4578313253012048
+            },
+            "none": {
+              "precision": 0.7755102040816326,
+              "recall": 0.6386554621848739,
+              "f1-score": 0.7004608294930875
+            }
+          },
+          "confusion_matrix": [
+            [
+              22,
+              3,
+              2,
+              4,
+              1,
+              3,
+              1,
+              2
+            ],
+            [
+              4,
+              24,
+              2,
+              2,
+              2,
+              3,
+              1,
+              0
+            ],
+            [
+              6,
+              3,
+              22,
+              3,
+              1,
+              2,
+              3,
+              3
+            ],
+            [
+              2,
+              2,
+              4,
+              20,
+              3,
+              2,
+              3,
+              2
+            ],
+            [
+              5,
+              1,
+              4,
+              3,
+              14,
+              5,
+              1,
+              7
+            ],
+            [
+              4,
+              3,
+              7,
+              2,
+              3,
+              15,
+              1,
+              4
+            ],
+            [
+              4,
+              3,
+              4,
+              5,
+              3,
+              3,
+              19,
+              4
+            ],
+            [
+              9,
+              3,
+              7,
+              7,
+              6,
+              2,
+              9,
+              76
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 56,
+            "gym": 42,
+            "insurance": 52,
+            "mobile": 46,
+            "music": 33,
+            "software": 35,
+            "streaming": 38,
+            "none": 98
+          }
+        },
+        {
+          "fold": 4,
+          "none_bias": 1.0,
+          "temperature": 1.0,
+          "macro_f1": 0.466753797424878,
+          "accuracy": 0.51,
+          "per_class": {
+            "cloud": {
+              "precision": 0.39622641509433965,
+              "recall": 0.5526315789473685,
+              "f1-score": 0.46153846153846156
+            },
+            "gym": {
+              "precision": 0.46153846153846156,
+              "recall": 0.631578947368421,
+              "f1-score": 0.5333333333333333
+            },
+            "insurance": {
+              "precision": 0.42857142857142855,
+              "recall": 0.4883720930232558,
+              "f1-score": 0.45652173913043476
+            },
+            "mobile": {
+              "precision": 0.5135135135135135,
+              "recall": 0.5,
+              "f1-score": 0.5066666666666667
+            },
+            "music": {
+              "precision": 0.3333333333333333,
+              "recall": 0.2,
+              "f1-score": 0.25
+            },
+            "software": {
+              "precision": 0.4358974358974359,
+              "recall": 0.4358974358974359,
+              "f1-score": 0.4358974358974359
+            },
+            "streaming": {
+              "precision": 0.4594594594594595,
+              "recall": 0.37777777777777777,
+              "f1-score": 0.4146341463414634
+            },
+            "none": {
+              "precision": 0.7064220183486238,
+              "recall": 0.6470588235294118,
+              "f1-score": 0.6754385964912281
+            }
+          },
+          "confusion_matrix": [
+            [
+              21,
+              6,
+              4,
+              2,
+              0,
+              1,
+              1,
+              3
+            ],
+            [
+              2,
+              24,
+              0,
+              1,
+              0,
+              3,
+              4,
+              4
+            ],
+            [
+              2,
+              2,
+              21,
+              4,
+              4,
+              2,
+              4,
+              4
+            ],
+            [
+              5,
+              4,
+              0,
+              19,
+              1,
+              5,
+              1,
+              3
+            ],
+            [
+              5,
+              4,
+              7,
+              3,
+              8,
+              3,
+              2,
+              8
+            ],
+            [
+              1,
+              4,
+              5,
+              2,
+              2,
+              17,
+              3,
+              5
+            ],
+            [
+              3,
+              6,
+              7,
+              1,
+              2,
+              4,
+              17,
+              5
+            ],
+            [
+              14,
+              2,
+              5,
+              5,
+              7,
+              4,
+              5,
+              77
+            ]
+          ],
+          "prediction_distribution": {
+            "cloud": 53,
+            "gym": 52,
+            "insurance": 49,
+            "mobile": 37,
+            "music": 24,
+            "software": 39,
+            "streaming": 37,
+            "none": 109
+          }
+        }
+      ]
+    }
+  },
+  "partitions": [
+    {
+      "fold": 0,
+      "seconds": 5.7850744999996095,
+      "fit": {
+        "count": 1280,
+        "sha256": "b83cba598448c0772326fe12fdd7dc7026133491d65de9cf40193ca43a995b84"
+      },
+      "calibration": {
+        "count": 320,
+        "sha256": "6999f9fec8430b9ba4dc996176dea1831d27a8999c1d785477dd4f1e679d7686"
+      },
+      "outer_fit": {
+        "count": 1600,
+        "sha256": "ea35ee859158dd6767789c7738c90680611192a8ba1c70ec1ad352d714b22eae"
+      },
+      "heldout": {
+        "count": 400,
+        "sha256": "f2729dbac237a8109e734053a3f261187030893363460c9807de8b768b5a01ad"
+      }
+    },
+    {
+      "fold": 1,
+      "seconds": 5.192693500001042,
+      "fit": {
+        "count": 1280,
+        "sha256": "80333248eb36ba004db18f294b3281ac34b55d600853bb8d6ff78c1dc4943846"
+      },
+      "calibration": {
+        "count": 320,
+        "sha256": "01a5f7ccd627bdce6686a5b47db2fc25f1af28bd7e86c3995e0154fa70e329b8"
+      },
+      "outer_fit": {
+        "count": 1600,
+        "sha256": "11e2ae59e2485289cfb76c941617aa4c818687180a95c6ef4e1690d873cdf23f"
+      },
+      "heldout": {
+        "count": 400,
+        "sha256": "f604da628c3790f7d7986f1183e5179e486d8828b51fbb909601ae012bb585dd"
+      }
+    },
+    {
+      "fold": 2,
+      "seconds": 11.08322699999917,
+      "fit": {
+        "count": 1280,
+        "sha256": "3812d0415ab169e49036d0d6c0ee7ed8c790470372a0f7bb93f520cb3e23bb29"
+      },
+      "calibration": {
+        "count": 320,
+        "sha256": "d581fd87c38f5b273214376aec668baf5c1266cf67c6e4d55dc42cf033afefc0"
+      },
+      "outer_fit": {
+        "count": 1600,
+        "sha256": "95f16701851ef76cc0cee7afa5c155fa1ab195a1bed415d1679301cd313aaa17"
+      },
+      "heldout": {
+        "count": 400,
+        "sha256": "e597c2219a6f526c8940407c2a2126cf8a9cfce9d840d953a6a1e363acacb74b"
+      }
+    },
+    {
+      "fold": 3,
+      "seconds": 8.720132399997965,
+      "fit": {
+        "count": 1280,
+        "sha256": "f3d936ba01cee505fd92a4c2d29ed758e96fbb99f13e034438ce9f99d11459dd"
+      },
+      "calibration": {
+        "count": 320,
+        "sha256": "4ac3d756667f4026182a35e910e6b19e90d730ea4bf53115b0ac845ab00deab1"
+      },
+      "outer_fit": {
+        "count": 1600,
+        "sha256": "651368ec300211c725c2b0d5b71941887319ec670d3fa40bedeff8be99c8a09a"
+      },
+      "heldout": {
+        "count": 400,
+        "sha256": "f78be25b48f3f444397c5d55293e038a2a25a4f9758d902a369c64c11be060b3"
+      }
+    },
+    {
+      "fold": 4,
+      "seconds": 9.54995069999859,
+      "fit": {
+        "count": 1280,
+        "sha256": "dc79d48d11ab48b7a0aba1ce966b3fa75f56b4c84e637fed028541f5a7adf852"
+      },
+      "calibration": {
+        "count": 320,
+        "sha256": "0902decc3ae4c7e8090383f5757bbfc3df53cfae8ebfb9c832a3aaaa46dc1277"
+      },
+      "outer_fit": {
+        "count": 1600,
+        "sha256": "01186fdb5ee7bae067ba60a2ab8461cbd17ada9a58db2dcd4e4200c8b5090855"
+      },
+      "heldout": {
+        "count": 400,
+        "sha256": "34a09932ffddc714248fd44cc2c6efe891e7c601627572c3707b4f11181abe27"
+      }
+    }
+  ],
+  "official_validation_independent": false,
+  "official_validation_diagnostic": {
+    "v1": {
+      "none_bias": 1.0,
+      "macro_f1": 0.1404300918312423,
+      "accuracy": 0.288,
+      "per_class": {
+        "cloud": {
+          "precision": 0.46153846153846156,
+          "recall": 0.1348314606741573,
+          "f1-score": 0.20869565217391303
+        },
+        "gym": {
+          "precision": 0.3,
+          "recall": 0.049586776859504134,
+          "f1-score": 0.0851063829787234
+        },
+        "insurance": {
+          "precision": 0.2916666666666667,
+          "recall": 0.0707070707070707,
+          "f1-score": 0.11382113821138211
+        },
+        "mobile": {
+          "precision": 0.43478260869565216,
+          "recall": 0.09615384615384616,
+          "f1-score": 0.15748031496062992
+        },
+        "music": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0
+        },
+        "software": {
+          "precision": 0.2777777777777778,
+          "recall": 0.04807692307692308,
+          "f1-score": 0.08196721311475409
+        },
+        "streaming": {
+          "precision": 0.25,
+          "recall": 0.030927835051546393,
+          "f1-score": 0.05504587155963303
+        },
+        "none": {
+          "precision": 0.28160919540229884,
+          "recall": 0.8361774744027304,
+          "f1-score": 0.42132416165090286
+        }
+      },
+      "confusion_matrix": [
+        [
+          12,
+          2,
+          0,
+          0,
+          1,
+          0,
+          1,
+          73
+        ],
+        [
+          1,
+          6,
+          2,
+          1,
+          1,
+          2,
+          0,
+          108
+        ],
+        [
+          0,
+          1,
+          7,
+          2,
+          1,
+          4,
+          1,
+          83
+        ],
+        [
+          2,
+          0,
+          5,
+          10,
+          0,
+          0,
+          0,
+          87
+        ],
+        [
+          2,
+          1,
+          1,
+          0,
+          0,
+          1,
+          0,
+          88
+        ],
+        [
+          0,
+          1,
+          2,
+          0,
+          0,
+          5,
+          3,
+          93
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          3,
+          93
+        ],
+        [
+          9,
+          9,
+          7,
+          9,
+          4,
+          6,
+          4,
+          245
+        ]
+      ],
+      "prediction_distribution": {
+        "cloud": 26,
+        "gym": 20,
+        "insurance": 24,
+        "mobile": 23,
+        "music": 7,
+        "software": 18,
+        "streaming": 12,
+        "none": 870
+      }
+    },
+    "combined": {
+      "none_bias": 0.75,
+      "macro_f1": 0.15397810622872146,
+      "accuracy": 0.285,
+      "per_class": {
+        "cloud": {
+          "precision": 0.45454545454545453,
+          "recall": 0.16853932584269662,
+          "f1-score": 0.2459016393442623
+        },
+        "gym": {
+          "precision": 0.23076923076923078,
+          "recall": 0.049586776859504134,
+          "f1-score": 0.08163265306122448
+        },
+        "insurance": {
+          "precision": 0.25925925925925924,
+          "recall": 0.0707070707070707,
+          "f1-score": 0.1111111111111111
+        },
+        "mobile": {
+          "precision": 0.375,
+          "recall": 0.11538461538461539,
+          "f1-score": 0.17647058823529413
+        },
+        "music": {
+          "precision": 0.125,
+          "recall": 0.010752688172043012,
+          "f1-score": 0.019801980198019802
+        },
+        "software": {
+          "precision": 0.3157894736842105,
+          "recall": 0.057692307692307696,
+          "f1-score": 0.0975609756097561
+        },
+        "streaming": {
+          "precision": 0.2777777777777778,
+          "recall": 0.05154639175257732,
+          "f1-score": 0.08695652173913043
+        },
+        "none": {
+          "precision": 0.27837514934289126,
+          "recall": 0.7952218430034129,
+          "f1-score": 0.41238938053097346
+        }
+      },
+      "confusion_matrix": [
+        [
+          15,
+          2,
+          0,
+          2,
+          0,
+          0,
+          1,
+          69
+        ],
+        [
+          1,
+          6,
+          2,
+          2,
+          1,
+          2,
+          0,
+          107
+        ],
+        [
+          0,
+          2,
+          7,
+          3,
+          1,
+          4,
+          2,
+          80
+        ],
+        [
+          3,
+          0,
+          5,
+          12,
+          0,
+          0,
+          0,
+          84
+        ],
+        [
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          86
+        ],
+        [
+          1,
+          1,
+          3,
+          2,
+          0,
+          6,
+          3,
+          88
+        ],
+        [
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          5,
+          90
+        ],
+        [
+          11,
+          14,
+          9,
+          8,
+          5,
+          6,
+          7,
+          233
+        ]
+      ],
+      "prediction_distribution": {
+        "cloud": 33,
+        "gym": 26,
+        "insurance": 27,
+        "mobile": 32,
+        "music": 8,
+        "software": 19,
+        "streaming": 18,
+        "none": 837
+      }
+    }
+  },
+  "historical_diagnostics": [
+    {
+      "cutoff": "2025-07-01 00:00:00+00:00",
+      "horizon_end_exclusive": "2025-09-29 00:00:00+00:00",
+      "label_kind": "next observed same-description event; not official recurrence labels",
+      "historical_streams": 33482,
+      "forecastable_streams": 18368,
+      "future_observed_streams": 16246,
+      "date_error_pairs": 10317,
+      "new_future_streams": 9657,
+      "calendar_adjusted_streams": 94,
+      "binary_horizon_counts": {
+        "tp": 4726,
+        "fp": 3458,
+        "fn": 11520,
+        "tn": 13778
+      },
+      "date_errors_conditional_on_observation": {
+        "v1_median_date": {
+          "mae_days": 63.65951289325152,
+          "median_ae_days": 50.52576388888891
+        },
+        "v2_calendar_date": {
+          "mae_days": 63.65870517163779,
+          "median_ae_days": 50.52576388888889
+        }
+      }
+    },
+    {
+      "cutoff": "2025-10-01 00:00:00+00:00",
+      "horizon_end_exclusive": "2025-12-30 00:00:00+00:00",
+      "label_kind": "next observed same-description event; not official recurrence labels",
+      "historical_streams": 43330,
+      "forecastable_streams": 26419,
+      "future_observed_streams": 19412,
+      "date_error_pairs": 14290,
+      "new_future_streams": 7290,
+      "calendar_adjusted_streams": 245,
+      "binary_horizon_counts": {
+        "tp": 6140,
+        "fp": 4730,
+        "fn": 13272,
+        "tn": 19188
+      },
+      "date_errors_conditional_on_observation": {
+        "v1_median_date": {
+          "mae_days": 72.84213282566157,
+          "median_ae_days": 53.97470775462962
+        },
+        "v2_calendar_date": {
+          "mae_days": 72.83940143570355,
+          "median_ae_days": 53.98306712962963
+        }
+      }
+    }
+  ],
+  "versions": {
+    "numpy": "2.3.5",
+    "pandas": "2.3.3",
+    "scikit-learn": "1.9.1",
+    "catboost": "1.2.10"
+  },
+  "seconds": 240.79835979999916,
+  "base_commit": "0199a8b7c8b2c790a9d3447b156f2088708c2864",
+  "source_sha256": {
+    "ubs_v2_temporal.toml": "195c915234f18638ea0aa8179c34dbff7bc8b8d6ce120c3152bc44737e020f42",
+    "compare_ubs_temporal.py": "86f962c1f964f3e9d0e44d37456263209848602feb68ba42c8ff17b5392b0b4d",
+    "data.py": "72906e9d526ccf2a6e236a9b40be49bf5979fb9e79ba9c270e3fd3723e8f9516",
+    "evaluation.py": "af735b31baf73055e73dc090499a442c5fda7c73ad91851a5d9add962666e28a",
+    "features.py": "7dc7844c15de5daeb37e0e215da8c85c23426c5dfb8ba86753b6952628d338d5",
+    "models.py": "557038ffecce10cf2a4edde03a0ac22e2c022d17df680b8b18344554a0c371fb",
+    "temporal_experiment.py": "d0a11f0c4558bcaab62bcd678fb770a4be84749f189545a1914910badaf1231f",
+    "temporal_features.py": "743bc5179fd9bbafb36c0d332a91194e2b48f59e07a9bf330ad4dde41bd7acae",
+    "__init__.py": "da24b71d16d7a422fee38ea6783408eb3d3f6080f18797b373de5a239dac7de6"
+  },
+  "input_sha256": {
+    "sample_submission.csv": "53a24cd23d680c2573f5b048dd69d1747f20adc45e308593d914ee13e8d00ed2",
+    "test_transactions.jsonl": "cc6083d6e0d4f4787f0766d6eb22fd5d267194c9a71a04da81e60dc23f5463e4",
+    "train_labels.csv": "cab0ec46064348f970ffafdd4f42a12d41a8db660e9db835e7235851b556ff9f",
+    "train_transactions.jsonl": "ba0902b33b1181921ee5b1f8f445693201c0968ca52d70a92e12cbb114e7d70a",
+    "valid_labels.csv": "979bd9b69253084fc9e2b1ef473c07a628a8b18091169051ba304cfed0fb5642",
+    "valid_transactions.jsonl": "2c30941d49ca20f7b082526407f24529c5a704205610373eff952f4f444a3622"
+  },
+  "v1_original_reproduction": {
+    "metrics": {
+      "accuracy": 0.266,
+      "confusion_matrix": [
+        [
+          46,
+          5,
+          5,
+          15,
+          4,
+          3,
+          7,
+          4
+        ],
+        [
+          20,
+          43,
+          5,
+          20,
+          5,
+          12,
+          5,
+          11
+        ],
+        [
+          16,
+          11,
+          34,
+          14,
+          2,
+          8,
+          8,
+          6
+        ],
+        [
+          12,
+          4,
+          11,
+          57,
+          1,
+          4,
+          5,
+          10
+        ],
+        [
+          13,
+          12,
+          9,
+          21,
+          19,
+          5,
+          6,
+          8
+        ],
+        [
+          19,
+          13,
+          8,
+          13,
+          8,
+          27,
+          9,
+          7
+        ],
+        [
+          15,
+          13,
+          6,
+          26,
+          3,
+          6,
+          23,
+          5
+        ],
+        [
+          89,
+          31,
+          33,
+          43,
+          24,
+          30,
+          26,
+          17
+        ]
+      ],
+      "macro_f1": 0.2710242658492452,
+      "per_class": {
+        "cloud": {
+          "f1-score": 0.2884012539184953,
+          "precision": 0.2,
+          "recall": 0.5168539325842697
+        },
+        "gym": {
+          "f1-score": 0.33992094861660077,
+          "precision": 0.32575757575757575,
+          "recall": 0.35537190082644626
+        },
+        "insurance": {
+          "f1-score": 0.3238095238095238,
+          "precision": 0.3063063063063063,
+          "recall": 0.3434343434343434
+        },
+        "mobile": {
+          "f1-score": 0.36421725239616615,
+          "precision": 0.2727272727272727,
+          "recall": 0.5480769230769231
+        },
+        "music": {
+          "f1-score": 0.2389937106918239,
+          "precision": 0.2878787878787879,
+          "recall": 0.20430107526881722
+        },
+        "none": {
+          "f1-score": 0.09418282548476455,
+          "precision": 0.25,
+          "recall": 0.05802047781569966
+        },
+        "software": {
+          "f1-score": 0.271356783919598,
+          "precision": 0.28421052631578947,
+          "recall": 0.25961538461538464
+        },
+        "streaming": {
+          "f1-score": 0.24731182795698925,
+          "precision": 0.25842696629213485,
+          "recall": 0.23711340206185566
+        }
+      },
+      "prediction_distribution": {
+        "cloud": 230,
+        "gym": 132,
+        "insurance": 111,
+        "mobile": 209,
+        "music": 66,
+        "none": 68,
+        "software": 95,
+        "streaming": 89
+      }
+    },
+    "config": {
+      "catboost": {
+        "depth": 6,
+        "iterations": 350,
+        "learning_rate": 0.05
+      },
+      "data": {
+        "cutoff": "2026-01-01",
+        "directory": "data/raw/ubs_2026",
+        "target": "target_next_recurring_merchant"
+      },
+      "features": {
+        "recent_windows": [
+          7,
+          14,
+          30,
+          60,
+          90,
+          180
+        ],
+        "tfidf_max_features": 2500
+      },
+      "logistic": {
+        "c_values": [
+          0.3,
+          1.0,
+          3.0
+        ],
+        "class_weights": [
+          "none",
+          "balanced"
+        ]
+      },
+      "outputs": {
+        "metrics_directory": "outputs/metrics/temporal_v2_v1_reproduction",
+        "submission": "outputs/predictions/temporal_v2_v1_reproduction.csv"
+      },
+      "project": {
+        "random_seed": 42
+      }
+    },
+    "seconds": 166.22917569999845,
+    "best_model": "recurrence_heuristic",
+    "official_validation_used_for_selection": true,
+    "submission_validated_clients": 1000
+  },
+  "preimplementation_analysis": {
+    "train_clients": 2000,
+    "train_rows": 147459,
+    "streams": 50720,
+    "one_event": 17669,
+    "two_events": 9325,
+    "three_plus": 23726,
+    "repeated_client_timestamp": 0,
+    "duplicate_stream_timestamp": 0,
+    "zero_intervals": 0,
+    "post_cutoff": 0,
+    "regular_std_le3_two_events": 9325,
+    "regular_std_le3_three_plus": 817,
+    "quantiles": {
+      "events": {
+        "0.1": 1.0,
+        "0.5": 2.0,
+        "0.9": 6.0
+      },
+      "mean": {
+        "0.1": 29.5528125,
+        "0.5": 69.7352025462963,
+        "0.9": 161.86604166666666
+      },
+      "median": {
+        "0.1": 23.877939814814816,
+        "0.5": 61.06686342592592,
+        "0.9": 162.57566550925924
+      },
+      "std": {
+        "0.1": 0.0,
+        "0.5": 26.670895308868474,
+        "0.9": 75.72428819444444
+      },
+      "mad": {
+        "0.1": 0.0,
+        "0.5": 13.472997685185184,
+        "0.9": 56.19028935185185
+      },
+      "cv": {
+        "0.1": 0.0,
+        "0.5": 0.46592717138369594,
+        "0.9": 0.9507857187366258
+      },
+      "age": {
+        "0.1": 13.339640046296296,
+        "0.5": 84.04942708333334,
+        "0.9": 255.3825949074074
+      },
+      "days_until_expected": {
+        "0.1": -136.86069444444445,
+        "0.5": 3.6278067129629648,
+        "0.9": 111.49582175925926
+      }
+    },
+    "by_target_client_medians": {
+      "cloud": {
+        "streams": 26.0,
+        "events": 74.0,
+        "median_interval": 62.801261574074076,
+        "median_cv": 0.4650301589257136,
+        "median_mad": 13.799231770833334,
+        "median_recency": 87.56121527777779,
+        "recent90": 18.5
+      },
+      "gym": {
+        "streams": 26.0,
+        "events": 74.5,
+        "median_interval": 61.271079282407406,
+        "median_cv": 0.46075396553114467,
+        "median_mad": 14.029403935185185,
+        "median_recency": 87.14113136574073,
+        "recent90": 18.0
+      },
+      "insurance": {
+        "streams": 26.0,
+        "events": 79.5,
+        "median_interval": 60.70229745370371,
+        "median_cv": 0.4837920005921578,
+        "median_mad": 14.73793547453704,
+        "median_recency": 80.6875925925926,
+        "recent90": 20.0
+      },
+      "mobile": {
+        "streams": 25.0,
+        "events": 75.0,
+        "median_interval": 61.19707465277777,
+        "median_cv": 0.4743475722133534,
+        "median_mad": 14.011163194444444,
+        "median_recency": 84.50123842592592,
+        "recent90": 19.0
+      },
+      "music": {
+        "streams": 25.0,
+        "events": 77.0,
+        "median_interval": 60.35398726851852,
+        "median_cv": 0.47941268706496987,
+        "median_mad": 14.125405092592596,
+        "median_recency": 85.24202835648148,
+        "recent90": 19.0
+      },
+      "none": {
+        "streams": 24.0,
+        "events": 64.0,
+        "median_interval": 62.526759259259265,
+        "median_cv": 0.4059734269323635,
+        "median_mad": 11.6689525462963,
+        "median_recency": 86.23380787037037,
+        "recent90": 18.0
+      },
+      "software": {
+        "streams": 26.0,
+        "events": 74.0,
+        "median_interval": 61.423356481481484,
+        "median_cv": 0.46909920003222066,
+        "median_mad": 13.060625,
+        "median_recency": 85.10171296296296,
+        "recent90": 19.0
+      },
+      "streaming": {
+        "streams": 25.0,
+        "events": 74.0,
+        "median_interval": 61.06478009259259,
+        "median_cv": 0.4874142870911208,
+        "median_mad": 14.62100983796296,
+        "median_recency": 81.07534143518518,
+        "recent90": 20.0
+      }
+    },
+    "important_limit": "Target per client is not a merchant family label per event. Descriptions used only as existing stream keys."
+  }
+}

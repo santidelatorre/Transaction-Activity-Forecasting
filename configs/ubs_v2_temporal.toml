@@ -1,0 +1,17 @@
+# Frozen before the first V2 comparison; no official-validation tuning.
+seed = 42
+folds = 5
+calibration_fraction = 0.20
+data_directory = "data/raw/ubs_2026"
+cutoff = "2026-01-01T00:00:00Z"
+horizon_days = 90
+historical_cutoffs = ["2025-07-01T00:00:00Z", "2025-10-01T00:00:00Z"]
+output = "outputs/metrics/ubs_v2_temporal/results.json"
+
+[variants]
+v1 = []
+intervals = ["intervals"]
+periodicity = ["periodicity"]
+activity = ["activity"]
+horizon = ["horizon"]
+combined = ["intervals", "periodicity", "activity", "horizon"]
