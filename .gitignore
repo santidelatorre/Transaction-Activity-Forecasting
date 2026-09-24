@@ -34,6 +34,7 @@ outputs/models/*
 outputs/predictions/*
 outputs/metrics/*
 outputs/figures/*
+outputs/experiments/*.sqlite3*
 !outputs/models/.gitkeep
 !outputs/predictions/.gitkeep
 !outputs/metrics/.gitkeep

@@ -192,3 +192,38 @@ La integración en `main` se propone mediante Pull Requests y requiere revisión
 y CI. La configuración de protección de rama y los permisos los gestiona el
 propietario del repositorio. No se presupone una licencia ni permiso adicional
 de publicación de datos por disponer de este código.
+
+## UBS V2 integrada
+
+La receta V2 congelada combina 75% CatBoost sobre 146 agregados históricos sin
+features derivadas del target y 25% heurística de periodicidad. En el mismo split
+oficial obtiene Macro-F1 **0.391549456** y accuracy **0.4240**, frente a
+**0.271024266 / 0.2660** de V1. La validación ha sido reutilizada para selección;
+`music` sigue por debajo de V1. Consulta el
+[informe completo](reports/v2_final_report.md) y el
+[resumen del equipo](reports/v2_final_summary.md).
+
+Desde la raíz del repositorio, con el entorno instalado:
+
+```powershell
+python scripts/run_ubs_v2.py
+```
+
+Genera `outputs/metrics/ubs_v2/` y
+`outputs/submission_v2.csv`, ajustando primero solo con train para
+validación y después con train+valid para test. V1 conserva su runner,
+configuración y submission independientes. En la máquina de integración se
+recuperó Python en `.venv/runtime_v2/python.exe`, que puede sustituir a `python`
+si el ejecutable original de `.venv` apunta a una instalación eliminada.
+
+Los experimentos rechazados solo se ejecutan mediante selección explícita en
+`scripts/evaluate_v2_candidate.py`; el runner final usa la receta congelada.
+`scripts/audit_ubs_v2.py` añade cinco folds internos y análisis pareado del
+ledger local. Datos, predicciones, modelos, cachés y SQLite permanecen ignorados
+por Git.
+
+Antes de subir el CSV, ejecutar la auditoría reproducible del contrato:
+
+```powershell
+python scripts/validate_submission.py
+```
