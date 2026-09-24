@@ -1,0 +1,12 @@
+{
+  "model": "StreamV3PushEmbedModel",
+  "push_weight": 0.85,
+  "v2_macro_f1": 0.3915494559105542,
+  "push_macro_f1": 0.44454709747059196,
+  "push_embed_macro_f1": 0.4570384307914666,
+  "push_embed_accuracy": 0.484,
+  "delta_vs_v2": 0.06548897488091243,
+  "delta_vs_push": 0.012491333320874654,
+  "note": "From VALID grid in esteban pretrain experiment; frozen as StreamV3PushEmbedModel.",
+  "experiment_seconds": 403.0919281250099
+}
