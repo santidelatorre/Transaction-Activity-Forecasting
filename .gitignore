@@ -4,6 +4,7 @@ env/
 .env
 .env.*
 !.env.example
+.codex/
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -38,7 +39,13 @@ outputs/figures/*
 *.csv
 *.tsv
 *.parquet
+*.jsonl
+*.xlsx
+*.xls
 *.zip
+*.7z
+*.gz
+*.tar
 *.pickle
 *.pkl
 *.joblib
