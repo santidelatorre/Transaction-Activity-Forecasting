@@ -210,7 +210,7 @@ python scripts/run_ubs_v2.py
 ```
 
 Genera `outputs/metrics/ubs_v2/` y
-`outputs/predictions/submission_v2.csv`, ajustando primero solo con train para
+`outputs/submission_v2.csv`, ajustando primero solo con train para
 validación y después con train+valid para test. V1 conserva su runner,
 configuración y submission independientes. En la máquina de integración se
 recuperó Python en `.venv/runtime_v2/python.exe`, que puede sustituir a `python`
@@ -221,3 +221,9 @@ Los experimentos rechazados solo se ejecutan mediante selección explícita en
 `scripts/audit_ubs_v2.py` añade cinco folds internos y análisis pareado del
 ledger local. Datos, predicciones, modelos, cachés y SQLite permanecen ignorados
 por Git.
+
+Antes de subir el CSV, ejecutar la auditoría reproducible del contrato:
+
+```powershell
+python scripts/validate_submission.py
+```

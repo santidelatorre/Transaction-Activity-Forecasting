@@ -23,7 +23,7 @@ from transaction_forecasting.ubs.v2 import IntegratedV2Model
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--metrics-directory", default="outputs/metrics/ubs_v2")
-    parser.add_argument("--submission", default="outputs/predictions/submission_v2.csv")
+    parser.add_argument("--submission", default="outputs/submission_v2.csv")
     args = parser.parse_args()
     metrics_dir, submission_path = Path(args.metrics_directory), Path(args.submission)
     # V1 artifact preservation is enforced even when custom output paths are supplied.
