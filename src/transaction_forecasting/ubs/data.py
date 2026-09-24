@@ -7,10 +7,13 @@ from pathlib import Path
 
 import pandas as pd
 
-CUTOFF = pd.Timestamp("2026-01-01", tz="UTC")
-LABELS = ("cloud", "gym", "insurance", "mobile", "music", "software", "streaming", "none")
-TARGET_COLUMN = "target_next_recurring_merchant"
-PREDICTION_COLUMN = "predicted_next_recurring_merchant"
+from transaction_forecasting.evaluation.official import CUTOFF_DATE, PREDICTION
+from transaction_forecasting.evaluation.official import LABELS as LABELS
+from transaction_forecasting.evaluation.official import TARGET as TARGET_COLUMN
+from transaction_forecasting.evaluation.official import validate_submission as validate_client_set
+
+CUTOFF = pd.Timestamp(CUTOFF_DATE, tz="UTC")
+PREDICTION_COLUMN = PREDICTION
 TRANSACTION_COLUMNS = {
     "client_id",
     "timestamp",
@@ -111,17 +114,10 @@ def validate_submission(
     submission: pd.DataFrame, sample: pd.DataFrame, test_transactions: pd.DataFrame
 ) -> None:
     """Strictly verify schema, row order, IDs, cardinality, and allowed predictions."""
-    expected_columns = ["client_id", PREDICTION_COLUMN]
-    if submission.columns.tolist() != expected_columns:
-        raise ValueError(f"Submission columns must be exactly {expected_columns}")
-    if len(submission) != len(sample) or submission["client_id"].duplicated().any():
-        raise ValueError("Submission row count or client uniqueness is invalid")
+    # Share schema, vocabulary and coverage checks with the CSV CLI while
+    # retaining UBS V1's stricter order check and None return contract.
+    validate_client_set(submission, sample)
     if not submission["client_id"].equals(sample["client_id"]):
         raise ValueError("Submission must preserve sample_submission client order")
     if set(submission["client_id"]) != set(test_transactions["client_id"]):
         raise ValueError("Submission client IDs do not match test")
-    if submission[PREDICTION_COLUMN].isna().any():
-        raise ValueError("Submission contains missing predictions")
-    unknown = set(submission[PREDICTION_COLUMN]).difference(LABELS)
-    if unknown:
-        raise ValueError(f"Submission contains unknown labels: {sorted(unknown)}")

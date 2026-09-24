@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
+from sklearn.metrics import f1_score
 
 from transaction_forecasting.ubs.data import (
+    LABELS,
     PREDICTION_COLUMN,
     validate_submission,
 )
+from transaction_forecasting.ubs.evaluation import evaluate_predictions
 from transaction_forecasting.ubs.features import ClientFeatureBuilder, build_recurrence_streams
 
 
@@ -61,3 +64,28 @@ def test_submission_validation_requires_sample_order() -> None:
     validate_submission(valid, sample, test_transactions)
     with pytest.raises(ValueError, match="order"):
         validate_submission(valid.iloc[::-1].reset_index(drop=True), sample, test_transactions)
+
+
+def test_official_macro_f1_matches_manual_result_and_sklearn() -> None:
+    clients = [f"C{i}" for i in range(len(LABELS))]
+    target = pd.Series(LABELS, index=clients)
+    prediction = target.copy()
+    prediction.loc["C0"] = "none"
+    prediction = prediction.iloc[::-1]
+
+    metrics = evaluate_predictions(target, prediction)
+    expected = (6.0 + 2.0 / 3.0) / 8.0
+    aligned = prediction.reindex(target.index)
+
+    assert metrics["macro_f1"] == pytest.approx(expected)
+    assert metrics["macro_f1"] == pytest.approx(
+        f1_score(target, aligned, labels=LABELS, average="macro", zero_division=0)
+    )
+    assert metrics["accuracy"] == 7.0 / 8.0
+
+
+def test_official_macro_f1_assigns_zero_to_absent_classes() -> None:
+    target = pd.Series(["cloud"], index=["A"])
+    prediction = pd.Series(["cloud"], index=["A"])
+
+    assert evaluate_predictions(target, prediction)["macro_f1"] == 1.0 / 8.0

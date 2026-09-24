@@ -7,6 +7,7 @@ import json
 import random
 import tomllib
 from pathlib import Path
+from time import perf_counter
 from typing import Any
 
 import numpy as np
@@ -44,6 +45,11 @@ def experiment_row(
     class_weight: str,
     metrics: dict[str, object],
     notes: str,
+    *,
+    train_seconds: float,
+    inference_seconds: float,
+    feature_count: int,
+    validation_clients: int,
 ) -> dict[str, object]:
     return {
         "model": name,
@@ -51,8 +57,17 @@ def experiment_row(
         "class_weight": class_weight,
         "macro_f1": metrics["macro_f1"],
         "accuracy": metrics["accuracy"],
+        "train_seconds": train_seconds,
+        "inference_seconds": inference_seconds,
+        "feature_count": feature_count,
+        "validation_clients": validation_clients,
         "notes": notes,
     }
+
+
+def indexed_prediction(values: np.ndarray, client_ids: pd.Index) -> pd.Series:
+    """Attach client IDs before scoring so row order cannot change the metric."""
+    return pd.Series(values, index=client_ids, name=PREDICTION_COLUMN)
 
 
 def markdown_table(frame: pd.DataFrame, digits: int = 4) -> str:
@@ -127,6 +142,7 @@ def render_report(
 - Accuracy: {best_metrics["accuracy"]:.6f}
 - Heuristic macro-F1: {heuristic_metrics["macro_f1"]:.6f}
 - Ensemble improvement over its ML component: {ensemble_improvement:.6f}
+- Final submission refit: selected approach retrained on train + validation labels.
 
 ### Per-class metrics
 
@@ -158,6 +174,7 @@ Submission: `{submission_path.resolve()}`
 
 
 def main() -> None:
+    run_started = perf_counter()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", default="configs/ubs_v1.toml")
     arguments = parser.parse_args()
@@ -167,11 +184,11 @@ def main() -> None:
     np.random.seed(seed)
 
     data = load_ubs_data(settings["data"]["directory"])
+    feature_started = perf_counter()
     builder = ClientFeatureBuilder().fit(data.train_transactions, data.train_labels)
     x_train = builder.transform(data.train_transactions)
     x_valid = builder.transform(data.valid_transactions)
-    x_test = builder.transform(data.test_transactions)
-    if not (x_train.index.is_unique and x_valid.index.is_unique and x_test.index.is_unique):
+    if not (x_train.index.is_unique and x_valid.index.is_unique):
         raise ValueError("Feature tables must contain exactly one unique row per client")
     y_train = data.train_labels.set_index("client_id")[TARGET_COLUMN].reindex(x_train.index)
     y_valid = data.valid_labels.set_index("client_id")[TARGET_COLUMN].reindex(x_valid.index)
@@ -179,22 +196,29 @@ def main() -> None:
         raise ValueError("Feature/label alignment produced missing targets")
     train_documents = build_client_documents(data.train_transactions, x_train.index)
     valid_documents = build_client_documents(data.valid_transactions, x_valid.index)
-    test_documents = build_client_documents(data.test_transactions, x_test.index)
+    validation_feature_seconds = perf_counter() - feature_started
 
     outputs: dict[str, dict[str, Any]] = {}
     details: dict[str, dict[str, object]] = {}
     experiments: list[dict[str, object]] = []
 
+    train_started = perf_counter()
     majority = str(y_train.mode().iloc[0])
+    dummy_train_seconds = perf_counter() - train_started
+    inference_started = perf_counter()
     dummy_prediction = np.repeat(majority, len(x_valid))
     dummy_probabilities = np.zeros((len(x_valid), len(LABELS)))
     dummy_probabilities[:, LABELS.index(majority)] = 1.0
-    dummy_metrics = evaluate_predictions(y_valid, dummy_prediction)
+    dummy_inference_seconds = perf_counter() - inference_started
+    dummy_metrics = evaluate_predictions(
+        y_valid, indexed_prediction(dummy_prediction, x_valid.index)
+    )
     details["dummy_majority"] = dummy_metrics
     outputs["dummy_majority"] = {
         "prediction": dummy_prediction,
         "probabilities": dummy_probabilities,
         "kind": "dummy",
+        "feature_count": 0,
     }
     experiments.append(
         experiment_row(
@@ -203,19 +227,30 @@ def main() -> None:
             "none",
             dummy_metrics,
             f"Always predicts train majority: {majority}",
+            train_seconds=dummy_train_seconds,
+            inference_seconds=dummy_inference_seconds,
+            feature_count=0,
+            validation_clients=len(x_valid),
         )
     )
 
+    train_started = perf_counter()
     heuristic = RecurrenceHeuristic().tune(x_valid, y_valid)
+    heuristic_train_seconds = perf_counter() - train_started
+    inference_started = perf_counter()
     heuristic_probabilities = heuristic.predict_proba(x_valid)
     heuristic_prediction = np.asarray(LABELS)[heuristic_probabilities.argmax(axis=1)]
-    heuristic_metrics = evaluate_predictions(y_valid, heuristic_prediction)
+    heuristic_inference_seconds = perf_counter() - inference_started
+    heuristic_metrics = evaluate_predictions(
+        y_valid, indexed_prediction(heuristic_prediction, x_valid.index)
+    )
     details["recurrence_heuristic"] = heuristic_metrics
     outputs["recurrence_heuristic"] = {
         "prediction": heuristic_prediction,
         "probabilities": heuristic_probabilities,
         "kind": "heuristic",
         "model": heuristic,
+        "feature_count": len(LABELS) * 4,
     }
     experiments.append(
         experiment_row(
@@ -224,6 +259,10 @@ def main() -> None:
             "validation-calibrated none bias",
             heuristic_metrics,
             f"none_bias={heuristic.none_bias:.2f}; temperature={heuristic.temperature:.2f}",
+            train_seconds=heuristic_train_seconds,
+            inference_seconds=heuristic_inference_seconds,
+            feature_count=len(LABELS) * 4,
+            validation_clients=len(x_valid),
         )
     )
 
@@ -232,21 +271,29 @@ def main() -> None:
         class_weight = None if class_weight_setting == "none" else str(class_weight_setting)
         for c_value in logistic_settings["c_values"]:
             name = f"logistic_c{float(c_value):g}_{class_weight_setting}"
+            train_started = perf_counter()
             model = ClientTextLogistic(
                 c=float(c_value),
                 class_weight=class_weight,
                 seed=seed,
                 max_text_features=int(settings["features"]["tfidf_max_features"]),
             ).fit(x_train, train_documents, y_train)
+            train_seconds = perf_counter() - train_started
+            inference_started = perf_counter()
             probabilities = model.predict_proba(x_valid, valid_documents)
             prediction = np.asarray(LABELS)[probabilities.argmax(axis=1)]
-            metrics = evaluate_predictions(y_valid, prediction)
+            inference_seconds = perf_counter() - inference_started
+            metrics = evaluate_predictions(y_valid, indexed_prediction(prediction, x_valid.index))
+            feature_count = len(model.numeric_columns_) + len(
+                model.vectorizer.get_feature_names_out()
+            )
             details[name] = metrics
             outputs[name] = {
                 "prediction": prediction,
                 "probabilities": probabilities,
                 "kind": "logistic",
                 "model": model,
+                "feature_count": feature_count,
             }
             experiments.append(
                 experiment_row(
@@ -255,12 +302,17 @@ def main() -> None:
                     str(class_weight_setting),
                     metrics,
                     f"C={float(c_value):g}",
+                    train_seconds=train_seconds,
+                    inference_seconds=inference_seconds,
+                    feature_count=feature_count,
+                    validation_clients=len(x_valid),
                 )
             )
 
     catboost_settings = settings["catboost"]
     for balanced in (False, True):
         name = f"catboost_{'balanced' if balanced else 'normal'}"
+        train_started = perf_counter()
         model = CatBoostClientModel(
             balanced=balanced,
             seed=seed,
@@ -268,15 +320,20 @@ def main() -> None:
             depth=int(catboost_settings["depth"]),
             learning_rate=float(catboost_settings["learning_rate"]),
         ).fit(x_train, y_train)
+        train_seconds = perf_counter() - train_started
+        inference_started = perf_counter()
         probabilities = model.predict_proba(x_valid)
         prediction = np.asarray(LABELS)[probabilities.argmax(axis=1)]
-        metrics = evaluate_predictions(y_valid, prediction)
+        inference_seconds = perf_counter() - inference_started
+        metrics = evaluate_predictions(y_valid, indexed_prediction(prediction, x_valid.index))
+        feature_count = len(model.columns_)
         details[name] = metrics
         outputs[name] = {
             "prediction": prediction,
             "probabilities": probabilities,
             "kind": "catboost",
             "model": model,
+            "feature_count": feature_count,
         }
         experiments.append(
             experiment_row(
@@ -288,6 +345,10 @@ def main() -> None:
                     f"iterations={catboost_settings['iterations']}; "
                     f"depth={catboost_settings['depth']}"
                 ),
+                train_seconds=train_seconds,
+                inference_seconds=inference_seconds,
+                feature_count=feature_count,
+                validation_clients=len(x_valid),
             )
         )
 
@@ -299,10 +360,11 @@ def main() -> None:
     )
     best_ml = outputs[best_ml_name]
     best_ensemble: tuple[float, float, np.ndarray, np.ndarray, dict[str, object]] | None = None
+    train_started = perf_counter()
     for alpha in np.arange(0.05, 0.51, 0.05):
         probabilities = (1.0 - alpha) * best_ml["probabilities"] + alpha * heuristic_probabilities
         prediction = np.asarray(LABELS)[probabilities.argmax(axis=1)]
-        metrics = evaluate_predictions(y_valid, prediction)
+        metrics = evaluate_predictions(y_valid, indexed_prediction(prediction, x_valid.index))
         candidate = (float(metrics["macro_f1"]), float(metrics["accuracy"]))
         if best_ensemble is None or candidate > best_ensemble[:2]:
             best_ensemble = (
@@ -313,15 +375,27 @@ def main() -> None:
                 {**metrics, "alpha": float(alpha)},
             )
     assert best_ensemble is not None
-    ensemble_metrics = best_ensemble[4]
+    ensemble_train_seconds = perf_counter() - train_started
+    alpha = float(best_ensemble[4]["alpha"])
+    inference_started = perf_counter()
+    ensemble_probabilities = (1.0 - alpha) * best_ml[
+        "probabilities"
+    ] + alpha * heuristic_probabilities
+    ensemble_prediction = np.asarray(LABELS)[ensemble_probabilities.argmax(axis=1)]
+    ensemble_inference_seconds = perf_counter() - inference_started
+    ensemble_metrics = {
+        **evaluate_predictions(y_valid, indexed_prediction(ensemble_prediction, x_valid.index)),
+        "alpha": alpha,
+    }
     ensemble_name = f"ensemble_{best_ml_name}_heuristic"
     details[ensemble_name] = ensemble_metrics
     outputs[ensemble_name] = {
-        "prediction": best_ensemble[3],
-        "probabilities": best_ensemble[2],
+        "prediction": ensemble_prediction,
+        "probabilities": ensemble_probabilities,
         "kind": "ensemble",
         "base_name": best_ml_name,
         "alpha": ensemble_metrics["alpha"],
+        "feature_count": best_ml["feature_count"],
     }
     ensemble_improvement = float(ensemble_metrics["macro_f1"] - details[best_ml_name]["macro_f1"])
     experiments.append(
@@ -331,6 +405,10 @@ def main() -> None:
             "inherited",
             ensemble_metrics,
             f"alpha={ensemble_metrics['alpha']:.2f}; delta_macro_f1={ensemble_improvement:+.6f}",
+            train_seconds=ensemble_train_seconds,
+            inference_seconds=ensemble_inference_seconds,
+            feature_count=int(best_ml["feature_count"]),
+            validation_clients=len(x_valid),
         )
     )
 
@@ -344,14 +422,62 @@ def main() -> None:
     best_output = outputs[best_name]
     best_metrics = details[best_name]
 
+    # Model selection is complete. Refit the selected approach on every labelled
+    # client before touching test predictions; test labels never exist or enter here.
+    final_feature_started = perf_counter()
+    all_transactions = pd.concat(
+        [data.train_transactions, data.valid_transactions], ignore_index=True
+    )
+    all_labels = pd.concat([data.train_labels, data.valid_labels], ignore_index=True)
+    final_builder = ClientFeatureBuilder().fit(all_transactions, all_labels)
+    x_all = final_builder.transform(all_transactions)
+    x_test = final_builder.transform(data.test_transactions)
+    if not (x_all.index.is_unique and x_test.index.is_unique):
+        raise ValueError("Final feature tables must contain one unique row per client")
+    y_all = all_labels.set_index("client_id")[TARGET_COLUMN].reindex(x_all.index)
+    if y_all.isna().any():
+        raise ValueError("Final feature/label alignment produced missing targets")
+    all_documents = build_client_documents(all_transactions, x_all.index)
+    test_documents = build_client_documents(data.test_transactions, x_test.index)
+    final_feature_seconds = perf_counter() - final_feature_started
+
+    final_train_started = perf_counter()
     if best_output["kind"] == "logistic":
-        test_probabilities = best_output["model"].predict_proba(x_test, test_documents)
-        importance = best_output["model"].feature_importance()
+        selected_model = best_output["model"]
+        final_model = ClientTextLogistic(
+            c=selected_model.c,
+            class_weight=selected_model.class_weight,
+            seed=selected_model.seed,
+            max_text_features=selected_model.max_text_features,
+        ).fit(x_all, all_documents, y_all)
+        final_train_seconds = perf_counter() - final_train_started
+        final_inference_started = perf_counter()
+        test_probabilities = final_model.predict_proba(x_test, test_documents)
+        final_inference_seconds = perf_counter() - final_inference_started
+        importance = final_model.feature_importance()
     elif best_output["kind"] == "catboost":
-        test_probabilities = best_output["model"].predict_proba(x_test)
-        importance = best_output["model"].feature_importance()
+        selected_model = best_output["model"]
+        final_model = CatBoostClientModel(
+            balanced=selected_model.balanced,
+            seed=selected_model.seed,
+            iterations=selected_model.iterations,
+            depth=selected_model.depth,
+            learning_rate=selected_model.learning_rate,
+        ).fit(x_all, y_all)
+        final_train_seconds = perf_counter() - final_train_started
+        final_inference_started = perf_counter()
+        test_probabilities = final_model.predict_proba(x_test)
+        final_inference_seconds = perf_counter() - final_inference_started
+        importance = final_model.feature_importance()
     elif best_output["kind"] == "heuristic":
-        test_probabilities = heuristic.predict_proba(x_test)
+        final_heuristic = RecurrenceHeuristic(
+            none_bias=heuristic.none_bias,
+            temperature=heuristic.temperature,
+        )
+        final_train_seconds = perf_counter() - final_train_started
+        final_inference_started = perf_counter()
+        test_probabilities = final_heuristic.predict_proba(x_test)
+        final_inference_seconds = perf_counter() - final_inference_started
         importance = pd.DataFrame(
             {
                 "feature": [
@@ -366,15 +492,45 @@ def main() -> None:
     elif best_output["kind"] == "ensemble":
         base_output = outputs[best_output["base_name"]]
         if base_output["kind"] == "logistic":
-            base_test = base_output["model"].predict_proba(x_test, test_documents)
+            selected_model = base_output["model"]
+            final_base = ClientTextLogistic(
+                c=selected_model.c,
+                class_weight=selected_model.class_weight,
+                seed=selected_model.seed,
+                max_text_features=selected_model.max_text_features,
+            ).fit(x_all, all_documents, y_all)
         else:
-            base_test = base_output["model"].predict_proba(x_test)
+            selected_model = base_output["model"]
+            final_base = CatBoostClientModel(
+                balanced=selected_model.balanced,
+                seed=selected_model.seed,
+                iterations=selected_model.iterations,
+                depth=selected_model.depth,
+                learning_rate=selected_model.learning_rate,
+            ).fit(x_all, y_all)
+        final_heuristic = RecurrenceHeuristic(
+            none_bias=heuristic.none_bias,
+            temperature=heuristic.temperature,
+        )
+        final_train_seconds = perf_counter() - final_train_started
+        final_inference_started = perf_counter()
+        if base_output["kind"] == "logistic":
+            base_test = final_base.predict_proba(x_test, test_documents)
+        else:
+            base_test = final_base.predict_proba(x_test)
         alpha = float(best_output["alpha"])
-        test_probabilities = (1.0 - alpha) * base_test + alpha * heuristic.predict_proba(x_test)
-        importance = base_output["model"].feature_importance()
+        test_probabilities = (1.0 - alpha) * base_test + alpha * final_heuristic.predict_proba(
+            x_test
+        )
+        final_inference_seconds = perf_counter() - final_inference_started
+        importance = final_base.feature_importance()
     else:
+        final_majority = str(y_all.mode().iloc[0])
+        final_train_seconds = perf_counter() - final_train_started
+        final_inference_started = perf_counter()
         test_probabilities = np.zeros((len(x_test), len(LABELS)))
-        test_probabilities[:, LABELS.index(majority)] = 1.0
+        test_probabilities[:, LABELS.index(final_majority)] = 1.0
+        final_inference_seconds = perf_counter() - final_inference_started
         importance = pd.DataFrame({"feature": ["train majority"], "importance": [1.0]})
     test_prediction = np.asarray(LABELS)[test_probabilities.argmax(axis=1)]
 
@@ -385,14 +541,16 @@ def main() -> None:
 
     metrics_dir = Path(settings["outputs"]["metrics_directory"])
     metrics_dir.mkdir(parents=True, exist_ok=True)
+    save_json(metrics_dir / "run_config.json", settings)
     submission_path = Path(settings["outputs"]["submission"])
     submission_path.parent.mkdir(parents=True, exist_ok=True)
     submission.to_csv(submission_path, index=False)
     written_submission = pd.read_csv(submission_path, dtype={"client_id": str})
     validate_submission(written_submission, data.sample_submission, data.test_transactions)
-    pd.DataFrame(experiments).sort_values(["macro_f1", "accuracy"], ascending=False).to_csv(
-        metrics_dir / "experiments.csv", index=False
+    experiments_frame = pd.DataFrame(experiments).sort_values(
+        ["macro_f1", "accuracy"], ascending=False
     )
+    experiments_frame.to_csv(metrics_dir / "experiments.csv", index=False)
     save_json(metrics_dir / "validation_metrics.json", details)
     pd.DataFrame(best_metrics["confusion_matrix"], index=LABELS, columns=LABELS).to_csv(
         metrics_dir / "best_confusion_matrix.csv"
@@ -434,9 +592,6 @@ def main() -> None:
         .round(4)
         .to_dict(),
     }
-    experiments_frame = pd.DataFrame(experiments).sort_values(
-        ["macro_f1", "accuracy"], ascending=False
-    )
     report = render_report(
         experiments_frame,
         best_name,
@@ -450,6 +605,7 @@ def main() -> None:
         submission_path,
     )
     (metrics_dir / "report.md").write_text(report, encoding="utf-8")
+    run_seconds = perf_counter() - run_started
     summary = {
         "best_model": best_name,
         "best_macro_f1": best_metrics["macro_f1"],
@@ -472,10 +628,22 @@ def main() -> None:
         "top_features": importance.head(15).to_dict(orient="records"),
         "submission": str(submission_path.resolve()),
         "submission_rows": len(submission),
+        "submission_prediction_distribution": submission[PREDICTION_COLUMN]
+        .value_counts()
+        .reindex(LABELS, fill_value=0)
+        .astype(int)
+        .to_dict(),
         "train_clients": len(x_train),
         "valid_clients": len(x_valid),
         "test_clients": len(x_test),
         "feature_count": x_train.shape[1],
+        "final_refit_clients": len(x_all),
+        "final_refit_uses_train_and_valid": True,
+        "validation_feature_seconds": validation_feature_seconds,
+        "final_feature_seconds": final_feature_seconds,
+        "final_model_train_seconds": final_train_seconds,
+        "final_inference_seconds": final_inference_seconds,
+        "pipeline_seconds": run_seconds,
     }
     save_json(metrics_dir / "summary.json", summary)
     print(json.dumps(summary, indent=2, default=str))
