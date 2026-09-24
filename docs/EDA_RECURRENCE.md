@@ -1,106 +1,124 @@
-# EDA: recurrencia, calendario y texto
+# Javi: EDA de recurrencia UBS
 
-## Evidencia disponible (24-09-2026)
+## Datos y reproducción
 
-No hay archivos UBS crudos en este checkout para recalcular cifras. Sin embargo,
-`origin/main:docs/UBS_DATASET_ANALYSIS.md` contiene un análisis reproducible
-generado con `scripts/analyze_ubs_dataset.py` sobre datos locales ignorados por
-Git. Las cifras siguientes proceden de ese informe y **no se han revalidado
-contra los archivos originales en esta rama**. El `mock_transactions()` de esta
-rama sigue siendo sintético y no debe usarse como evidencia UBS.
+Análisis ejecutado el 24-09-2026 sobre el ZIP público de
+[`UBS-AG/Swiss-AI-Weeks`](https://github.com/UBS-AG/Swiss-AI-Weeks/blob/main/hackathons/2026/data/dataset.zip),
+SHA-256 `1afc95470f4e8641601503172be3e698ef9eaf91528d911a6a01a120911634c6`.
+Los archivos extraídos están en `data/raw/ubs_2026/`, ignorados por Git. El corte
+es `2026-01-01` UTC y las etiquetas son **por cliente**, no por transacción.
 
-## Hallazgos medidos en el informe de `origin/main`
+```powershell
+python scripts/analyze_javi_recurrence.py --data-dir data/raw/ubs_2026
+```
 
-- En train hay 33.051 grupos repetidos `(client_id, description)` y los 2.000
-  clientes tienen alguna descripción repetida. La mediana de apariciones de un
-  grupo repetido es 3. Solo el 30,69 % de esos grupos cumple desviación estándar
-  de intervalos `<= 3` días; el 25,22 % tiene CV de importe `<= 5 %`. Hay
-  recurrencia abundante, pero frecuencia de repetición y regularidad son
-  propiedades diferentes.
-- Las bandas aproximadas de periodicidad de train clasifican 13.819 grupos
-  como trimestrales, 9.338 mensuales, 7.802 anuales, 1.286 quincenales y
-  796 semanales. Son bins descriptivos del informe, no series verificadas ni
-  porcentajes de clientes. La ventana histórica de unos 13 meses hace que
-  interpretaciones anuales o trimestrales necesiten especial cautela.
-- `description` tiene 1.475 valores únicos en train. Los términos más comunes
-  incluyen `shop` (13.187), `salary` (12.031), `plan` (10.922), `service` (8.880)
-  y `atm` (8.083). Esos recuentos son de términos en transacciones, no de
-  clientes, y su frecuencia global no implica poder discriminativo.
-- El texto histórico sí muestra asociaciones con las ocho clases: `cloud access`
-  aparece en el 80,53 % de clientes `cloud` frente al 15,91 % del resto;
-  `phone contract` en 82,72 % de `mobile` frente a 17,47 %; `member pass` en
-  76,26 % de `music` frente a 16,54 %; y `member plan` en 47,24 % de `none`
-  frente a 7,48 %. Son asociaciones de **train**, no rendimiento validado.
-  Además, la palabra literal `mobile` o `music` aparece en 0 % de los clientes
-  de esas clases, de modo que buscar solo el nombre exacto de la etiqueta
-  perdería ambas señales.
-- Descripciones con aparente pureza, como `member plan` (72,87 % `none` entre
-  387 clientes) o `digital service` (70,88 % `none` entre 419), pueden ser
-  atajos propios del generador. Deben comprobarse en validación con clientes
-  distintos antes de incorporarse como reglas o codificaciones supervisadas.
+El script usa solo la biblioteca estándar de Python y guarda los agregados en
+`outputs/metrics/javi_recurrence.json` (también ignorado por Git). Comprueba que
+los clientes etiquetados coinciden con los historiales y que no hay eventos desde
+el corte. Train y validation se analizan por separado; no se modificó el pipeline
+ni se usaron etiquetas de validation para construir features.
 
-Sí hay un hallazgo verificable sobre el código, distinto de un hallazgo del
-dataset: `models.baseline.predict_next()` agrupa por el texto literal de
-`merchant`, elige el comercio más frecuente y predice con la mediana de días
-entre sus eventos. Si solo hay un evento, usa 30 días; considera regular un
-historial con al menos dos intervalos y desviación estándar de hasta tres días.
-Esto sirve como punto de comparación, pero no reconoce variantes del nombre,
-meses de duración variable, cobros quincenales anclados al calendario ni varias
-series recurrentes por cliente. No modificarlo hasta observar datos reales y
-medir la mejora en un split causal.
+## Periodicidad e intervalos
 
-## Análisis reproducible al recibir el dataset
+Una *serie* es un par `(client_id, description)` con al menos dos eventos. Las
+bandas siguientes clasifican la **mediana** de sus intervalos: semanal hasta 10
+días, quincenal hasta 18, mensual hasta 45, trimestral hasta 110 y anual hasta
+400. Son categorías descriptivas; «mensual» aquí no prueba un cargo anclado al
+calendario.
 
-Primero confirmar los nombres reales de cliente, fecha, descripción/comercio,
-importe, moneda, dirección y clase, así como el instante de predicción. Formar
-un historial por cliente usando solo eventos anteriores a ese instante.
-Conservar dos vistas de texto: literal y normalizada. La normalización inicial
-puede plegar mayúsculas, espacios, puntuación y números variables, pero debe
-conservar una copia del valor original para auditar colisiones. No fusionar
-contrapartes distintas solo por compartir tokens genéricos.
+| Banda | Train, todas | Validation, todas | Train, regular con ≥3 eventos | Validation, regular con ≥3 eventos |
+| --- | ---: | ---: | ---: | ---: |
+| Semanal | 796 | 414 | 27 | 14 |
+| Quincenal | 1.286 | 554 | 27 | 13 |
+| Mensual | 9.338 | 3.714 | 492 | 86 |
+| Trimestral | 13.819 | 6.769 | 203 | 106 |
+| Anual | 7.802 | 5.034 | 68 | 32 |
+| Otros | 10 | 4 | 0 | 0 |
+| **Total** | **33.051** | **16.489** | **817** | **251** |
 
-| Pregunta | Medida y desglose | Control necesario |
-| --- | --- | --- |
-| ¿Cuántas series se repiten? | Por cliente y descripción/comercio, proporción con al menos 2, 3 y 4 eventos; clientes distintos por serie; cobertura de transacciones | Denominador de clientes y de series por separado; excluir duplicados exactos |
-| ¿Qué cadencias aparecen? | Histograma de intervalos consecutivos; masa cerca de 1, 7, 14 y 28–31 días; mediana, MAD y p90 de cada serie | Separar eventos con mismo timestamp; no interpretar intervalo cero como recurrencia |
-| ¿Hay anclaje de calendario? | Cuota en mismo día de semana, día de mes, último día hábil o fin de mes; errores respecto a fecha semanal/mensual esperada | Los meses tienen 28–31 días; festivos y fines de semana desplazan cargos |
-| ¿Qué texto domina? | Top descripciones literales y normalizadas por transacciones y clientes únicos; cobertura top 10/50; tasa de fragmentación de variantes | Evitar publicar nombres de personas, cuentas o texto sensible |
-| ¿Cuántas series tiene cada cliente? | Número de comercios repetidos, cuota de eventos del más frecuente y entropía de comercio | Un top por volumen puede ocultar otra serie predictiva |
-| ¿Cómo difieren las ocho clases? | Repetir las medidas anteriores por clase: soporte de clientes, mediana/IQR y prevalencia con intervalo de confianza | Calcular solo en train; mostrar tasas dentro de cada clase y comparación con el total |
-| ¿Qué ocurre con poco historial? | Separar clientes con 0, 1, 2 y 3+ transacciones antes del corte; soporte por clase y disponibilidad de cada estadístico | Intervalos y estabilidad no existen con 0–1 eventos; documentar los nulos |
+«Regular» exige **al menos tres eventos** y desviación estándar de los intervalos
+≤3 días. En train, 9.325 de las 33.051 series repetidas tienen solo **un**
+intervalo; en validation son 6.276 de 16.489. Un solo intervalo siempre produce
+desviación cero. El informe general anterior comunicaba 30,69 % de grupos con
+desviación ≤3 días en train y 39,58 % en validation incluyendo esos casos. Con
+soporte mínimo, quedan 817/33.051 (2,47 %) y 251/16.489 (1,52 %).
+Por eso conviene almacenar por separado número de eventos, número de intervalos
+y dispersión; un indicador binario de «regular» sin soporte exagera la evidencia.
 
-Para cada señal por clase, registrar número de clientes, porcentaje dentro de
-la clase y diferencia frente al resto con la misma ventana de observación.
-Contrastar sobre todo clientes con longitud de historial comparable: una clase
-puede parecer más periódica solo por contar con más meses observados. Repetir
-el análisis por cortes temporales; publicar únicamente agregados cuando el
-texto pueda identificar a alguien.
+## Familias frente a `none`
 
-## Features candidatas para probar, no para activar todavía
+`any_family` agrupa las siete clases distintas de `none`. Las tasas de recurrencia
+son porcentajes de **clientes** con al menos una serie que cumple el criterio
+anterior. «Mensual saliente» exige además que todos los eventos de esa serie
+tengan `direction=out`.
 
-Todas se calculan hasta `as_of` excluido. Los estadísticos de una serie requieren
-una clave de comercio/descripción estable; si falta o cambia mucho, usar una
-versión a nivel cliente y marcar la cobertura. Calcular por moneda y dirección
-cuando el importe o la recurrencia dependan de ellas.
+| Partición y etiqueta | Clientes | Mediana de transacciones | Clientes con serie regular | Clientes con serie mensual saliente regular | Último evento >30 días antes del corte |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Train, `any_family` | 1.403 | 75 | 31,36 % | 18,03 % | 1 |
+| Train, `none` | 597 | 64 | 38,69 % | 21,44 % | 9 |
+| Validation, `any_family` | 707 | 75 | 23,20 % | 5,66 % | 0 |
+| Validation, `none` | 293 | 65 | 20,14 % | 5,80 % | 3 |
 
-| Feature | Definición operativa | Soporte mínimo |
-| --- | --- | --- |
-| `series_event_count`, `series_lifespan_days` | Eventos y días entre primero y último de cada cliente–comercio | 1, 2 respectivamente |
-| `series_recency_days` | Días desde el último evento anterior a `as_of` | 1 |
-| `gap_median_days`, `gap_mad_days` | Mediana y desviación absoluta mediana de intervalos positivos ordenados | 2 y 3 eventos |
-| `gap_last_over_median` | Último intervalo dividido por la mediana, con división protegida | 3 eventos |
-| `weekly_phase_error` | Mediana de distancia en días al múltiplo de 7 más próximo, sobre intervalos positivos | 3 eventos |
-| `monthly_calendar_error` | Error en días entre cada evento y el siguiente esperado al sumar un mes calendario al anterior; comparar anclaje a fin de mes | 3 eventos |
-| `weekday_mode_share`, `monthday_mode_share`, `month_end_share` | Fracción de eventos en día modal de semana/mes y al cierre de mes | 2 eventos; suavizar con soporte |
-| `description_repeat_share`, `description_unique_count` | Cuota de eventos en descripciones que reaparecen y número de descripciones distintas | 1 |
-| `merchant_top_share`, `merchant_entropy` | Concentración de eventos por comercio normalizado | 1 |
-| `text_variant_count` | Número de textos literales asociados al mismo comercio normalizado | 1; auditar fusiones |
-| `series_count_30d`, `series_count_90d` | Eventos de la serie en ventanas previas de 30/90 días | 0 |
+`none` tiene menos transacciones históricas en ambas particiones, pero **también
+tiene series repetidas y regulares**. En train su tasa de clientes con alguna
+serie regular incluso supera a la de las familias; en validation la relación se
+invierte. La regularidad de cualquier descripción no es una regla fiable para
+descartar `none`: la clase significa que no se espera una **familia objetivo**
+recurrente en los 90 días posteriores, no que el cliente carezca de pagos
+repetidos. La inactividad >30 días está concentrada en `none`, pero solo afecta
+a 10 clientes train y 3 validation; sirve como hipótesis de feature, no como
+umbral decidido con estos pocos casos.
 
-Las señales de periodicidad son continuas; no convertirlas enseguida en reglas
-binarias de «semanal» o «mensual». Mantener valores nulos y banderas de soporte
-para series cortas. Contrastar familias de features por separado en el mismo
-split y con la Macro-F1 oficial, una vez confirmados target y métrica. Un token
-o comercio con asociación aparente a una clase debe evaluarse con soporte de
-clientes únicos y fuera de muestra: las frecuencias globales o codificaciones
-por target aprendidas sobre validación causarían leakage.
+| Clase | Train: clientes con serie regular | Validation: clientes con serie regular |
+| --- | ---: | ---: |
+| cloud | 33,16 % | 35,96 % |
+| gym | 35,79 % | 23,14 % |
+| insurance | 32,71 % | 14,14 % |
+| mobile | 30,37 % | 24,04 % |
+| music | 31,82 % | 25,81 % |
+| software | 28,21 % | 24,04 % |
+| streaming | 28,00 % | 16,49 % |
+| none | 38,69 % | 20,14 % |
+
+Las diferencias entre particiones aconsejan comparar señales **por familia de
+descripción**, con recencia respecto a su cadencia y número de observaciones,
+antes de convertir «hay recurrencia» en una predicción. Las descripciones son
+texto observado; el target por cliente no etiqueta cada transacción histórica.
+
+## Historiales cortos y casos extraños
+
+- El mínimo es 8 transacciones por cliente en train y validation. No hay
+  clientes con 0–2 eventos; solo uno tiene ≤10 en train (`none`) y uno en
+  validation (`streaming`). La menor amplitud de historial es 177,95 días en
+  train y 300,60 en validation. Este dataset **no prueba** un fallback para
+  clientes recién incorporados.
+- No aparecen pares de transacciones con el mismo timestamp dentro de un cliente
+  ni intervalos cero dentro de una serie repetida. Sí hay timestamps iguales
+  entre clientes distintos, irrelevantes para esta agrupación.
+- Hay 125 series train y 75 validation con algún intervalo superior a 365 días.
+  En una ventana histórica de unos 13 meses pueden ser cargos anuales, cambios
+  de descripción o coincidencias; no etiquetarlas automáticamente como errores.
+- El informe general registra cero duplicados exactos y cero eventos en o tras
+  el corte. Los importes están en monedas distintas: cualquier medida de
+  estabilidad de importe debe separar monedas.
+
+## Features y comprobaciones propuestas
+
+1. `stream_event_count`, `interval_count`, `gap_median_days`, `gap_std_days` y
+   `days_since_last`: conservar `NaN` en dispersión si solo hay un intervalo.
+2. Distancia al siguiente vencimiento semanal y mensual **calendario**, además
+   de una banda de mediana de días. Comparar ambas definiciones en el mismo split.
+3. Número de series salientes regulares y recientes **por familia candidata**,
+   usando asociaciones de descripción aprendidas solo en train. Añadir cuota
+   de eventos de la serie, estabilidad de importe por moneda y recencia relativa
+   a su intervalo típico.
+4. Para `none`, probar señales de interrupción: tiempo desde el último evento de
+   la serie candidata dividido por su intervalo habitual, ausencia reciente
+   pese a recurrencia histórica y longitud del historial. Analizar errores por
+   clase y no inferir `none` solo por falta de una serie genérica.
+5. Mantener un grupo de análisis para series con dos eventos, gaps >365 días y
+   clientes con poca historia. Medir cobertura y Macro-F1 por clase antes de
+   activar cualquier nueva regla o feature en el pipeline.
+
+La asociación entre estas medidas y el target es descriptiva; no se ha hecho
+un experimento de modelo ni se afirma mejora de Macro-F1.
