@@ -15,10 +15,11 @@ from importlib.metadata import version
 from pathlib import Path
 from time import perf_counter
 
+import numpy as np
 import pandas as pd
 
 from transaction_forecasting.experiment_tracking import ExperimentLogger
-from transaction_forecasting.ubs.data import PREDICTION_COLUMN, TARGET_COLUMN, load_ubs_data
+from transaction_forecasting.ubs.data import LABELS, PREDICTION_COLUMN, TARGET_COLUMN, load_ubs_data
 from transaction_forecasting.ubs.evaluation import evaluate_predictions
 from transaction_forecasting.ubs.features import ClientFeatureBuilder
 from transaction_forecasting.ubs.models import RecurrenceHeuristic
@@ -198,9 +199,36 @@ def main():
     if args.candidate.startswith("temporal_"):
         blocks = tuple(args.candidate.removeprefix("temporal_").split("+"))
         x_valid = temporal_matrix(x_valid, data.valid_transactions, builder, cache, "valid", blocks)
+    elif args.candidate == "merchant_blend":
+        from sklearn.impute import SimpleImputer
+        from sklearn.linear_model import LogisticRegression
+        from sklearn.preprocessing import StandardScaler
+
+        from transaction_forecasting.ubs.text_v2 import MerchantFeatureBuilder
+
+        merchant = MerchantFeatureBuilder().fit(data.train_transactions, data.train_labels)
+        train = x_train.join(merchant.transform(data.train_transactions, training=True))
+        valid = x_valid.join(merchant.transform(data.valid_transactions))
+        imputer, scaler = SimpleImputer(strategy="median"), StandardScaler()
+        train_matrix = scaler.fit_transform(imputer.fit_transform(train))
+        valid_matrix = scaler.transform(imputer.transform(valid))
+        classifier = LogisticRegression(
+            C=0.3,
+            class_weight="balanced",
+            max_iter=2000,
+            random_state=42,
+            tol=1e-5,
+        ).fit(train_matrix, y_train)
+        raw = classifier.predict_proba(valid_matrix)
+        probabilities = np.column_stack(
+            [raw[:, list(classifier.classes_).index(label)] for label in LABELS]
+        )
+        blended = 0.75 * model.predict_proba(x_valid) + 0.25 * probabilities
+        prediction = pd.Series(np.asarray(LABELS)[blended.argmax(axis=1)], index=x_valid.index)
     elif args.candidate not in ("baseline", "tracking", "quality_gate"):
         raise ValueError("Unknown candidate")
-    prediction = pd.Series(model.predict(x_valid), index=x_valid.index)
+    if args.candidate != "merchant_blend":
+        prediction = pd.Series(model.predict(x_valid), index=x_valid.index)
     metrics = evaluate_predictions(y_valid, prediction)
     if args.candidate in ("baseline", "tracking", "quality_gate"):
         if abs(metrics["macro_f1"] - REFERENCE) > 1e-12:
