@@ -22,8 +22,7 @@ def evaluate_predictions(
         unexpected = prediction.index.difference(target.index)
         if len(missing) or len(unexpected):
             raise ValueError(
-                f"Prediction client mismatch: {len(missing)} missing, "
-                f"{len(unexpected)} unexpected"
+                f"Prediction client mismatch: {len(missing)} missing, {len(unexpected)} unexpected"
             )
         aligned_prediction = prediction.reindex(target.index)
     else:
