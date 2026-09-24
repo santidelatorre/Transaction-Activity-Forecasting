@@ -12,7 +12,21 @@ safe to use while the challenge dataset and official metric are being confirmed:
 ```bash
 python -m pytest
 python -c "from transaction_forecasting.pipeline import run_smoke_pipeline; print(run_smoke_pipeline()[1])"
+python -m transaction_forecasting.pipeline --synthetic
 ```
+
+## Pipeline configurable
+
+El flujo genérico se ejecuta con `python -m transaction_forecasting.pipeline
+--config configs/default.toml`. Mientras no se conozca el dataset, usa
+`--synthetic`, que no representa ninguna columna ni regla de negocio real.
+
+`configs/default.toml` centraliza los campos marcados `TODO(dataset)`: ruta y
+formato, contrato de columnas/tipos, fecha de corte, horizonte/embargo, target
+y parámetros. El pipeline carga CSV o Parquet, limpia duplicados exactos, hace
+el split temporal train/validation/test, ajusta transformadores solo con train,
+evalúa candidatos y guarda registros JSONL. El baseline genérico es una media
+del target y existe solo para verificar el flujo hasta que se defina la tarea.
 
 The shared contracts, workstream split, temporal evaluation rules, and milestone
 plan are in [`docs/HACKATHON_PLAN.md`](docs/HACKATHON_PLAN.md),
