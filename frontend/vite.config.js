@@ -11,7 +11,7 @@ export default defineConfig({
     alias: { '@': sourceDir },
   },
   server: {
-    proxy: { '/api': 'http://127.0.0.1:8000' },
+    proxy: { '/api': process.env.RECURRING_API_TARGET || 'http://127.0.0.1:8000' },
   },
   build: { outDir: 'dist', emptyOutDir: true },
 });
