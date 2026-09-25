@@ -1,5 +1,13 @@
 # Stream identity, time representation, and an evidence-led pitch
 
+**Same-source update after this review:** the allowed branch advanced to
+`d5dddfd` while the experiments ran. Its README now explicitly marks the
+historical 0.619493 result INVALID under a strict rule against VALID-informed
+selection. The historical pitch below must call it a development-validation
+result exposed to selection, never an untouched evaluation. See the
+[completed investigation](README.md) for this qualification and the new
+TRAIN-only attribution and ablation evidence.
+
 ## Scope and evidence standard
 
 This investigation studies only the files supplied by `research/import-v2-stream-identity` at source commit `e4aa4c5`. No other branch, checkout, or historical implementation was consulted. Earlier conversational claims about other implementations are not evidence for this report.
@@ -168,7 +176,7 @@ Suggested English script, approximately 130 words; rehearse rather than assuming
 >
 > Our key finding was that a model scoring 0.685 in training cross-validation fell to 0.177 on the supplied validation set. Descriptions and merchant codes were much noisier. We trained against that shift and tested each addition: extra clock detail did not help, while refund context improved our harsh-noise experiment by 0.033 Macro-F1.
 >
-> The final system achieved 0.619 Macro-F1 on 1,000 supplied validation clients, reproduced in two independent builds. We can show the observed payments behind a prediction and where evidence is uncertain. That supports payment reminders and subscription reviews. Exact future dates and real-bank impact remain to be validated.
+> The final system recorded 0.619 Macro-F1 on 1,000 supplied development-validation clients. That set informed model selection, so this is not an independent test score. We can show observed payments behind predictions and where evidence is uncertain. The proposed use is payment reminders and subscription reviews; exact dates and real-bank impact still need validation.
 
 Suggested Spanish version:
 
@@ -176,7 +184,7 @@ Suggested Spanish version:
 >
 > El hallazgo clave fue que un modelo con 0,685 en validación cruzada de entrenamiento cayó a 0,177 en la validación proporcionada por UBS. Las descripciones y los códigos comerciales eran mucho más ruidosos. Entrenamos frente a ese cambio y comprobamos cada incorporación: añadir más detalle de reloj no ayudó; el contexto de devoluciones mejoró en 0,033 nuestro experimento con ruido intenso.
 >
-> El sistema final obtuvo 0,619 de Macro-F1 en 1.000 clientes de validación, reproducido en dos ejecuciones. Mostramos los pagos observados que aportan evidencia y sus límites. La aplicación propuesta es ayudar con recordatorios y revisión de suscripciones; las fechas exactas y el impacto real todavía requieren validación.
+> El sistema registró 0,619 de Macro-F1 en 1.000 clientes de validación de desarrollo. Ese conjunto influyó en la selección, así que no es un resultado independiente. Mostramos los pagos observados que aportan evidencia y sus límites. La aplicación propuesta es ayudar con recordatorios y revisión de suscripciones; las fechas exactas y el impacto real todavía requieren validación.
 
 The experiment comparison in the middle sentence is a **train-side synthetic-stress comparison**, and the final 0.619 is **official supplied validation**, not a hidden-test score. Keep those labels visible on the slide. Do not present this historical result as an improvement newly achieved by the current audit.
 

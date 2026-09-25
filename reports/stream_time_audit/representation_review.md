@@ -1,5 +1,10 @@
 # Stream identity and relative-time representation: source audit
 
+The source branch advanced during the investigation. This audit remains pinned
+to the commit below; the [completed report](README.md) records the allowed
+same-branch update, its stricter qualification of historical VALID results,
+and new measured experiments. No other branch was studied.
+
 Audit date: 2026-09-25. Scope: only the worktree created from
 `research/import-v2-stream-identity`, source commit
 `e4aa4c58175242e198cefd32d6ac4558145523af`. No other branch, checkout, or history

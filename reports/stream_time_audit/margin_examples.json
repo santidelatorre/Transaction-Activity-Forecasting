@@ -1,0 +1,158 @@
+{
+  "sample": "first 32 held-out IDs in each of five folds; selection independent of labels",
+  "n_clients": 160,
+  "max_margin_reconstruction_error": 6.661338147750939e-15,
+  "warning": "Raw ranker is_none contribution is not the separately predicted none score. Shared positive-logit shifts cancel.",
+  "examples": [
+    {
+      "fold": 0,
+      "true_family": "insurance",
+      "prediction": "insurance",
+      "positive_winner": "insurance",
+      "positive_runner_up": "gym",
+      "positive_raw_margin": 2.619798855225817,
+      "sum_all_margin_contributions": 2.6197988552258167,
+      "none_score": 0.028736292984017153,
+      "positive_winner_score": 0.7744846349697664,
+      "scope": "conditional positive-family margin of one compact ranker; none explained separately",
+      "top_margin_contributions": [
+        {
+          "feature": "broad0_refund_count90",
+          "winner_value": 0.0,
+          "runner_value": 2.0,
+          "contribution_to_margin": 0.5165587904887781
+        },
+        {
+          "feature": "broad0_refund_last_age",
+          "winner_value": 999.0,
+          "runner_value": 26.361157407407408,
+          "contribution_to_margin": 0.43274651391105534
+        },
+        {
+          "feature": "amount0_next_active_rank",
+          "winner_value": 1.0,
+          "runner_value": 2.0,
+          "contribution_to_margin": 0.30716346362853736
+        },
+        {
+          "feature": "amount0_overdue_ratio",
+          "winner_value": 0.5998893402861994,
+          "runner_value": 1.0801374078191301,
+          "contribution_to_margin": -0.17147380121034958
+        },
+        {
+          "feature": "amount0_span",
+          "winner_value": 213.07471064814817,
+          "runner_value": 301.95012731481484,
+          "contribution_to_margin": 0.16569351363153106
+        },
+        {
+          "feature": "amount0_refund_last_age",
+          "winner_value": 999.0,
+          "runner_value": 26.361157407407408,
+          "contribution_to_margin": 0.16330644891401075
+        },
+        {
+          "feature": "broad0_normalized_price",
+          "winner_value": 0.48855470626931424,
+          "runner_value": 0.32547770041692103,
+          "contribution_to_margin": 0.12906975751448999
+        },
+        {
+          "feature": "amount0_next_median",
+          "winner_value": 12.219675925925923,
+          "runner_value": -2.424230324074074,
+          "contribution_to_margin": -0.11729118635049332
+        },
+        {
+          "feature": "broad0_own_template_diversity",
+          "winner_value": 4.0,
+          "runner_value": 4.0,
+          "contribution_to_margin": 0.11306177773677564
+        },
+        {
+          "feature": "broad0_refund_count30",
+          "winner_value": 0.0,
+          "runner_value": 1.0,
+          "contribution_to_margin": 0.10994738856752458
+        }
+      ],
+      "anonymous_case": "correct_example"
+    },
+    {
+      "fold": 0,
+      "true_family": "streaming",
+      "prediction": "mobile",
+      "positive_winner": "mobile",
+      "positive_runner_up": "streaming",
+      "positive_raw_margin": 0.2532097747728269,
+      "sum_all_margin_contributions": 0.2532097747728281,
+      "none_score": 0.02428694810317428,
+      "positive_winner_score": 0.4189593823513512,
+      "scope": "conditional positive-family margin of one compact ranker; none explained separately",
+      "top_margin_contributions": [
+        {
+          "feature": "amount0_own_semantic_per_event",
+          "winner_value": 0.0,
+          "runner_value": 0.03,
+          "contribution_to_margin": -0.3956422484442626
+        },
+        {
+          "feature": "broad0_refund_ratio",
+          "winner_value": 0.25,
+          "runner_value": 0.0,
+          "contribution_to_margin": 0.33069201475744847
+        },
+        {
+          "feature": "broad0_own_template_diversity",
+          "winner_value": 1.0,
+          "runner_value": 3.0,
+          "contribution_to_margin": -0.32442229086106544
+        },
+        {
+          "feature": "broad0_count_60",
+          "winner_value": 2.0,
+          "runner_value": 1.0,
+          "contribution_to_margin": 0.29127301464687216
+        },
+        {
+          "feature": "amount0_next_active_rank",
+          "winner_value": 3.0,
+          "runner_value": 1.0,
+          "contribution_to_margin": -0.2378419828880642
+        },
+        {
+          "feature": "broad0_first_age",
+          "winner_value": 40.06390046296296,
+          "runner_value": 294.6222685185185,
+          "contribution_to_margin": 0.14376790244035742
+        },
+        {
+          "feature": "amount0_normalized_price",
+          "winner_value": -999.0,
+          "runner_value": 0.5233921909053987,
+          "contribution_to_margin": -0.14231296433075868
+        },
+        {
+          "feature": "amount0_amount_mad",
+          "winner_value": -999.0,
+          "runner_value": 0.0063866371898795874,
+          "contribution_to_margin": 0.13365883094739442
+        },
+        {
+          "feature": "amount0_own_template_diversity",
+          "winner_value": -999.0,
+          "runner_value": 3.0,
+          "contribution_to_margin": -0.12532140100924735
+        },
+        {
+          "feature": "broad0_own_semantic_per_event",
+          "winner_value": 0.5,
+          "runner_value": 0.037037037037037035,
+          "contribution_to_margin": 0.11872012679618699
+        }
+      ],
+      "anonymous_case": "error_example"
+    }
+  ]
+}

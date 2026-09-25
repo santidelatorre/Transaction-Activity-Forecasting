@@ -1,0 +1,59 @@
+{
+  "scope": "TRAIN histories only; no labels read",
+  "synthetic_probes": {
+    "weekly": {
+      "gap": 7,
+      "age": 8,
+      "source_rounded_period": 14.0,
+      "source_next_active": 13.0,
+      "weekly_modulo_offset_for_comparison": 6,
+      "interpretation": "Cycle mismatch demonstration; no claim that modulo rolling establishes continuation."
+    },
+    "sentinel": {
+      "source_global_mean": 875.75,
+      "mean_excluding_999": 13.0,
+      "interpretation": "Source mean blends timing and number of absent/inactive candidates."
+    },
+    "refund_tie": {
+      "first_order_refund_count": 0,
+      "reordered_refund_count": 1,
+      "interpretation": "Synthetic provenance edge case; source currency inferred from nearest timestamp."
+    }
+  },
+  "observed_incidence": {
+    "train_clients": 2000,
+    "candidate_rows_including_none": 16000,
+    "streams": 9891,
+    "amount0": {
+      "positive_candidates_present": 4504,
+      "gap_between_6_and_8_days": 6,
+      "stale_over_1_35_observed_cycles": 806,
+      "inactive_or_absent_999": 12313,
+      "negative_signed_next_offset": 1084,
+      "clients_with_active_candidate": 1726,
+      "source_minus_available_mean_median_days": 737.2970703125,
+      "source_minus_available_mean_max_days": 874.1098596643519
+    },
+    "amount1": {
+      "positive_candidates_present": 550,
+      "gap_between_6_and_8_days": 0,
+      "stale_over_1_35_observed_cycles": 330,
+      "inactive_or_absent_999": 15783,
+      "negative_signed_next_offset": 367
+    },
+    "broad0": {
+      "positive_candidates_present": 5577,
+      "gap_between_6_and_8_days": 10,
+      "stale_over_1_35_observed_cycles": 1364,
+      "inactive_or_absent_999": 11899,
+      "negative_signed_next_offset": 1755,
+      "clients_with_active_candidate": 1790,
+      "source_minus_available_mean_median_days": 734.1581575520834,
+      "source_minus_available_mean_max_days": 874.0722873263888
+    },
+    "different_currency_card_timestamp_ties": 0,
+    "clients_with_different_currency_card_timestamp_ties": 0,
+    "exact_duplicate_transaction_rows": 0
+  },
+  "limitation": "Incidence does not establish impact on predictions. Absent-state sentinels may encode useful availability; removing them needs controlled model evaluation."
+}

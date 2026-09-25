@@ -1,0 +1,60 @@
+{
+  "signature": {
+    "source_branch": "research/import-v2-stream-identity",
+    "source_commit": "e4aa4c58175242e198cefd32d6ac4558145523af",
+    "input_sha256": {
+      "train_transactions.jsonl": "ba0902b33b1181921ee5b1f8f445693201c0968ca52d70a92e12cbb114e7d70a",
+      "train_labels.csv": "cab0ec46064348f970ffafdd4f42a12d41a8db660e9db835e7235851b556ff9f",
+      "unlabeled_pretrain_transactions.jsonl": "660181aea49a68820f724ba30a1a5cf8ace8158a8aef11bc8446cc577d3466a3"
+    },
+    "source_sha256": {
+      "scripts/investigate_stream_time.py": "075d00a60b5c580b59fbb5a02478d87d0c8b6e31f8103911c3f5c37d8ceb9603",
+      "src/ubs_recurrence/__init__.py": "443277e2e6ee564043bc49699355466a00cf81ae14d0ec9b392da4c69a6d9f72",
+      "src/ubs_recurrence/augmentation.py": "54c3d62c1b44e9c9705962b2b0fab65a726b39cdf730da2b848dd10e4b092b0f",
+      "src/ubs_recurrence/cli.py": "9ec258535f926b7fa605e2c190064bcb574c1f35c51ea2dea2e881f69e4b9c02",
+      "src/ubs_recurrence/compact.py": "4ac5594e8cf2ef9f5c58544815460e195d2f61fc9ebc888dd2a6682126e3c0c5",
+      "src/ubs_recurrence/data.py": "c3f7818121cf4c532505f9ca9e1f1e625916b37a4b42a9eb0f164533edc86548",
+      "src/ubs_recurrence/decision.py": "cb1c503309ef7005f05f12c5bab3278a2b6257f2cae7b8b34b9b4a55c4314600",
+      "src/ubs_recurrence/evaluation.py": "ed8491097f572cf4af3c9faebb7141234737693c26b62eaa208875fa9a4b286f",
+      "src/ubs_recurrence/features.py": "e9c9a212217a40fc2cfa4d8b7ba55d41501de35086523f79d82a780d3a2af530",
+      "src/ubs_recurrence/model.py": "22b2ee36409c09a6b7a3ccd6f25f4e07081fb90766313f1ec2009ce3b8113205",
+      "src/ubs_recurrence/payment_context.py": "d8c9b768c4c120838bd68b60aee98248fecb6c4f170f4d5885036cd1a57bc2c3",
+      "src/ubs_recurrence/price_prior.py": "a663c4675151e1cbfeb028375d3181baf791644249add160e46b24c69bc3f2cb",
+      "src/ubs_recurrence/ranking.py": "17fed13c5ea60f889c31d05d0265bc528ef1776e07d44652b2b0716046bc3a97",
+      "src/ubs_recurrence/research_time.py": "dc387c875b8bb078de1915fd34e617276430fb0c40cf2a5004b739472b8bae45",
+      "src/ubs_recurrence/streams.py": "d76570abfaee9a393ea57a615562a35a3c69686a9269d571f01d3dcbc65a0920",
+      "src/ubs_recurrence/templates.py": "6376985931105556e5400ba017138f731bb7bb8440f9272fbe96db06c6115397"
+    },
+    "variants": [
+      "control",
+      "no_temporal",
+      "no_refund",
+      "cycle_state"
+    ],
+    "views": [
+      "original",
+      "valid_like",
+      "test_like"
+    ],
+    "fold_seed": 42,
+    "folds": 5,
+    "model_seeds": [
+      42
+    ],
+    "legacy_weight": 0.0,
+    "protocol_sha256": "cf1462f468a980f1d2e73214b6ef2cdab8bf4d6369510a9cf1c58a76638ccb2d",
+    "packages": {
+      "numpy": "2.3.3",
+      "pandas": "2.3.3",
+      "scipy": "1.18.1",
+      "scikit-learn": "1.9.1",
+      "lightgbm": "4.7.0",
+      "xgboost": "3.4.1",
+      "pyarrow": "21.0.0",
+      "joblib": "1.6.0"
+    },
+    "python": "3.13.2"
+  },
+  "started_utc": "2026-09-25T08:10:53.880578+00:00",
+  "git_commit": "e4aa4c58175242e198cefd32d6ac4558145523af"
+}

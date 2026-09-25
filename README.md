@@ -1,7 +1,23 @@
 # UBS: next recurring merchant family
 
-**Official validation: 0.619493 macro-F1, 0.647 accuracy, all 1,000 clients and
-all eight classes. The 0.80 research objective was not reached.** Two independent
+## Stream-time research branch
+
+This branch investigates only `research/import-v2-stream-identity` at
+`e4aa4c58175242e198cefd32d6ac4558145523af`. Start with the
+[stream-time investigation](reports/stream_time_audit/README.md), including
+the frozen protocol, source audit, paired TRAIN experiments, model attribution
+and an evidence-based pitch. New research helpers do not replace the production
+predictor or the frozen submission. The historical baseline below is preserved.
+
+While the study ran, the same source branch advanced to `d5dddfd`. Its updated
+README classifies the historical 0.619493 result as **INVALID under a strict
+no-VALID-informed-selection requirement**. It remains a development result,
+not an untouched holdout claim. See the investigation's source-update note;
+the new experiments are explicitly pinned to `e4aa4c5`.
+
+**Historical development-validation result: 0.619493 macro-F1, 0.647 accuracy,
+all 1,000 clients and all eight classes; exposed to model selection.
+The 0.80 research objective was not reached.** Two independent
 raw-data builds reproduced every prediction and probability exactly.
 
 This is a fresh implementation of the [official UBS 2026 challenge](https://github.com/UBS-AG/Swiss-AI-Weeks/blob/796d5805ec5f8a228a3ec0de36a2b4e6e1b1a1df/hackathons/2026/challenge.md).

@@ -1,0 +1,218 @@
+[
+  {
+    "fold": 0,
+    "true_family": "insurance",
+    "prediction": "insurance",
+    "runner_up": "gym",
+    "normalized_scores": {
+      "cloud": 0.02607745764479192,
+      "gym": 0.05639604126985302,
+      "insurance": 0.7744846349697664,
+      "mobile": 0.0277191425354673,
+      "music": 0.02886214353203469,
+      "software": 0.02886214353203469,
+      "streaming": 0.02886214353203469,
+      "none": 0.028736292984017153
+    },
+    "scope": "one-seed compact component; raw contributions are not final probability contributions",
+    "ranker_raw_score": 1.4543683634812523,
+    "ranker_base_value": -1.0554843826893492,
+    "ranker_sum_all_contributions": 1.4543683634812519,
+    "ranker_top": [
+      {
+        "feature": "broad0_own_template_diversity",
+        "value": 4.0,
+        "raw_contribution": 0.3536494061319818
+      },
+      {
+        "feature": "amount0_own_semantic_per_event",
+        "value": 0.109375,
+        "raw_contribution": 0.3206082447472248
+      },
+      {
+        "feature": "broad0_count_60",
+        "value": 2.0,
+        "raw_contribution": 0.2783285906309303
+      },
+      {
+        "feature": "broad0_own_semantic_per_event",
+        "value": 0.109375,
+        "raw_contribution": 0.19171074657197376
+      },
+      {
+        "feature": "amount0_next_active_rank",
+        "value": 1.0,
+        "raw_contribution": 0.18411583884601213
+      },
+      {
+        "feature": "broad0_last_age",
+        "value": 18.321064814814815,
+        "raw_contribution": 0.14350834238035845
+      },
+      {
+        "feature": "amount0_own_template_count_per_event",
+        "value": 0.875,
+        "raw_contribution": 0.12952129991876557
+      },
+      {
+        "feature": "broad0_normalized_price",
+        "value": 0.48855470626931424,
+        "raw_contribution": 0.11256186487434898
+      }
+    ],
+    "none_raw_logit": -3.520437126558937,
+    "none_base_value": -1.9250242688140846,
+    "none_sum_all_contributions": -3.520437126558938,
+    "none_top": [
+      {
+        "feature": "amount0_own_template_diversity__min",
+        "value": 4.0,
+        "raw_contribution": -0.5273288329200768
+      },
+      {
+        "feature": "amount0_own_mcc__min",
+        "value": 1.0,
+        "raw_contribution": -0.2754710781759942
+      },
+      {
+        "feature": "amount0_refund_ratio__mean",
+        "value": 0.09090909090909091,
+        "raw_contribution": 0.26889018835559336
+      },
+      {
+        "feature": "client_mcc_7997__min",
+        "value": 13.0,
+        "raw_contribution": -0.2680420956814891
+      },
+      {
+        "feature": "amount0_amount_cv__max",
+        "value": 0.009774207332779178,
+        "raw_contribution": -0.20544348841872745
+      },
+      {
+        "feature": "amount0_amount_cv__min",
+        "value": 0.009710015066150608,
+        "raw_contribution": 0.17571538657058194
+      },
+      {
+        "feature": "amount0_refund_count__max",
+        "value": 2.0,
+        "raw_contribution": 0.17414995633616565
+      },
+      {
+        "feature": "broad0_amount_cv__min",
+        "value": 0.009403437350572587,
+        "raw_contribution": 0.16066032078646633
+      }
+    ],
+    "anonymous_case": "correct_example"
+  },
+  {
+    "fold": 0,
+    "true_family": "streaming",
+    "prediction": "mobile",
+    "runner_up": "streaming",
+    "normalized_scores": {
+      "cloud": 0.03223263018528718,
+      "gym": 0.016878125714168895,
+      "insurance": 0.08282766524811805,
+      "mobile": 0.4189593823513512,
+      "music": 0.06700229249672525,
+      "software": 0.03257268607702994,
+      "streaming": 0.32524026982414517,
+      "none": 0.02428694810317428
+    },
+    "scope": "one-seed compact component; raw contributions are not final probability contributions",
+    "ranker_raw_score": 0.7067232751182126,
+    "ranker_base_value": -1.0554843826893492,
+    "ranker_sum_all_contributions": 0.7067232751182152,
+    "ranker_top": [
+      {
+        "feature": "broad0_count_60",
+        "value": 2.0,
+        "raw_contribution": 0.4689809825619204
+      },
+      {
+        "feature": "broad0_own_semantic_per_event",
+        "value": 0.5,
+        "raw_contribution": 0.2708056313143886
+      },
+      {
+        "feature": "broad0_refund_ratio",
+        "value": 0.25,
+        "raw_contribution": 0.254322913838874
+      },
+      {
+        "feature": "is_none",
+        "value": 0.0,
+        "raw_contribution": -0.17734207496918833
+      },
+      {
+        "feature": "broad0_first_age",
+        "value": 40.06390046296296,
+        "raw_contribution": 0.1422529694652514
+      },
+      {
+        "feature": "amount0_span",
+        "value": -999.0,
+        "raw_contribution": 0.12639555576206646
+      },
+      {
+        "feature": "broad0_count_30",
+        "value": 1.0,
+        "raw_contribution": 0.12114154120990898
+      },
+      {
+        "feature": "broad0_weekend_fraction",
+        "value": 0.5,
+        "raw_contribution": 0.1098901255010626
+      }
+    ],
+    "none_raw_logit": -3.6932294480285024,
+    "none_base_value": -1.9250242688140846,
+    "none_sum_all_contributions": -3.6932294480284984,
+    "none_top": [
+      {
+        "feature": "amount0_first_age__min",
+        "value": 49.19287037037037,
+        "raw_contribution": 0.40705657543875085
+      },
+      {
+        "feature": "client_mcc_6012__min",
+        "value": 25.0,
+        "raw_contribution": -0.3426972667151693
+      },
+      {
+        "feature": "amount0_own_template_diversity__min",
+        "value": 1.0,
+        "raw_contribution": -0.33960710718492587
+      },
+      {
+        "feature": "broad0_amount_cv__min",
+        "value": 0.006507592190889309,
+        "raw_contribution": -0.2808230907582932
+      },
+      {
+        "feature": "broad0_own_template_diversity_per_event__mean",
+        "value": 0.20208333333333334,
+        "raw_contribution": -0.24433250301787593
+      },
+      {
+        "feature": "amount0_refund_ratio__mean",
+        "value": 0.0,
+        "raw_contribution": -0.22323120969161087
+      },
+      {
+        "feature": "amount0_gap_last__min",
+        "value": 0.889814814814816,
+        "raw_contribution": 0.21870358385203398
+      },
+      {
+        "feature": "client_total_count__min",
+        "value": 115.0,
+        "raw_contribution": -0.20303793533422654
+      }
+    ],
+    "anonymous_case": "error_example"
+  }
+]

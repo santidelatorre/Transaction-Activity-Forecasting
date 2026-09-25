@@ -1,0 +1,96 @@
+{
+  "allowed_source_branch": "research/import-v2-stream-identity",
+  "experiment_base": "e4aa4c58175242e198cefd32d6ac4558145523af",
+  "same_branch_update_during_investigation": "d5dddfd8d93df61d3a6421f860428bf491c995f7",
+  "comparison": "AST comparison ignores formatting and import reordering/removal; not a proof of arbitrary semantic equivalence",
+  "modules": [
+    {
+      "path": "src/ubs_recurrence/__init__.py",
+      "ast_equal_excluding_imports": true,
+      "changed_definitions": []
+    },
+    {
+      "path": "src/ubs_recurrence/augmentation.py",
+      "ast_equal_excluding_imports": true,
+      "changed_definitions": []
+    },
+    {
+      "path": "src/ubs_recurrence/cli.py",
+      "ast_equal_excluding_imports": false,
+      "changed_definitions": [
+        "predict",
+        "train"
+      ]
+    },
+    {
+      "path": "src/ubs_recurrence/compact.py",
+      "ast_equal_excluding_imports": true,
+      "changed_definitions": []
+    },
+    {
+      "path": "src/ubs_recurrence/data.py",
+      "ast_equal_excluding_imports": false,
+      "changed_definitions": [
+        "aligned_target",
+        "labels",
+        "transactions"
+      ]
+    },
+    {
+      "path": "src/ubs_recurrence/decision.py",
+      "ast_equal_excluding_imports": true,
+      "changed_definitions": []
+    },
+    {
+      "path": "src/ubs_recurrence/evaluation.py",
+      "ast_equal_excluding_imports": false,
+      "changed_definitions": [
+        "record"
+      ]
+    },
+    {
+      "path": "src/ubs_recurrence/features.py",
+      "ast_equal_excluding_imports": false,
+      "changed_definitions": [
+        "tabular"
+      ]
+    },
+    {
+      "path": "src/ubs_recurrence/model.py",
+      "ast_equal_excluding_imports": false,
+      "changed_definitions": [
+        "parameters"
+      ]
+    },
+    {
+      "path": "src/ubs_recurrence/payment_context.py",
+      "ast_equal_excluding_imports": false,
+      "changed_definitions": [
+        "payment_context"
+      ]
+    },
+    {
+      "path": "src/ubs_recurrence/price_prior.py",
+      "ast_equal_excluding_imports": false,
+      "changed_definitions": [
+        "learn_price_profiles"
+      ]
+    },
+    {
+      "path": "src/ubs_recurrence/ranking.py",
+      "ast_equal_excluding_imports": true,
+      "changed_definitions": []
+    },
+    {
+      "path": "src/ubs_recurrence/streams.py",
+      "ast_equal_excluding_imports": true,
+      "changed_definitions": []
+    },
+    {
+      "path": "src/ubs_recurrence/templates.py",
+      "ast_equal_excluding_imports": true,
+      "changed_definitions": []
+    }
+  ],
+  "action": "Keep experiment code pinned; document source update without merging or reading another branch."
+}

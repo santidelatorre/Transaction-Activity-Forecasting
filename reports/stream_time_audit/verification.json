@@ -1,0 +1,10 @@
+{
+  "verified_aggregate_scores": 12,
+  "verified_client_isolated_models": 20,
+  "unique_train_clients": 2000,
+  "maximum_f1_reconciliation_error": 0.0,
+  "all_confusion_matrices_match": true,
+  "all_probability_rows_normalized": true,
+  "official_holdout_labels_loaded": false,
+  "scope": "Independent reconstruction from saved CSVs and source TRAIN labels; no new predictions selected."
+}
