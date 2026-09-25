@@ -37,10 +37,13 @@ reales se omiten explícitamente si faltan artefactos; los de estados vacíos no
 - `GET /api/v1/experiments?limit=7&offset=0`: comparativas históricas del informe V3
   y, a continuación, registros existentes en SQLite; nunca crea una base de datos.
 - La curva sigue el orden del informe. No se inventan fechas ni hitos de tuning.
-- La cifra de clientes se calcula de la matriz de confusión. Macro-F1 y accuracy
-  conservan sus nombres y significados; el resultado medido es sobre VALID, no TEST.
-- Las barras corresponden a CatBoost del brazo A ajustado con TRAIN. No describen
-  la contribución individual ni el ensemble completo (75 % CatBoost / 25 % heurística).
+- Clientes, recall macro y Macro-F1 se calculan o se leen de la matriz de confusión;
+  accuracy es el valor del informe. Los resultados son sobre VALID, no TEST.
+- La importancia de variables corresponde a CatBoost A ajustado con TRAIN. La
+  comparación muestra solo candidatos medidos en el informe; no incluye resultados
+  individuales de LightGBM o XGBoost.
+- La corrección focalizada aplicó un umbral fijo de 0,85, sin búsqueda sobre VALID.
+  V3-A combina 75 % CatBoost y 25 % heurística de periodicidad.
 - Sin artefactos, se muestran estados vacíos; un error de API permite reintentar.
 - La API de presentación no entrena, consulta TEST labels ni escribe predicciones.
 

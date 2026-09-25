@@ -17,13 +17,13 @@ import pandas as pd
 BASE_SHA = "051ce64a7cf0ab999f8aacb81fa405d5fa0257cf"
 MODEL_VERSION = "V3-A"
 ARMS = {
-    "V2": ("V2 baseline", "History and recurrence"),
-    "history_control": ("History only", "Control: history features only"),
-    "A": ("V3-A · family identity", "Family identity features"),
-    "B": ("V3-B · recurrence", "Additional recurrence features"),
-    "full": ("Full V3", "Identity and recurrence features"),
-    "ensemble": ("V3 / V2 blend", "50/50 blend"),
-    "focused": ("Targeted correction", "Family-level correction"),
+    "V2": ("Baseline V2", "Historial y periodicidad"),
+    "history_control": ("Solo historial", "Control con features del historial"),
+    "A": ("V3-A · identidad por familia", "Features de identidad por familia"),
+    "B": ("V3-B · recurrencia", "Features adicionales de periodicidad"),
+    "full": ("V3 completo", "Identidad y periodicidad"),
+    "ensemble": ("Mezcla V3 / V2", "Mezcla 50/50"),
+    "focused": ("Corrección focalizada", "Umbral fijo 0,85 · sin búsqueda en VALID"),
 }
 
 
@@ -52,6 +52,14 @@ def _client_count(metrics: dict[str, Any]) -> int:
     if sum(counts) == 0:
         raise ValueError("Validation cohort is empty")
     return sum(counts)
+
+
+def _macro_recall(metrics: dict[str, Any]) -> float:
+    """Compute class-balanced recall from the official true-by-predicted matrix."""
+    _client_count(metrics)
+    matrix = metrics["confusion_matrix"]
+    recalls = [row[index] / sum(row) if sum(row) else 0.0 for index, row in enumerate(matrix)]
+    return sum(recalls) / len(recalls)
 
 
 def snapshot(root: Path) -> dict[str, Any]:
@@ -108,7 +116,7 @@ def snapshot(root: Path) -> dict[str, Any]:
                 "delta_vs_baseline": score - baseline if baseline is not None else None,
                 "source": "valid_results.json",
                 "order_kind": "report",
-                "notes": "Historical comparison on reused VALID; shown in report order.",
+                "notes": "Comparación histórica sobre VALID reutilizado; orden del informe.",
             }
         )
 
@@ -130,6 +138,7 @@ def snapshot(root: Path) -> dict[str, Any]:
         "metrics": {
             "macro_f1": _score(selected["macro_f1"]),
             "accuracy": _score(selected["accuracy"]),
+            "macro_recall": _macro_recall(selected),
             "validation_clients": _client_count(selected),
             "baseline_macro_f1": baseline,
             "delta_vs_baseline": (
@@ -137,7 +146,7 @@ def snapshot(root: Path) -> dict[str, Any]:
             ),
         },
         "importance": importance,
-        "importance_scope": "CatBoost arm A, trained on TRAIN and evaluated on VALID",
+        "importance_scope": "CatBoost del brazo A, ajustado en TRAIN para evaluar VALID",
         "importance_method": "CatBoost PredictionValuesChange",
         "experiments": rows,
         "comparison_group": group,

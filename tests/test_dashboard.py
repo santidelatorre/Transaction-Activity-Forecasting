@@ -37,14 +37,16 @@ def test_promoted_arm_not_highest_score_or_historical_oof_selection(tmp_path):
     assert result["base_sha"] == dashboard.BASE_SHA
     assert result["metrics"]["macro_f1"] == 0.42
     assert result["metrics"]["accuracy"] == 0.46
+    assert result["metrics"]["macro_recall"] == pytest.approx(0.0575)
     assert result["metrics"]["validation_clients"] == 100
     assert result["metrics"]["delta_vs_baseline"] == pytest.approx(0.03)
     assert result["importance"][0] == {"feature": "mcc_4814_share", "importance": 4.2}
     selected = [row for row in result["experiments"] if row["result"] == "selected"]
     assert [row["candidate"] for row in selected] == ["A"]
-    assert selected[0]["model_name"] == "V3-A · family identity"
-    assert selected[0]["milestone"] == "Family identity features"
-    assert result["importance_scope"] == "CatBoost arm A, trained on TRAIN and evaluated on VALID"
+    assert selected[0]["model_name"] == "V3-A · identidad por familia"
+    assert selected[0]["milestone"] == "Features de identidad por familia"
+    assert "ajustado en TRAIN" in result["importance_scope"]
+    assert "evaluar VALID" in result["importance_scope"]
     assert all(row["recorded_at_utc"] is None for row in result["experiments"])
     assert all(row["order_kind"] == "report" for row in result["experiments"])
     assert result["validation_independent"] is False
