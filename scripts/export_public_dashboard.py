@@ -30,6 +30,7 @@ PUBLIC_FIELDS = (
     "version_history",
     "v4_experiments",
     "v4_diagnostics",
+    "mainline_v4",
     "evidence_sources",
     "importance_scope",
     "importance_method",

@@ -174,6 +174,74 @@ function DotScore({ score, evidence, split, name, selected }) {
   </div>;
 }
 
+function ScoreBar({ score, max = 0.8 }) {
+  if (!Number.isFinite(score)) return <span className="text-[11px] text-[#8A8A8A]">—</span>;
+  return <div className="flex items-center gap-3">
+    <div className="relative h-4 min-w-24 flex-1 border-b border-[#D7D7D7]">
+      <span className="absolute bottom-[-4px] h-2 w-2 -translate-x-1/2 rounded-full bg-[#E60000]" style={{ left: `${Math.min(100, (score / max) * 100)}%` }} />
+    </div>
+    <span className="w-16 shrink-0 text-right font-mono text-xs tabular-nums">{format(score, 4)}</span>
+  </div>;
+}
+
+function MainlineV4({ data, loading, error }) {
+  const bundle = data?.mainline_v4;
+  const official = bundle?.official_valid ?? [];
+  const ablations = bundle?.ablations ?? [];
+  const perClass = bundle?.per_class_valid ?? [];
+  return <section id="mainline" className="mt-6 scroll-mt-24 rounded-sm border border-[#E60000] bg-white">
+    <div className="px-6 pt-6 sm:px-7">
+      <Eyebrow className="text-[#E60000]">Current main</Eyebrow>
+      <h2 className="mt-2 text-xl font-medium tracking-tight">Stream Identity V4 on main</h2>
+      <p className="mt-2 max-w-3xl text-xs leading-5 text-[#686868]">{bundle?.note || 'Loading the mainline freeze.'}</p>
+      <p className="mt-1 break-all text-[10px] text-[#888]">Source commit {bundle?.source?.commit || '—'} · {bundle?.source?.protocol_path}</p>
+    </div>
+    {loading || error || !official.length ? <Empty loading={loading} error={error}>Mainline V4 results are not in this snapshot.</Empty> : <>
+      <div className="overflow-x-auto px-6 py-6 sm:px-7">
+        <table className="w-full min-w-[720px] text-left text-xs">
+          <caption className="sr-only">Official VALID comparison published on main.</caption>
+          <thead className="border-y border-[#E4E4E4] text-[10px] uppercase tracking-[0.09em] text-[#757575]"><tr><th className="py-3">Model</th><th className="py-3">VALID Macro-F1</th><th className="py-3 text-right">Accuracy</th><th className="py-3">Status</th></tr></thead>
+          <tbody>{official.map((row) => <tr key={row.id} className="border-b border-[#ECECEC]">
+            <th className="py-3 pr-4 font-medium" scope="row">{row.name}</th>
+            <td className="py-3 pr-4"><ScoreBar score={row.macro_f1} /></td>
+            <td className="py-3 text-right font-mono tabular-nums">{format(row.accuracy, 3)}</td>
+            <td className="py-3 text-[11px] text-[#686868]">{row.status === 'selected_on_main' ? 'Frozen on main' : row.status === 'invalid_confirmation' ? 'Reproduced · confirmation invalid' : 'Historical reference'}</td>
+          </tr>)}</tbody>
+        </table>
+      </div>
+      <div className="overflow-x-auto border-t border-[#EAEAEA] px-6 py-6 sm:px-7">
+        <h3 className="text-sm font-medium">TRAIN-only ablations</h3>
+        <p className="mt-1 text-[11px] leading-5 text-[#686868]">Macro-F1 on the clean TRAIN protocol. Medium and severe are stability checks, not the challenge score. Only legacy_half was opened on VALID.</p>
+        <table className="mt-4 w-full min-w-[860px] text-left text-xs">
+          <thead className="border-y border-[#E4E4E4] text-[10px] uppercase tracking-[0.09em] text-[#757575]"><tr><th className="py-3">Variant</th><th className="py-3">OOF</th><th className="py-3 text-right">Accuracy</th><th className="py-3 text-right">Δ vs full</th><th className="py-3 text-right">Medium</th><th className="py-3 text-right">Severe</th></tr></thead>
+          <tbody>{ablations.map((row) => <tr key={row.id} className={`border-b border-[#ECECEC] ${row.status === 'selected_on_main' ? 'bg-[#FFF6F6]' : ''}`}>
+            <th className="py-3 pr-3 font-medium" scope="row">{row.name}{row.status === 'selected_on_main' ? ' · frozen' : ''}</th>
+            <td className="py-3 pr-3"><ScoreBar score={row.train_oof} /></td>
+            <td className="py-3 text-right font-mono tabular-nums">{format(row.accuracy, 3)}</td>
+            <td className="py-3 text-right font-mono tabular-nums">{signed(row.delta_vs_full)}</td>
+            <td className="py-3 text-right font-mono tabular-nums">{format(row.medium_f1, 4)}</td>
+            <td className="py-3 text-right font-mono tabular-nums">{format(row.severe_f1, 4)}</td>
+          </tr>)}</tbody>
+        </table>
+      </div>
+      <div className="overflow-x-auto border-t border-[#EAEAEA] px-6 py-6 sm:px-7">
+        <h3 className="text-sm font-medium">Frozen recipe · VALID by class</h3>
+        <table className="mt-4 w-full min-w-[640px] text-left text-xs">
+          <thead className="border-y border-[#E4E4E4] text-[10px] uppercase tracking-[0.09em] text-[#757575]"><tr><th className="py-3">Class</th><th className="py-3 text-right">Precision</th><th className="py-3 text-right">Recall</th><th className="py-3 text-right">F1</th><th className="py-3 text-right">Support</th><th className="py-3 text-right">Predicted</th></tr></thead>
+          <tbody>{perClass.map((row) => <tr key={row.class} className="border-b border-[#ECECEC]">
+            <th className="py-3 font-medium" scope="row">{row.class}</th>
+            <td className="py-3 text-right font-mono tabular-nums">{format(row.precision, 3)}</td>
+            <td className="py-3 text-right font-mono tabular-nums">{format(row.recall, 3)}</td>
+            <td className="py-3 text-right font-mono tabular-nums">{format(row.f1, 4)}</td>
+            <td className="py-3 text-right font-mono tabular-nums">{format(row.support)}</td>
+            <td className="py-3 text-right font-mono tabular-nums">{format(row.predicted)}</td>
+          </tr>)}</tbody>
+        </table>
+      </div>
+    </>}
+  </section>;
+}
+
 function V4Comparison({ data, loading, error }) {
   const rows = data?.v4_experiments ?? [];
   return <section id="comparison" className="mt-6 scroll-mt-24 rounded-sm border border-[#E4E4E4] bg-white">
@@ -268,7 +336,7 @@ export default function App() {
     <header className="sticky top-0 z-30 border-b border-[#EAEAEA] bg-white/95 backdrop-blur-sm">
       <div className="mx-auto flex h-[76px] max-w-[1320px] items-center justify-between gap-5 px-5 sm:px-8 lg:px-12">
         <a href="#content" className="flex shrink-0 items-center gap-3" aria-label="Recurring Insights home"><span className="grid h-8 w-8 grid-cols-2 items-end gap-[3px] border-b-[3px] border-[#E60000] pb-[3px]" aria-hidden="true"><span className="h-3 bg-[#E60000]" /><span className="h-6 bg-[#E60000]" /></span><span className="text-base font-semibold tracking-[-0.035em]">Recurring Insights<span className="mt-0.5 block text-[9px] font-medium uppercase tracking-[0.22em] text-[#888]">Transaction intelligence</span></span></a>
-        <nav aria-label="Main navigation" className="hidden items-center gap-7 text-xs text-[#686868] md:flex"><a href="#quality" className="hover:text-[#E60000]">Overview</a><a href="#progress" className="hover:text-[#E60000]">Versions</a><a href="#comparison" className="hover:text-[#E60000]">V4 research</a><a href="#experiments" className="hover:text-[#E60000]">Audit trail</a></nav>
+        <nav aria-label="Main navigation" className="hidden items-center gap-7 text-xs text-[#686868] md:flex"><a href="#quality" className="hover:text-[#E60000]">Overview</a><a href="#progress" className="hover:text-[#E60000]">Versions</a><a href="#mainline" className="hover:text-[#E60000]">Main V4</a><a href="#comparison" className="hover:text-[#E60000]">V4 research</a><a href="#experiments" className="hover:text-[#E60000]">Audit trail</a></nav>
         <div className="flex shrink-0 items-center gap-2 sm:gap-5"><img src={ubsLogo} alt="UBS logo" className="h-7 w-auto sm:h-8" /><button type="button" onClick={() => setRevision((value) => value + 1)} disabled={loading} className="flex items-center gap-2 border border-[#DADADA] px-3 py-2 text-[11px] hover:border-[#1A1A1A] disabled:opacity-50" aria-label="Refresh results"><RefreshCw size={12} className={loading ? 'motion-safe:animate-spin' : ''} /><span className="hidden sm:inline">Refresh</span></button></div>
       </div>
     </header>
@@ -288,6 +356,7 @@ export default function App() {
         </div>
       </section>
       <div className="mt-6 space-y-6"><VersionChart data={data} loading={loading} error={error} /><ImportanceChart data={data} loading={loading} error={error} /></div>
+      <MainlineV4 data={data} loading={loading} error={error} />
       <V4Comparison data={data} loading={loading} error={error} />
       <ExperimentTable revision={revision} ensembleWeights={data?.ensemble_weights} />
       <section id="method" className="mt-10 grid gap-7 border-y border-[#E4E4E4] py-8 md:grid-cols-[1.1fr_1fr_1fr]"><div><Eyebrow className="text-[#E60000]">Trust needs context</Eyebrow><h2 className="mt-3 max-w-xs text-xl font-medium leading-7 tracking-tight">A useful signal.<br />With its limits in view.</h2></div><div><h3 className="text-xs font-semibold">History precedes prediction</h3><p className="mt-2 text-xs leading-6 text-[#686868]">The predictor uses transactions before the cutoff. Descriptions can be ambiguous; family associations are learned with client separation.</p></div><div><h3 className="text-xs font-semibold">Validation is not a final test</h3><p className="mt-2 text-xs leading-6 text-[#686868]">VALID was reused during research. “None” means no recurring family is predicted within the horizon, not a guarantee of zero transactions.</p></div></section>

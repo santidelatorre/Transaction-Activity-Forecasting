@@ -70,7 +70,11 @@ def _evidence() -> dict[str, Any]:
         raise ValueError("Unexpected dashboard evidence metric")
     if evidence["v4_decision"]["base_sha"] != BASE_SHA:
         raise ValueError("V4 decision does not reference the frozen baseline")
-    for row in [*evidence["version_results"], *evidence["v4_experiments"]]:
+    rows = [*evidence["version_results"], *evidence["v4_experiments"]]
+    mainline = evidence.get("mainline_v4", {})
+    rows.extend(mainline.get("official_valid", []))
+    rows.extend(mainline.get("ablations", []))
+    for row in rows:
         for key in ("macro_f1", "train_oof", "valid"):
             if row.get(key) is not None:
                 _score(row[key])
@@ -144,6 +148,7 @@ def snapshot(root: Path) -> dict[str, Any]:
         "version_history": _history(evidence, None, None, None),
         "v4_experiments": evidence["v4_experiments"],
         "v4_diagnostics": evidence["diagnostics"],
+        "mainline_v4": evidence.get("mainline_v4", {}),
         "evidence_sources": {
             "versions": evidence["version_source"],
             "v4": evidence["v4_source"],

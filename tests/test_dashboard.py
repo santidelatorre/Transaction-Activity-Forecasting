@@ -110,6 +110,16 @@ def test_v4_evidence_separates_clean_oof_reused_valid_and_stress():
     assert experiments["santiago-average"]["valid"] is None
     assert experiments["christian-b"]["train_evidence"].startswith("author-reported")
     assert evidence["diagnostics"][0]["protocol"] == "stress-not-comparable-to-clean"
+    mainline = evidence["mainline_v4"]
+    assert mainline["source"]["commit"] == "c1f6c16a37fdf8544ee1169f1c3440fd397cb38d"
+    frozen = next(row for row in mainline["official_valid"] if row["id"] == "stream-clean")
+    assert frozen["status"] == "selected_on_main"
+    assert frozen["macro_f1"] == pytest.approx(0.634819707075)
+    assert frozen["train_oof"] == pytest.approx(0.673810376395381)
+    assert len(mainline["ablations"]) == 15
+    assert next(row for row in mainline["ablations"] if row["id"] == "legacy_half")["status"] == (
+        "selected_on_main"
+    )
 
 
 @pytest.mark.parametrize("bad_score", [None, True, "0.8", 1.1, float("nan")])

@@ -154,5 +154,76 @@
       "evidence": "verified",
       "note": "V3-A under simulated corruption, not a replacement model."
     }
-  ]
+  ],
+  "mainline_v4": {
+    "source": {
+      "ref": "origin/main",
+      "commit": "c1f6c16a37fdf8544ee1169f1c3440fd397cb38d",
+      "protocol_path": "reports/stream_identity_clean_protocol.md",
+      "readme": "README.md"
+    },
+    "note": "Current main freezes Stream Identity clean. Variant scores are TRAIN-only OOF. Only the frozen recipe has one later VALID score. The historical Stream Identity VALID used labels during development, so main marks that confirmation INVALID.",
+    "official_valid": [
+      {
+        "id": "main-v1",
+        "name": "V1 historical",
+        "macro_f1": 0.271024266,
+        "accuracy": 0.266,
+        "status": "reference",
+        "note": "Same 1,000 VALID clients."
+      },
+      {
+        "id": "main-v2",
+        "name": "V2 historical",
+        "macro_f1": 0.391549456,
+        "accuracy": 0.424,
+        "status": "reference",
+        "note": "Delta baseline for the clean freeze."
+      },
+      {
+        "id": "stream-historical",
+        "name": "Stream Identity historical",
+        "macro_f1": 0.619493424,
+        "accuracy": 0.647,
+        "status": "invalid_confirmation",
+        "note": "Score is reproduced, but VALID labels influenced earlier choices."
+      },
+      {
+        "id": "stream-clean",
+        "name": "Stream Identity clean frozen",
+        "macro_f1": 0.634819707075,
+        "accuracy": 0.662,
+        "train_oof": 0.673810376395381,
+        "status": "selected_on_main",
+        "note": "Selected on TRAIN OOF before this single VALID read. Delta vs V2 +0.243270251075."
+      }
+    ],
+    "per_class_valid": [
+      {"class": "cloud", "precision": 0.652632, "recall": 0.696629, "f1": 0.673913, "support": 89, "predicted": 95},
+      {"class": "gym", "precision": 0.658537, "recall": 0.669421, "f1": 0.663934, "support": 121, "predicted": 123},
+      {"class": "insurance", "precision": 0.623656, "recall": 0.585859, "f1": 0.604167, "support": 99, "predicted": 93},
+      {"class": "mobile", "precision": 0.702128, "recall": 0.634615, "f1": 0.666667, "support": 104, "predicted": 94},
+      {"class": "music", "precision": 0.60241, "recall": 0.537634, "f1": 0.568182, "support": 93, "predicted": 83},
+      {"class": "software", "precision": 0.602151, "recall": 0.538462, "f1": 0.568528, "support": 104, "predicted": 93},
+      {"class": "streaming", "precision": 0.6, "recall": 0.556701, "f1": 0.57754, "support": 97, "predicted": 90},
+      {"class": "none", "precision": 0.714286, "recall": 0.802048, "f1": 0.755627, "support": 293, "predicted": 329}
+    ],
+    "ablations": [
+      {"id": "full", "name": "full", "train_oof": 0.661873024, "accuracy": 0.6915, "delta_vs_full": 0.0, "medium_f1": 0.634408, "severe_f1": 0.612453},
+      {"id": "no_unlabeled", "name": "no_unlabeled", "train_oof": 0.65836325, "accuracy": 0.688, "delta_vs_full": -0.00351, "medium_f1": 0.632474, "severe_f1": 0.598482},
+      {"id": "no_augmentations", "name": "no_augmentations", "train_oof": 0.671134983, "accuracy": 0.705, "delta_vs_full": 0.009262, "medium_f1": 0.346809, "severe_f1": 0.141027},
+      {"id": "no_multiseed", "name": "no_multiseed", "train_oof": 0.655213961, "accuracy": 0.6855, "delta_vs_full": -0.006659, "medium_f1": 0.634237, "severe_f1": 0.614544},
+      {"id": "principal_lightgbm", "name": "principal_lightgbm", "train_oof": 0.637299464, "accuracy": 0.6655, "delta_vs_full": -0.024574, "medium_f1": 0.623584, "severe_f1": 0.606307},
+      {"id": "no_none_detector", "name": "no_none_detector", "train_oof": 0.653500551, "accuracy": 0.681, "delta_vs_full": -0.008372, "medium_f1": 0.628693, "severe_f1": 0.607349},
+      {"id": "no_soft_assignment", "name": "no_soft_assignment", "train_oof": 0.657948585, "accuracy": 0.689, "delta_vs_full": -0.003924, "medium_f1": 0.638593, "severe_f1": 0.605819},
+      {"id": "simple_postprocessing", "name": "simple_postprocessing", "train_oof": 0.658867561, "accuracy": 0.6865, "delta_vs_full": -0.003005, "medium_f1": 0.628217, "severe_f1": 0.609527},
+      {"id": "no_payment_context", "name": "no_payment_context", "train_oof": 0.640262455, "accuracy": 0.67, "delta_vs_full": -0.021611, "medium_f1": 0.60571, "severe_f1": 0.5695},
+      {"id": "no_cadence_thresholds", "name": "no_cadence_thresholds", "train_oof": 0.664197851, "accuracy": 0.693, "delta_vs_full": 0.002325, "medium_f1": 0.639106, "severe_f1": 0.606644},
+      {"id": "seven_leaves", "name": "seven_leaves", "train_oof": 0.646648371, "accuracy": 0.6785, "delta_vs_full": -0.015225, "medium_f1": 0.629212, "severe_f1": 0.595516},
+      {"id": "no_legacy", "name": "no_legacy", "train_oof": 0.646228824, "accuracy": 0.678, "delta_vs_full": -0.015644, "medium_f1": 0.626967, "severe_f1": 0.600898},
+      {"id": "legacy_half", "name": "legacy_half", "train_oof": 0.673810376395381, "accuracy": 0.7015, "delta_vs_full": 0.011937, "medium_f1": 0.638174, "severe_f1": 0.609738, "status": "selected_on_main"},
+      {"id": "temperature_1_5", "name": "temperature_1_5", "train_oof": 0.661475809, "accuracy": 0.6925, "delta_vs_full": -0.000397, "medium_f1": 0.633901, "severe_f1": 0.609054},
+      {"id": "train_prior_bias", "name": "train_prior_bias", "train_oof": 0.658340883, "accuracy": 0.6855, "delta_vs_full": -0.003532, "medium_f1": 0.631396, "severe_f1": 0.619108}
+    ]
+  }
 }

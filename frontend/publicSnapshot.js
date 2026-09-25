@@ -236,6 +236,254 @@ export default {
   ],
   "importance_method": "CatBoost PredictionValuesChange",
   "importance_scope": "CatBoost arm A, fitted on TRAIN for VALID evaluation",
+  "mainline_v4": {
+    "ablations": [
+      {
+        "accuracy": 0.6915,
+        "delta_vs_full": 0.0,
+        "id": "full",
+        "medium_f1": 0.634408,
+        "name": "full",
+        "severe_f1": 0.612453,
+        "train_oof": 0.661873024
+      },
+      {
+        "accuracy": 0.688,
+        "delta_vs_full": -0.00351,
+        "id": "no_unlabeled",
+        "medium_f1": 0.632474,
+        "name": "no_unlabeled",
+        "severe_f1": 0.598482,
+        "train_oof": 0.65836325
+      },
+      {
+        "accuracy": 0.705,
+        "delta_vs_full": 0.009262,
+        "id": "no_augmentations",
+        "medium_f1": 0.346809,
+        "name": "no_augmentations",
+        "severe_f1": 0.141027,
+        "train_oof": 0.671134983
+      },
+      {
+        "accuracy": 0.6855,
+        "delta_vs_full": -0.006659,
+        "id": "no_multiseed",
+        "medium_f1": 0.634237,
+        "name": "no_multiseed",
+        "severe_f1": 0.614544,
+        "train_oof": 0.655213961
+      },
+      {
+        "accuracy": 0.6655,
+        "delta_vs_full": -0.024574,
+        "id": "principal_lightgbm",
+        "medium_f1": 0.623584,
+        "name": "principal_lightgbm",
+        "severe_f1": 0.606307,
+        "train_oof": 0.637299464
+      },
+      {
+        "accuracy": 0.681,
+        "delta_vs_full": -0.008372,
+        "id": "no_none_detector",
+        "medium_f1": 0.628693,
+        "name": "no_none_detector",
+        "severe_f1": 0.607349,
+        "train_oof": 0.653500551
+      },
+      {
+        "accuracy": 0.689,
+        "delta_vs_full": -0.003924,
+        "id": "no_soft_assignment",
+        "medium_f1": 0.638593,
+        "name": "no_soft_assignment",
+        "severe_f1": 0.605819,
+        "train_oof": 0.657948585
+      },
+      {
+        "accuracy": 0.6865,
+        "delta_vs_full": -0.003005,
+        "id": "simple_postprocessing",
+        "medium_f1": 0.628217,
+        "name": "simple_postprocessing",
+        "severe_f1": 0.609527,
+        "train_oof": 0.658867561
+      },
+      {
+        "accuracy": 0.67,
+        "delta_vs_full": -0.021611,
+        "id": "no_payment_context",
+        "medium_f1": 0.60571,
+        "name": "no_payment_context",
+        "severe_f1": 0.5695,
+        "train_oof": 0.640262455
+      },
+      {
+        "accuracy": 0.693,
+        "delta_vs_full": 0.002325,
+        "id": "no_cadence_thresholds",
+        "medium_f1": 0.639106,
+        "name": "no_cadence_thresholds",
+        "severe_f1": 0.606644,
+        "train_oof": 0.664197851
+      },
+      {
+        "accuracy": 0.6785,
+        "delta_vs_full": -0.015225,
+        "id": "seven_leaves",
+        "medium_f1": 0.629212,
+        "name": "seven_leaves",
+        "severe_f1": 0.595516,
+        "train_oof": 0.646648371
+      },
+      {
+        "accuracy": 0.678,
+        "delta_vs_full": -0.015644,
+        "id": "no_legacy",
+        "medium_f1": 0.626967,
+        "name": "no_legacy",
+        "severe_f1": 0.600898,
+        "train_oof": 0.646228824
+      },
+      {
+        "accuracy": 0.7015,
+        "delta_vs_full": 0.011937,
+        "id": "legacy_half",
+        "medium_f1": 0.638174,
+        "name": "legacy_half",
+        "severe_f1": 0.609738,
+        "status": "selected_on_main",
+        "train_oof": 0.673810376395381
+      },
+      {
+        "accuracy": 0.6925,
+        "delta_vs_full": -0.000397,
+        "id": "temperature_1_5",
+        "medium_f1": 0.633901,
+        "name": "temperature_1_5",
+        "severe_f1": 0.609054,
+        "train_oof": 0.661475809
+      },
+      {
+        "accuracy": 0.6855,
+        "delta_vs_full": -0.003532,
+        "id": "train_prior_bias",
+        "medium_f1": 0.631396,
+        "name": "train_prior_bias",
+        "severe_f1": 0.619108,
+        "train_oof": 0.658340883
+      }
+    ],
+    "note": "Current main freezes Stream Identity clean. Variant scores are TRAIN-only OOF. Only the frozen recipe has one later VALID score. The historical Stream Identity VALID used labels during development, so main marks that confirmation INVALID.",
+    "official_valid": [
+      {
+        "accuracy": 0.266,
+        "id": "main-v1",
+        "macro_f1": 0.271024266,
+        "name": "V1 historical",
+        "note": "Same 1,000 VALID clients.",
+        "status": "reference"
+      },
+      {
+        "accuracy": 0.424,
+        "id": "main-v2",
+        "macro_f1": 0.391549456,
+        "name": "V2 historical",
+        "note": "Delta baseline for the clean freeze.",
+        "status": "reference"
+      },
+      {
+        "accuracy": 0.647,
+        "id": "stream-historical",
+        "macro_f1": 0.619493424,
+        "name": "Stream Identity historical",
+        "note": "Score is reproduced, but VALID labels influenced earlier choices.",
+        "status": "invalid_confirmation"
+      },
+      {
+        "accuracy": 0.662,
+        "id": "stream-clean",
+        "macro_f1": 0.634819707075,
+        "name": "Stream Identity clean frozen",
+        "note": "Selected on TRAIN OOF before this single VALID read. Delta vs V2 +0.243270251075.",
+        "status": "selected_on_main",
+        "train_oof": 0.673810376395381
+      }
+    ],
+    "per_class_valid": [
+      {
+        "class": "cloud",
+        "f1": 0.673913,
+        "precision": 0.652632,
+        "predicted": 95,
+        "recall": 0.696629,
+        "support": 89
+      },
+      {
+        "class": "gym",
+        "f1": 0.663934,
+        "precision": 0.658537,
+        "predicted": 123,
+        "recall": 0.669421,
+        "support": 121
+      },
+      {
+        "class": "insurance",
+        "f1": 0.604167,
+        "precision": 0.623656,
+        "predicted": 93,
+        "recall": 0.585859,
+        "support": 99
+      },
+      {
+        "class": "mobile",
+        "f1": 0.666667,
+        "precision": 0.702128,
+        "predicted": 94,
+        "recall": 0.634615,
+        "support": 104
+      },
+      {
+        "class": "music",
+        "f1": 0.568182,
+        "precision": 0.60241,
+        "predicted": 83,
+        "recall": 0.537634,
+        "support": 93
+      },
+      {
+        "class": "software",
+        "f1": 0.568528,
+        "precision": 0.602151,
+        "predicted": 93,
+        "recall": 0.538462,
+        "support": 104
+      },
+      {
+        "class": "streaming",
+        "f1": 0.57754,
+        "precision": 0.6,
+        "predicted": 90,
+        "recall": 0.556701,
+        "support": 97
+      },
+      {
+        "class": "none",
+        "f1": 0.755627,
+        "precision": 0.714286,
+        "predicted": 329,
+        "recall": 0.802048,
+        "support": 293
+      }
+    ],
+    "source": {
+      "commit": "c1f6c16a37fdf8544ee1169f1c3440fd397cb38d",
+      "protocol_path": "reports/stream_identity_clean_protocol.md",
+      "readme": "README.md",
+      "ref": "origin/main"
+    }
+  },
   "metrics": {
     "accuracy": 0.461,
     "baseline_macro_f1": 0.3915494559105542,
