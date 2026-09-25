@@ -1,8 +1,25 @@
 # UBS: next recurring merchant family
 
-**Official validation: 0.619493 macro-F1, 0.647 accuracy, all 1,000 clients and
-all eight classes. The 0.80 research objective was not reached.** Two independent
-raw-data builds reproduced every prediction and probability exactly.
+**Historical claim: 0.619493 macro-F1, 0.647 accuracy.** VALID was consulted
+during model selection, including rejection of decision biases. This score is
+not evidence from an untouched holdout. The strict acceptance status is
+**INVALID** under a requirement of no VALID-informed selection. See the
+[V1/V2 comparison and independent reproduction audit](reports/stream_identity_benchmark.md)
+for the measured results, provenance, leakage findings and delivery checks.
+The 0.80 research objective was not reached.
+
+The common-protocol benchmark rebuilds two independent models from raw data,
+refits the frozen historical V1/V2 recipes, scores every official VALID client
+with the historical evaluator, computes paired bootstrap intervals and writes
+a separate TRAIN-only submission. With the local official data installed:
+
+```powershell
+python -X utf8 scripts/run_ubs_stream_identity.py --run-name benchmark_train_only_20260925 --device cuda --replicas 2
+python scripts/validate_submission.py --submission outputs/predictions/submission_stream_identity.csv --sample data/raw/ubs_2026/sample_submission.csv
+```
+
+Completed runs are immutable. Add `--verify` to the benchmark command to
+check its input/source/artifact hashes and recalculate all three scores.
 
 This is a fresh implementation of the [official UBS 2026 challenge](https://github.com/UBS-AG/Swiss-AI-Weeks/blob/796d5805ec5f8a228a3ec0de36a2b4e6e1b1a1df/hackathons/2026/challenge.md).
 Given a client's transactions before **2026-01-01**, predict the next recurring

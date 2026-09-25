@@ -1,3 +1,4 @@
 # Preserve the validated submission byte-for-byte on every operating system.
 /submissions/submission.csv -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+/outputs/predictions/submission_stream_identity.csv -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 *.png binary

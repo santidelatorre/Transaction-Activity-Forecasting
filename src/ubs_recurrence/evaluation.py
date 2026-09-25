@@ -1,75 +1,163 @@
-from datetime import datetime, timezone
 import hashlib
 import json
 import subprocess
-from pathlib import Path
+from datetime import UTC, datetime
+
 import numpy as np
 import pandas as pd
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, f1_score, log_loss
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    log_loss,
+)
+
 from .data import LABELS, ROOT
 
 
 def metrics(y, probabilities):
     p = np.asarray(probabilities)
-    if p.shape != (len(y),len(LABELS)) or not np.isfinite(p).all():
+    if p.shape != (len(y), len(LABELS)) or not np.isfinite(p).all():
         raise ValueError("Invalid probability array")
-    if np.any(p < 0) or not np.allclose(p.sum(axis=1),1,atol=1e-6):
+    if np.any(p < 0) or not np.allclose(p.sum(axis=1), 1, atol=1e-6):
         raise ValueError("Probabilities must be nonnegative and sum to one")
     pred = p.argmax(axis=1)
-    report = classification_report(y,pred,labels=range(len(LABELS)),target_names=LABELS,zero_division=0,output_dict=True)
+    report = classification_report(
+        y,
+        pred,
+        labels=range(len(LABELS)),
+        target_names=LABELS,
+        zero_division=0,
+        output_dict=True,
+    )
     confidence = p.max(axis=1)
     bins = []
-    for lo,hi in zip(np.linspace(0,1,11)[:-1],np.linspace(0,1,11)[1:]):
+    for lo, hi in zip(np.linspace(0, 1, 11)[:-1], np.linspace(0, 1, 11)[1:]):
         m = (confidence > lo) & (confidence <= hi)
         if m.any():
-            bins.append({"lower":float(lo),"upper":float(hi),"n":int(m.sum()),"confidence":float(confidence[m].mean()),"accuracy":float((pred[m]==y[m]).mean())})
-    return {"macro_f1":float(f1_score(y,pred,labels=range(len(LABELS)),average="macro",zero_division=0)),
-            "accuracy":float(accuracy_score(y,pred)), "classification_report":report,
-            "confusion_matrix":confusion_matrix(y,pred,labels=range(len(LABELS))).tolist(),
-            "confusion_matrix_order":LABELS,
-            "prediction_frequency":dict(zip(LABELS,np.bincount(pred,minlength=8).tolist())),
-            "true_frequency":dict(zip(LABELS,np.bincount(y,minlength=8).tolist())),
-            "log_loss":float(log_loss(y,p,labels=range(len(LABELS)))),
-            "calibration_bins":bins}
+            bins.append(
+                {
+                    "lower": float(lo),
+                    "upper": float(hi),
+                    "n": int(m.sum()),
+                    "confidence": float(confidence[m].mean()),
+                    "accuracy": float((pred[m] == y[m]).mean()),
+                }
+            )
+    return {
+        "macro_f1": float(
+            f1_score(
+                y, pred, labels=range(len(LABELS)), average="macro", zero_division=0
+            )
+        ),
+        "accuracy": float(accuracy_score(y, pred)),
+        "classification_report": report,
+        "confusion_matrix": confusion_matrix(
+            y, pred, labels=range(len(LABELS))
+        ).tolist(),
+        "confusion_matrix_order": LABELS,
+        "prediction_frequency": dict(
+            zip(LABELS, np.bincount(pred, minlength=8).tolist())
+        ),
+        "true_frequency": dict(zip(LABELS, np.bincount(y, minlength=8).tolist())),
+        "log_loss": float(log_loss(y, p, labels=range(len(LABELS)))),
+        "calibration_bins": bins,
+    }
 
 
 def source_fingerprint():
     h = hashlib.sha256()
-    for folder in ["src","scripts"]:
-        for path in sorted((ROOT/folder).rglob("*.py")):
+    for folder in ["src", "scripts"]:
+        for path in sorted((ROOT / folder).rglob("*.py")):
             h.update(str(path.relative_to(ROOT)).encode())
             h.update(path.read_bytes())
     return h.hexdigest()
 
 
-def record(experiment_id, ids, y, probabilities, *, metadata, runtime, fold_scores=None, split="oof"):
+def record(
+    experiment_id,
+    ids,
+    y,
+    probabilities,
+    *,
+    metadata,
+    runtime,
+    fold_scores=None,
+    split="oof",
+):
     out = ROOT / "outputs/experiments" / experiment_id
     out.mkdir(parents=True, exist_ok=False)
     result = metrics(y, probabilities)
     result.update(metadata)
-    result.update({"experiment_id":experiment_id,"timestamp":datetime.now(timezone.utc).isoformat(),
-                   "git_commit":subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip(),
-                   "source_sha256":source_fingerprint(),"runtime_seconds":float(runtime),
-                   "evaluation_split":split,"fold_macro_f1":fold_scores})
-    (out/"metrics.json").write_text(json.dumps(result,indent=2))
-    p = pd.DataFrame(probabilities,columns=[f"p_{l}" for l in LABELS])
-    p.insert(0,"client_id",ids)
+    result.update(
+        {
+            "experiment_id": experiment_id,
+            "timestamp": datetime.now(UTC).isoformat(),
+            "git_commit": subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+            ).strip(),
+            "source_sha256": source_fingerprint(),
+            "runtime_seconds": float(runtime),
+            "evaluation_split": split,
+            "fold_macro_f1": fold_scores,
+        }
+    )
+    (out / "metrics.json").write_text(json.dumps(result, indent=2))
+    p = pd.DataFrame(probabilities, columns=[f"p_{l}" for l in LABELS])
+    p.insert(0, "client_id", ids)
     p["true_label"] = np.array(LABELS)[y]
-    p["prediction"] = np.array(LABELS)[np.argmax(probabilities,axis=1)]
-    p.to_csv(out/"predictions.csv",index=False)
-    flat = {k:result[k] for k in ["experiment_id","timestamp","git_commit","source_sha256","evaluation_split","macro_f1","accuracy","runtime_seconds"]}
-    flat.update({k:json.dumps(result.get(k)) for k in ["hypothesis","features","model","parameters","seed","protocol","conclusion","status"]})
-    flat.update({"f1_"+l: result["classification_report"][l]["f1-score"] for l in LABELS})
+    p["prediction"] = np.array(LABELS)[np.argmax(probabilities, axis=1)]
+    p.to_csv(out / "predictions.csv", index=False)
+    flat = {
+        k: result[k]
+        for k in [
+            "experiment_id",
+            "timestamp",
+            "git_commit",
+            "source_sha256",
+            "evaluation_split",
+            "macro_f1",
+            "accuracy",
+            "runtime_seconds",
+        ]
+    }
+    flat.update(
+        {
+            k: json.dumps(result.get(k))
+            for k in [
+                "hypothesis",
+                "features",
+                "model",
+                "parameters",
+                "seed",
+                "protocol",
+                "conclusion",
+                "status",
+            ]
+        }
+    )
+    flat.update(
+        {"f1_" + l: result["classification_report"][l]["f1-score"] for l in LABELS}
+    )
     table = ROOT / "outputs/experiment_results.csv"
-    pd.DataFrame([flat]).to_csv(table,mode="a",header=not table.exists(),index=False)
+    pd.DataFrame([flat]).to_csv(table, mode="a", header=not table.exists(), index=False)
     # Compact committed evidence; detailed predictions/artifacts remain ignored.
     compact = ROOT / "reports/experiment_results.jsonl"
-    with compact.open("a",encoding="utf-8") as f:
-        f.write(json.dumps(result)+"\n")
+    with compact.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(result) + "\n")
     log = ROOT / "reports/experiment_log.md"
     if not log.exists():
-        log.write_text("# Executed experiments\n\nGenerated by the evaluation code. OOF results are exploratory model-selection evidence unless stated otherwise.\n\n| ID | Split | Macro-F1 | Accuracy | Seconds | Hypothesis |\n|---|---|---:|---:|---:|---|\n")
-    with log.open("a",encoding="utf-8") as f:
-        f.write(f"| {experiment_id} | {split} | {result['macro_f1']:.6f} | {result['accuracy']:.6f} | {runtime:.1f} | {metadata['hypothesis']} |\n")
-    print(experiment_id, f"macro-F1={result['macro_f1']:.6f} accuracy={result['accuracy']:.6f}",flush=True)
+        log.write_text(
+            "# Executed experiments\n\nGenerated by the evaluation code. OOF results are exploratory model-selection evidence unless stated otherwise.\n\n| ID | Split | Macro-F1 | Accuracy | Seconds | Hypothesis |\n|---|---|---:|---:|---:|---|\n"
+        )
+    with log.open("a", encoding="utf-8") as f:
+        f.write(
+            f"| {experiment_id} | {split} | {result['macro_f1']:.6f} | {result['accuracy']:.6f} | {runtime:.1f} | {metadata['hypothesis']} |\n"
+        )
+    print(
+        experiment_id,
+        f"macro-F1={result['macro_f1']:.6f} accuracy={result['accuracy']:.6f}",
+        flush=True,
+    )
     return result

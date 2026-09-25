@@ -13,10 +13,14 @@ dependencies = ["numpy", "pandas>=2.2", "scipy", "scikit-learn", "pyarrow", "cat
 ubs-recurrence = "ubs_recurrence.cli:main"
 
 [project.optional-dependencies]
-dev = ["pytest", "beautifulsoup4", "matplotlib"]
+dev = ["pytest", "beautifulsoup4", "matplotlib", "ruff==0.16.8"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+extend-exclude = [".codex", ".pre-commit-cache*", "outputs", "data", "*tmp*", "test-temp-none-gate"]

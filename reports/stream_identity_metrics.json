@@ -1,0 +1,695 @@
+{
+  "provenance": {
+    "started_at": "2026-09-25T08:06:56.754970+00:00",
+    "commit": "e4aa4c58175242e198cefd32d6ac4558145523af",
+    "branch": "research/import-v2-stream-identity",
+    "imported_commit": "e4aa4c58175242e198cefd32d6ac4558145523af",
+    "recipe": {
+      "seeds": [
+        42,
+        17,
+        2026
+      ],
+      "min_count": 3,
+      "legacy_weight": 0.25
+    },
+    "device": "cuda",
+    "replicas": 2,
+    "source_sha256": {
+      "src/ubs_recurrence/__init__.py": "443277e2e6ee564043bc49699355466a00cf81ae14d0ec9b392da4c69a6d9f72",
+      "src/ubs_recurrence/augmentation.py": "e6edc0aa8d07a90a09ef9d12ca7029bae98f448f690ae2b6d79d97d65ece3740",
+      "src/ubs_recurrence/cli.py": "680cefb45b16e0b97cfe262024a51dd54f0c189a210894ec46b7d1c87ee27206",
+      "src/ubs_recurrence/compact.py": "2dc3ec9c00f82a508055821b2599dd64411f32145f0edefc6ac33082824409f6",
+      "src/ubs_recurrence/data.py": "df6e7df2a16db57b4d88b6ddab7ecb3cdf41882faea65bc65c3a37a523969bcd",
+      "src/ubs_recurrence/decision.py": "0f34fc89f33b0302cc682e253f3b284b259aaed16bdd44e9ccd068d13a708d04",
+      "src/ubs_recurrence/evaluation.py": "51ee3fb14cfa172354fc8ffc156f3b559c8774b4875175b9561d57e7528a3db0",
+      "src/ubs_recurrence/features.py": "00a536c54448ec40a5b87bfc6029265582821e48c2ff8ef0f0fa50273584c9e8",
+      "src/ubs_recurrence/model.py": "77744d0c23cdf7779a9fbcd401896ecacb0312ff0aa2bf8584953c5662125b6c",
+      "src/ubs_recurrence/official.py": "87c08bc7606d60ca8ac6524a4196240641a222916b4b8aa8cf98c203fd8788fe",
+      "src/ubs_recurrence/payment_context.py": "2231e7e08fd6d45c2e47e6a885a371d1947b3ed4b4705f1c639a78b9d1b67fbe",
+      "src/ubs_recurrence/price_prior.py": "bc003099a0a36cb143d0a02353ca753e750936225f88e556ab10bb1178b5fe62",
+      "src/ubs_recurrence/ranking.py": "6b8679d4031a308c4cb1741c08873f6a18d472c4e3f3ba36e45eb1ac347bdbde",
+      "src/ubs_recurrence/streams.py": "def09fd8fd7b67ee0f35265207f6a1258b8d407642a0c392e7c53fc23ba2fe52",
+      "src/ubs_recurrence/templates.py": "4522887cd0b3b4e75cf2163b6f129e6d9baab2345421d12dbe95f6fa14fe614d",
+      "scripts/run_ubs_stream_identity.py": "2b2a892bfbcb39008a9ac031a0f120c3dffd74004e2f2d2b498ebef8e8230f0e",
+      "scripts/validate_submission.py": "590716df79d8d175510fa9f0e20a4957d6739c1df890a0ccaaf43ad53a17576d",
+      "pyproject.toml": "c4c0faebb55017669271eca607c338bc51d01c6caeedddceb01eec30f3e1e8d9",
+      "requirements-lock.txt": "3acd7405a281fb835a10a1b1ca2f79affc6cedd1f47d1534a9b5c80df5199bbd"
+    },
+    "data_sha256": {
+      "sample_submission.csv": "53a24cd23d680c2573f5b048dd69d1747f20adc45e308593d914ee13e8d00ed2",
+      "test_transactions.jsonl": "cc6083d6e0d4f4787f0766d6eb22fd5d267194c9a71a04da81e60dc23f5463e4",
+      "train_labels.csv": "cab0ec46064348f970ffafdd4f42a12d41a8db660e9db835e7235851b556ff9f",
+      "train_transactions.jsonl": "ba0902b33b1181921ee5b1f8f445693201c0968ca52d70a92e12cbb114e7d70a",
+      "unlabeled_pretrain_transactions.jsonl": "660181aea49a68820f724ba30a1a5cf8ace8158a8aef11bc8446cc577d3466a3",
+      "valid_labels.csv": "979bd9b69253084fc9e2b1ef473c07a628a8b18091169051ba304cfed0fb5642",
+      "valid_transactions.jsonl": "2c30941d49ca20f7b082526407f24529c5a704205610373eff952f4f444a3622"
+    },
+    "selection": "No changes or selection using this benchmark's VALID labels",
+    "versions": {
+      "numpy": "2.3.3",
+      "pandas": "2.3.3",
+      "scipy": "1.18.1",
+      "scikit-learn": "1.9.1",
+      "catboost": "1.2.10",
+      "lightgbm": "4.7.0",
+      "xgboost": "3.4.1"
+    },
+    "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "reference_commit": "96409b7940a991fbda5235b85ffeb40652a4087b",
+  "V1_original_commit": "0199a8b7c8b2c790a9d3447b156f2088708c2864",
+  "audit": {
+    "train": {
+      "clients": 2000,
+      "transactions": 147459,
+      "first_id": "C000001",
+      "last_id": "C003999",
+      "ids_sha256": "0258aa910731f0ee312878243fdcebc1496c54a6fb9e61ecfea65eaa652a2230",
+      "timestamp_min": "2024-11-07 00:07:06+00:00",
+      "timestamp_max": "2025-12-31 23:57:50+00:00",
+      "nulls": 0,
+      "duplicate_transactions": 0,
+      "duplicate_histories": 0
+    },
+    "valid": {
+      "clients": 1000,
+      "transactions": 73898,
+      "first_id": "C000000",
+      "last_id": "C003998",
+      "ids_sha256": "700fe8b6d587eff5329da39497c30457911e8dd9658714eaa9555442a38f0caa",
+      "timestamp_min": "2024-11-07 00:09:28+00:00",
+      "timestamp_max": "2025-12-31 23:55:23+00:00",
+      "nulls": 0,
+      "duplicate_transactions": 0,
+      "duplicate_histories": 0
+    },
+    "test": {
+      "clients": 1000,
+      "transactions": 75761,
+      "first_id": "C000004",
+      "last_id": "C003989",
+      "ids_sha256": "16a8397c2d7dea75486ca4c4a5be8a7434cfdc4bb9eaca3f969e1cae381ca36b",
+      "timestamp_min": "2024-11-07 00:33:43+00:00",
+      "timestamp_max": "2025-12-31 23:58:30+00:00",
+      "nulls": 0,
+      "duplicate_transactions": 0,
+      "duplicate_histories": 0
+    },
+    "unlabeled_pretrain": {
+      "clients": 10000,
+      "transactions": 749935,
+      "first_id": "U000000",
+      "last_id": "U009999",
+      "ids_sha256": "e8e247696e66ea720e30341c85cd1ce4ac6b906150ac4ce6395892859c5b5e3a",
+      "timestamp_min": "2024-11-07 00:06:22+00:00",
+      "timestamp_max": "2025-12-31 23:57:56+00:00",
+      "nulls": 0,
+      "duplicate_transactions": 0,
+      "duplicate_histories": 0
+    }
+  },
+  "models": {
+    "V1": {
+      "clients": 1000,
+      "macro_f1": 0.2710242658492452,
+      "accuracy": 0.266,
+      "label_order": [
+        "cloud",
+        "gym",
+        "insurance",
+        "mobile",
+        "music",
+        "software",
+        "streaming",
+        "none"
+      ],
+      "undefined_class_f1": 0.0,
+      "per_class": {
+        "cloud": {
+          "support": 89,
+          "predicted_count": 230,
+          "precision": 0.2,
+          "recall": 0.5168539325842697,
+          "f1": 0.2884012539184953
+        },
+        "gym": {
+          "support": 121,
+          "predicted_count": 132,
+          "precision": 0.32575757575757575,
+          "recall": 0.35537190082644626,
+          "f1": 0.33992094861660077
+        },
+        "insurance": {
+          "support": 99,
+          "predicted_count": 111,
+          "precision": 0.3063063063063063,
+          "recall": 0.3434343434343434,
+          "f1": 0.3238095238095238
+        },
+        "mobile": {
+          "support": 104,
+          "predicted_count": 209,
+          "precision": 0.2727272727272727,
+          "recall": 0.5480769230769231,
+          "f1": 0.36421725239616615
+        },
+        "music": {
+          "support": 93,
+          "predicted_count": 66,
+          "precision": 0.2878787878787879,
+          "recall": 0.20430107526881722,
+          "f1": 0.2389937106918239
+        },
+        "software": {
+          "support": 104,
+          "predicted_count": 95,
+          "precision": 0.28421052631578947,
+          "recall": 0.25961538461538464,
+          "f1": 0.271356783919598
+        },
+        "streaming": {
+          "support": 97,
+          "predicted_count": 89,
+          "precision": 0.25842696629213485,
+          "recall": 0.23711340206185566,
+          "f1": 0.24731182795698925
+        },
+        "none": {
+          "support": 293,
+          "predicted_count": 68,
+          "precision": 0.25,
+          "recall": 0.05802047781569966,
+          "f1": 0.09418282548476455
+        }
+      },
+      "confusion_true_by_predicted": {
+        "cloud": {
+          "cloud": 46,
+          "gym": 5,
+          "insurance": 5,
+          "mobile": 15,
+          "music": 4,
+          "software": 3,
+          "streaming": 7,
+          "none": 4
+        },
+        "gym": {
+          "cloud": 20,
+          "gym": 43,
+          "insurance": 5,
+          "mobile": 20,
+          "music": 5,
+          "software": 12,
+          "streaming": 5,
+          "none": 11
+        },
+        "insurance": {
+          "cloud": 16,
+          "gym": 11,
+          "insurance": 34,
+          "mobile": 14,
+          "music": 2,
+          "software": 8,
+          "streaming": 8,
+          "none": 6
+        },
+        "mobile": {
+          "cloud": 12,
+          "gym": 4,
+          "insurance": 11,
+          "mobile": 57,
+          "music": 1,
+          "software": 4,
+          "streaming": 5,
+          "none": 10
+        },
+        "music": {
+          "cloud": 13,
+          "gym": 12,
+          "insurance": 9,
+          "mobile": 21,
+          "music": 19,
+          "software": 5,
+          "streaming": 6,
+          "none": 8
+        },
+        "software": {
+          "cloud": 19,
+          "gym": 13,
+          "insurance": 8,
+          "mobile": 13,
+          "music": 8,
+          "software": 27,
+          "streaming": 9,
+          "none": 7
+        },
+        "streaming": {
+          "cloud": 15,
+          "gym": 13,
+          "insurance": 6,
+          "mobile": 26,
+          "music": 3,
+          "software": 6,
+          "streaming": 23,
+          "none": 5
+        },
+        "none": {
+          "cloud": 89,
+          "gym": 31,
+          "insurance": 33,
+          "mobile": 43,
+          "music": 24,
+          "software": 30,
+          "streaming": 26,
+          "none": 17
+        }
+      },
+      "true_distribution": {
+        "cloud": 89,
+        "gym": 121,
+        "insurance": 99,
+        "mobile": 104,
+        "music": 93,
+        "software": 104,
+        "streaming": 97,
+        "none": 293
+      },
+      "prediction_distribution": {
+        "cloud": 230,
+        "gym": 132,
+        "insurance": 111,
+        "mobile": 209,
+        "music": 66,
+        "software": 95,
+        "streaming": 89,
+        "none": 68
+      }
+    },
+    "V2": {
+      "clients": 1000,
+      "macro_f1": 0.3915494559105542,
+      "accuracy": 0.424,
+      "label_order": [
+        "cloud",
+        "gym",
+        "insurance",
+        "mobile",
+        "music",
+        "software",
+        "streaming",
+        "none"
+      ],
+      "undefined_class_f1": 0.0,
+      "per_class": {
+        "cloud": {
+          "support": 89,
+          "predicted_count": 71,
+          "precision": 0.5070422535211268,
+          "recall": 0.4044943820224719,
+          "f1": 0.45
+        },
+        "gym": {
+          "support": 121,
+          "predicted_count": 154,
+          "precision": 0.43506493506493504,
+          "recall": 0.5537190082644629,
+          "f1": 0.48727272727272725
+        },
+        "insurance": {
+          "support": 99,
+          "predicted_count": 148,
+          "precision": 0.3581081081081081,
+          "recall": 0.5353535353535354,
+          "f1": 0.4291497975708502
+        },
+        "mobile": {
+          "support": 104,
+          "predicted_count": 139,
+          "precision": 0.39568345323741005,
+          "recall": 0.5288461538461539,
+          "f1": 0.45267489711934156
+        },
+        "music": {
+          "support": 93,
+          "predicted_count": 60,
+          "precision": 0.21666666666666667,
+          "recall": 0.13978494623655913,
+          "f1": 0.16993464052287582
+        },
+        "software": {
+          "support": 104,
+          "predicted_count": 142,
+          "precision": 0.323943661971831,
+          "recall": 0.4423076923076923,
+          "f1": 0.37398373983739835
+        },
+        "streaming": {
+          "support": 97,
+          "predicted_count": 63,
+          "precision": 0.31746031746031744,
+          "recall": 0.20618556701030927,
+          "f1": 0.25
+        },
+        "none": {
+          "support": 293,
+          "predicted_count": 223,
+          "precision": 0.600896860986547,
+          "recall": 0.45733788395904434,
+          "f1": 0.5193798449612403
+        }
+      },
+      "confusion_true_by_predicted": {
+        "cloud": {
+          "cloud": 36,
+          "gym": 5,
+          "insurance": 11,
+          "mobile": 6,
+          "music": 4,
+          "software": 10,
+          "streaming": 5,
+          "none": 12
+        },
+        "gym": {
+          "cloud": 7,
+          "gym": 67,
+          "insurance": 9,
+          "mobile": 9,
+          "music": 5,
+          "software": 7,
+          "streaming": 5,
+          "none": 12
+        },
+        "insurance": {
+          "cloud": 4,
+          "gym": 6,
+          "insurance": 53,
+          "mobile": 4,
+          "music": 2,
+          "software": 7,
+          "streaming": 7,
+          "none": 16
+        },
+        "mobile": {
+          "cloud": 0,
+          "gym": 7,
+          "insurance": 15,
+          "mobile": 55,
+          "music": 3,
+          "software": 8,
+          "streaming": 0,
+          "none": 16
+        },
+        "music": {
+          "cloud": 3,
+          "gym": 14,
+          "insurance": 16,
+          "mobile": 12,
+          "music": 13,
+          "software": 12,
+          "streaming": 11,
+          "none": 12
+        },
+        "software": {
+          "cloud": 5,
+          "gym": 12,
+          "insurance": 10,
+          "mobile": 12,
+          "music": 2,
+          "software": 46,
+          "streaming": 4,
+          "none": 13
+        },
+        "streaming": {
+          "cloud": 2,
+          "gym": 17,
+          "insurance": 10,
+          "mobile": 10,
+          "music": 17,
+          "software": 13,
+          "streaming": 20,
+          "none": 8
+        },
+        "none": {
+          "cloud": 14,
+          "gym": 26,
+          "insurance": 24,
+          "mobile": 31,
+          "music": 14,
+          "software": 39,
+          "streaming": 11,
+          "none": 134
+        }
+      },
+      "true_distribution": {
+        "cloud": 89,
+        "gym": 121,
+        "insurance": 99,
+        "mobile": 104,
+        "music": 93,
+        "software": 104,
+        "streaming": 97,
+        "none": 293
+      },
+      "prediction_distribution": {
+        "cloud": 71,
+        "gym": 154,
+        "insurance": 148,
+        "mobile": 139,
+        "music": 60,
+        "software": 142,
+        "streaming": 63,
+        "none": 223
+      }
+    },
+    "Stream Identity": {
+      "clients": 1000,
+      "macro_f1": 0.6194934236214421,
+      "accuracy": 0.647,
+      "label_order": [
+        "cloud",
+        "gym",
+        "insurance",
+        "mobile",
+        "music",
+        "software",
+        "streaming",
+        "none"
+      ],
+      "undefined_class_f1": 0.0,
+      "per_class": {
+        "cloud": {
+          "support": 89,
+          "predicted_count": 96,
+          "precision": 0.6354166666666666,
+          "recall": 0.6853932584269663,
+          "f1": 0.6594594594594595
+        },
+        "gym": {
+          "support": 121,
+          "predicted_count": 119,
+          "precision": 0.6134453781512605,
+          "recall": 0.6033057851239669,
+          "f1": 0.6083333333333333
+        },
+        "insurance": {
+          "support": 99,
+          "predicted_count": 86,
+          "precision": 0.6511627906976745,
+          "recall": 0.5656565656565656,
+          "f1": 0.6054054054054054
+        },
+        "mobile": {
+          "support": 104,
+          "predicted_count": 97,
+          "precision": 0.6701030927835051,
+          "recall": 0.625,
+          "f1": 0.6467661691542289
+        },
+        "music": {
+          "support": 93,
+          "predicted_count": 86,
+          "precision": 0.5930232558139535,
+          "recall": 0.5483870967741935,
+          "f1": 0.5698324022346368
+        },
+        "software": {
+          "support": 104,
+          "predicted_count": 103,
+          "precision": 0.5631067961165048,
+          "recall": 0.5576923076923077,
+          "f1": 0.5603864734299517
+        },
+        "streaming": {
+          "support": 97,
+          "predicted_count": 86,
+          "precision": 0.5930232558139535,
+          "recall": 0.5257731958762887,
+          "f1": 0.5573770491803278
+        },
+        "none": {
+          "support": 293,
+          "predicted_count": 327,
+          "precision": 0.709480122324159,
+          "recall": 0.7918088737201365,
+          "f1": 0.7483870967741936
+        }
+      },
+      "confusion_true_by_predicted": {
+        "cloud": {
+          "cloud": 61,
+          "gym": 3,
+          "insurance": 1,
+          "mobile": 3,
+          "music": 2,
+          "software": 5,
+          "streaming": 7,
+          "none": 7
+        },
+        "gym": {
+          "cloud": 5,
+          "gym": 73,
+          "insurance": 6,
+          "mobile": 4,
+          "music": 2,
+          "software": 6,
+          "streaming": 5,
+          "none": 20
+        },
+        "insurance": {
+          "cloud": 4,
+          "gym": 8,
+          "insurance": 56,
+          "mobile": 5,
+          "music": 5,
+          "software": 5,
+          "streaming": 5,
+          "none": 11
+        },
+        "mobile": {
+          "cloud": 1,
+          "gym": 5,
+          "insurance": 6,
+          "mobile": 65,
+          "music": 5,
+          "software": 5,
+          "streaming": 2,
+          "none": 15
+        },
+        "music": {
+          "cloud": 4,
+          "gym": 6,
+          "insurance": 7,
+          "mobile": 5,
+          "music": 51,
+          "software": 8,
+          "streaming": 2,
+          "none": 10
+        },
+        "software": {
+          "cloud": 6,
+          "gym": 7,
+          "insurance": 1,
+          "mobile": 4,
+          "music": 5,
+          "software": 58,
+          "streaming": 5,
+          "none": 18
+        },
+        "streaming": {
+          "cloud": 6,
+          "gym": 7,
+          "insurance": 0,
+          "mobile": 4,
+          "music": 8,
+          "software": 7,
+          "streaming": 51,
+          "none": 14
+        },
+        "none": {
+          "cloud": 9,
+          "gym": 10,
+          "insurance": 9,
+          "mobile": 7,
+          "music": 8,
+          "software": 9,
+          "streaming": 9,
+          "none": 232
+        }
+      },
+      "true_distribution": {
+        "cloud": 89,
+        "gym": 121,
+        "insurance": 99,
+        "mobile": 104,
+        "music": 93,
+        "software": 104,
+        "streaming": 97,
+        "none": 293
+      },
+      "prediction_distribution": {
+        "cloud": 96,
+        "gym": 119,
+        "insurance": 86,
+        "mobile": 97,
+        "music": 86,
+        "software": 103,
+        "streaming": 86,
+        "none": 327
+      }
+    }
+  },
+  "bootstrap": {
+    "method": "paired client percentile bootstrap, conditional on fixed fitted models",
+    "repetitions": 2000,
+    "seed": 20260925,
+    "confidence": 0.95,
+    "intervals": {
+      "V1": [
+        0.2428509492514328,
+        0.2976972941795814
+      ],
+      "V2": [
+        0.35909988623244044,
+        0.420606772968374
+      ],
+      "Stream Identity": [
+        0.5844520522484628,
+        0.6495044440051359
+      ],
+      "delta_stream_vs_V2": [
+        0.19136232312011722,
+        0.26436411487443195
+      ]
+    }
+  },
+  "delta_vs_V1": 0.3484691577721969,
+  "delta_vs_V2": 0.22794396771088793,
+  "reproduction": {
+    "raw_data_rebuilds": 2,
+    "exact_probabilities": true,
+    "exact_predictions": true,
+    "exact_test_probabilities": true,
+    "exact_test_predictions": true
+  },
+  "submission": {
+    "valid": true,
+    "rows": 1000,
+    "sample_order": true,
+    "training_clients": 2000,
+    "sha256": "e226823a1cacb1579d3f7f40a2636e3f60f8126e362e4495d5a0e9cdb5ebadf7",
+    "distribution": {
+      "none": 374,
+      "gym": 105,
+      "software": 97,
+      "insurance": 97,
+      "cloud": 96,
+      "mobile": 88,
+      "streaming": 79,
+      "music": 64
+    }
+  },
+  "status": "INVALID",
+  "status_reason": "Historical VALID-informed rejection of decision biases; numeric reproduction does not undo selection exposure.",
+  "seconds": 971.6947744999998
+}
