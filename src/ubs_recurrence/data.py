@@ -9,11 +9,11 @@ PREDICTION = "predicted_next_recurring_merchant"
 CUTOFF = pd.Timestamp("2026-01-01", tz="UTC")
 
 
-def transactions(split):
+def transactions(split, *, use_cache=True):
     if split not in {"train", "valid", "test", "unlabeled_pretrain"}:
         raise ValueError(split)
     cache = ROOT / f"data/cache/{split}.parquet"
-    if cache.exists():
+    if use_cache and cache.exists():
         df = pd.read_parquet(cache)
     else:
         df = pd.read_json(ROOT / f"data/raw/{split}_transactions.jsonl", lines=True, dtype={"mcc":str})

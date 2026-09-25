@@ -1,0 +1,170 @@
+{
+  "timestamp": "2026-09-25T02:10:04.454805+00:00",
+  "source_sha256": "43dee7ede06469388006b3c87968c9b59c1a053f2fe7d0848f655069ae1bc13d",
+  "selection": "Primary candidate is the calibrated equal 3-model robustness ensemble, selected using train OOF stress only. Control and uncalibrated ensemble are predeclared comparators.",
+  "files": {
+    "valid_control.csv": "3964f53645b57966392354c9250726ca8c1121ee41b7c094cc41edce728e63a6",
+    "valid_frozen_calibrated.csv": "7310351a544dcc028ee04044834f3833fa9d6ae921ac65559fb8f3ae161e6df8",
+    "valid_frozen_control.csv": "3964f53645b57966392354c9250726ca8c1121ee41b7c094cc41edce728e63a6",
+    "valid_frozen_ensemble.csv": "f8c8df5adcdd97be145c3819b29f1b9f297ef876668410d30b21c1d78637a729",
+    "valid_hard.csv": "4a360d9c04fe04ebb52cd76a08963a8cd1720b71386671d1ab63510ea66f6a96",
+    "valid_soft.csv": "1214aee6909603215c5eb74ca2fd4e0707ffcd10236f306a0afbae55d55d5a1c",
+    "valid_xgb.csv": "d908de59ba0a44cfce223d229035af5933b02b50251945f9ded2ebb886fc10d1"
+  },
+  "config": {
+    "members": [
+      "robust_augTrue_droptextFalse_noise",
+      "robust_augTrue_droptextFalse_noise_soft",
+      "robust_augTrue_droptextFalse_noise_soft_xgb"
+    ],
+    "weights": [
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333
+    ],
+    "seed": 42,
+    "bias": [
+      -0.05000000000000001,
+      0.05000000000000001,
+      0.1,
+      0.2,
+      0.0,
+      -0.1,
+      0.1,
+      -0.3
+    ],
+    "bias_training_scenarios": [
+      "valid_like",
+      "test_like"
+    ],
+    "search_history": [
+      {
+        "step": "initial",
+        "score": 0.591531447672994,
+        "bias": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "step": 0.2,
+        "score": 0.6012742477466968,
+        "bias": [
+          -0.125,
+          0.07500000000000001,
+          0.07500000000000001,
+          0.07500000000000001,
+          0.07500000000000001,
+          0.07500000000000001,
+          0.07500000000000001,
+          -0.325
+        ]
+      },
+      {
+        "step": 0.2,
+        "score": 0.6035689301511041,
+        "bias": [
+          0.05,
+          0.05,
+          0.05,
+          0.25,
+          0.05,
+          -0.15000000000000002,
+          0.05,
+          -0.35000000000000003
+        ]
+      },
+      {
+        "step": 0.2,
+        "score": 0.6035689301511041,
+        "bias": [
+          0.05,
+          0.05,
+          0.05,
+          0.25,
+          0.05,
+          -0.15000000000000002,
+          0.05,
+          -0.35000000000000003
+        ]
+      },
+      {
+        "step": 0.1,
+        "score": 0.6038995787203585,
+        "bias": [
+          0.0625,
+          0.0625,
+          0.0625,
+          0.1625,
+          0.0625,
+          -0.1375,
+          0.0625,
+          -0.3375
+        ]
+      },
+      {
+        "step": 0.1,
+        "score": 0.6046730397797361,
+        "bias": [
+          -0.012499999999999997,
+          0.08750000000000002,
+          0.08750000000000002,
+          0.18750000000000003,
+          -0.01249999999999999,
+          -0.11249999999999999,
+          0.08750000000000002,
+          -0.3125
+        ]
+      },
+      {
+        "step": 0.1,
+        "score": 0.6049606581870004,
+        "bias": [
+          -6.938893903907228e-18,
+          6.938893903907228e-18,
+          0.1,
+          0.2,
+          0.0,
+          -0.1,
+          0.1,
+          -0.3
+        ]
+      },
+      {
+        "step": 0.05,
+        "score": 0.6066074559532674,
+        "bias": [
+          -0.05000000000000001,
+          0.05000000000000001,
+          0.1,
+          0.2,
+          0.0,
+          -0.1,
+          0.1,
+          -0.3
+        ]
+      },
+      {
+        "step": 0.05,
+        "score": 0.6066074559532674,
+        "bias": [
+          -0.05000000000000001,
+          0.05000000000000001,
+          0.1,
+          0.2,
+          0.0,
+          -0.1,
+          0.1,
+          -0.3
+        ]
+      }
+    ],
+    "caveat": "Bias fitted on train-side OOF labels; calibrated development F1 is not an independent OOF estimate. Official holdout remains untouched."
+  }
+}

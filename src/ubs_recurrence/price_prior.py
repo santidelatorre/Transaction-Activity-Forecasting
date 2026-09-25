@@ -5,8 +5,8 @@ from .data import ROOT,LABELS,transactions
 from .features import PATTERNS,MCC
 
 
-def learn_price_profiles():
-    d=transactions("unlabeled_pretrain")
+def learn_price_profiles(*,use_cache=True):
+    d=transactions("unlabeled_pretrain",use_cache=use_cache)
     d=d[(d.type=="card_payment")&(d.direction=="out")]
     result={}
     for f in LABELS[:-1]:

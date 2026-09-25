@@ -1,0 +1,21 @@
+{
+  "seeds": [
+    42,
+    17,
+    2026
+  ],
+  "min_count": 3,
+  "hierarchical": true,
+  "payment_context": "all",
+  "augmentation": [
+    "original",
+    "valid_like",
+    "test_like"
+  ],
+  "decision": "argmax",
+  "legacy_blend_mean_stress_gain": 0.009026022128803157,
+  "selection_rule": "Retain the larger legacy blend only if mean stress macro-F1 improves by at least 0.005; otherwise choose the simpler three-seed compact ensemble.",
+  "selected": "compact_3seed_plus25pct_v1",
+  "holdout_v1_used": "Previous frozen holdout established distribution shift and failed to confirm the tuned decision biases. No per-client holdout errors were used to engineer the final changes.",
+  "target_0_80_achieved": false
+}

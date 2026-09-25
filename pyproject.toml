@@ -7,7 +7,10 @@ name = "ubs-recurrence"
 version = "0.1.0"
 description = "Reproducible research into next recurring merchant family prediction"
 requires-python = ">=3.11"
-dependencies = ["numpy", "pandas>=2.2", "scipy", "scikit-learn", "pyarrow", "catboost", "lightgbm", "joblib"]
+dependencies = ["numpy", "pandas>=2.2", "scipy", "scikit-learn", "pyarrow", "catboost", "lightgbm", "xgboost", "joblib"]
+
+[project.scripts]
+ubs-recurrence = "ubs_recurrence.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest", "beautifulsoup4"]

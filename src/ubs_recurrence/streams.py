@@ -11,8 +11,8 @@ FAMILIES=LABELS[:-1]
 
 
 def amount_components(amounts, eps=.035, min_samples=3):
-    """1-D DBSCAN for min_samples=3, without estimator/thread setup overhead."""
-    if min_samples!=3:raise ValueError("Only min_samples=3 is supported")
+    """1-D DBSCAN for min_samples 2 or 3 without estimator setup overhead."""
+    if min_samples not in {2,3}:raise ValueError("Only min_samples=2 or 3 is supported")
     order=np.argsort(amounts,kind="stable")
     boundaries=np.flatnonzero(np.diff(np.log(np.asarray(amounts)[order]))>eps)+1
     return [c for c in np.split(order,boundaries) if len(c)>=min_samples]
@@ -57,7 +57,7 @@ def fast_stats(amount,days,desc,mcc,semantic,dom,dow,currency):
     return r
 
 
-def extract_streams(df, eps=.035, filter_background=False):
+def extract_streams(df, eps=.035, filter_background=False, min_count=3):
     rows=[]
     d=df[(df.type=="card_payment") & (df.direction=="out")].copy()
     d["description"]=d.description.map(normalize)
@@ -71,7 +71,7 @@ def extract_streams(df, eps=.035, filter_background=False):
     dom=d.timestamp.dt.day.to_numpy();dow=d.timestamp.dt.dayofweek.to_numpy()
     for (cid,currency),g in d.groupby(["client_id","currency"],sort=True):
         ix=g.row_number.to_numpy()
-        groups=[("amount",ix[c]) for c in amount_components(amounts[ix],eps)]
+        groups=[("amount",ix[c]) for c in amount_components(amounts[ix],eps,min_samples=min_count)]
         # Broader family/MCC grouping retains variable-amount recurring streams.
         for f in FAMILIES:
             choose=semantic[ix,FAMILIES.index(f)] | ((mcc[ix]==MCC[f]) & np.isin(desc[ix],TEMPLATES[f]+GENERIC))
