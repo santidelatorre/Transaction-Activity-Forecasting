@@ -1,5 +1,14 @@
 # Swiss AI Weeks / Transaction Activity Forecasting
 
+## Demo actual de Jaime: producto V4 sobre V3-A
+
+El recorrido real cliente → predicción → evidencia → investigación está en
+[DEMO_README.md](DEMO_README.md), con predictor congelado, API, React,
+healthcheck y comando de submission separado. El modelo es **V3-A**, no V4;
+Macro-F1 VALID reproducido: **0.424111097737**. Los runners V1/V2 y las
+secciones de smoke de abajo se conservan como contexto histórico y desarrollo;
+no son las entradas de esta demo.
+
 ## Contrato oficial y trabajo actual — 24 septiembre 2026
 
 El objetivo oficial ya está confirmado: predecir la próxima familia recurrente

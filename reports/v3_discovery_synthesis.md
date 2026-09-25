@@ -1,5 +1,11 @@
 # V3 discovery synthesis
 
+Historical report (before V3-A promotion). The current frozen baseline is
+**V3-A**, promoted in `fe6237e` and merged in `051ce64`. References below to
+V2 as production baseline, `full` selection and review-only A artifacts describe
+the earlier discovery decision. For the current product and submission path,
+see [DEMO_README.md](../DEMO_README.md).
+
 Integration branch: `integration/v3-discovery`. Baseline: main commit
 `5884ddd07a19b2e19b44b4fd55afdf4eb6dcf749`. No discovery branch was merged.
 Official files match the V2 fingerprints. Outputs, predictions, copied source
