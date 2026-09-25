@@ -1,0 +1,66 @@
+{
+  "train:valid": {
+    "oof_auc": 0.96015025,
+    "fold_auc": [
+      0.9632499999999999,
+      0.952,
+      0.96920625,
+      0.9621625,
+      0.95435
+    ],
+    "n_a": 2000,
+    "n_b": 1000,
+    "top_features": {
+      "none__member plan_first_age": 40.0,
+      "none__any_999_diversity": 35.8,
+      "none__digital service_first_age": 35.6,
+      "none__subscription charge_first_age": 32.2,
+      "music__any_999_max": 22.4,
+      "none__any_90_sum": 20.6,
+      "mobile__mcc_90_sum": 20.0,
+      "gym__any_999_diversity": 18.8,
+      "insurance__mcc_999_sum": 17.6,
+      "mobile__monthly plan_first_age": 17.4,
+      "cloud__mcc_90_sum": 16.4,
+      "none__any_90_diversity": 16.2,
+      "gym__mcc_999_sum": 16.0,
+      "streaming__any_999_sum": 15.8,
+      "software__any_999_max": 15.8
+    }
+  },
+  "train:test": {
+    "oof_auc": 0.97635275,
+    "fold_auc": [
+      0.9818749999999999,
+      0.969775,
+      0.9778875,
+      0.97591875,
+      0.975675
+    ],
+    "n_a": 2000,
+    "n_b": 1000,
+    "top_features": {
+      "none__digital service_first_age": 44.6,
+      "none__subscription charge_first_age": 42.2,
+      "none__member plan_first_age": 41.4,
+      "none__any_999_diversity": 32.0,
+      "gym__mcc_999_repeated": 28.8,
+      "insurance__mcc_999_repeated": 22.2,
+      "music__any_999_max": 21.8,
+      "mobile__monthly plan_first_age": 21.8,
+      "music__any_999_repeated": 18.4,
+      "mobile__mcc_999_sum": 18.4,
+      "gym__any_999_diversity": 18.2,
+      "streaming__any_999_max": 16.2,
+      "streaming__any_999_sum": 15.2,
+      "cloud__any_90_sum": 14.0,
+      "software__any_999_max": 14.0
+    }
+  },
+  "identifier_audit": {
+    "quartile_class_chi_square": 18.185823559669387,
+    "pvalue": 0.637216338953229,
+    "dof": 21,
+    "policy": "Identifiers and row ordering excluded regardless of association"
+  }
+}

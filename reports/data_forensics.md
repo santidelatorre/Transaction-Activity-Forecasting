@@ -63,3 +63,32 @@ claim an exact reconstruction of the label-generating process.
 Some none clients still have apparently regular family payments near cutoff.
 Therefore an active-looking stream alone cannot safely rule out none. A
 dedicated none detector is being compared with direct classification.
+
+## Critical deployment shift found before opening holdout labels
+
+Feature-only adversarial five-fold validation distinguishes train from official
+validation at AUC 0.96015, and train from test at AUC 0.97635. These are drift
+diagnostics, **not task prediction scores**. Full evidence is in
+`reports/distribution_shift.json` and `scripts/audit_shift.py`.
+
+| Split | Clients | Exact generic subscription-description events |
+|---|---:|---:|
+| Train | 2,000 | 3,661 |
+| Official validation | 1,000 | 6,016 |
+| Test | 1,000 | 8,919 |
+
+The four generic descriptions are monthly plan, digital service, member plan,
+and subscription charge. Train contains 1,396 exact phone-contract events,
+versus only 340 in validation and 253 in test despite the 2:1 client-count
+ratio. Unlabeled pretraining resembles the less-masked training vocabulary.
+
+Therefore ordinary random train CV is insufficient evidence of hidden-test
+performance. Models using generic-description prevalence to identify none are
+especially vulnerable: the same wording increasingly obscures genuine family
+streams at deployment. Research now adds fixed 30%/50% independent masking
+stress sets and training augmentation, preserves client boundaries for every
+augmented copy, and compares models removing text-count statistics. These
+stress sets approximate the observed shift; they are not official validation.
+
+Client-ID quartiles show no significant training class association (chi-square
+p=0.637). IDs and ordering remain excluded from all predictive features.
