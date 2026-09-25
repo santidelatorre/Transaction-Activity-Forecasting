@@ -10,6 +10,11 @@ from transaction_forecasting.api import service
 router = APIRouter(prefix="/api/v1")
 
 
+@router.get("/dashboard")
+def dashboard() -> dict[str, object]:
+    return service.get_dashboard()
+
+
 @router.get("/experiments")
 def experiments(
     limit: int = Query(default=100, ge=1, le=100),

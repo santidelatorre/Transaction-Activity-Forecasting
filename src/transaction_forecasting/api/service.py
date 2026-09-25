@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
 import tomllib
 from functools import lru_cache
@@ -11,6 +12,7 @@ from typing import Any
 
 import pandas as pd
 
+from transaction_forecasting.api import dashboard
 from transaction_forecasting.evaluation.official import (
     LABELS,
     PREDICTION,
@@ -22,9 +24,41 @@ from transaction_forecasting.ubs.data import read_transactions
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
-def get_experiments(*, limit: int = 100, offset: int = 0) -> dict[str, Any]:
+def _artifact_root() -> Path:
+    return Path(os.environ.get("RECURRING_ARTIFACT_ROOT", str(PROJECT_ROOT))).resolve()
+
+
+def get_dashboard() -> dict[str, Any]:
     try:
-        return read_experiments(PROJECT_ROOT / DEFAULT_DATABASE, limit=limit, offset=offset)
+        return dashboard.snapshot(_artifact_root())
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        raise ArtifactUnavailable(
+            "The V3-A evaluation artifacts are unavailable or invalid."
+        ) from error
+
+
+def get_experiments(*, limit: int = 100, offset: int = 0) -> dict[str, Any]:
+    if not 1 <= limit <= 100 or offset < 0:
+        raise ValueError("Invalid experiment page")
+    try:
+        root = _artifact_root()
+        current = get_dashboard()
+        imported = current["experiments"]
+        # Artifact comparisons precede the paginated SQLite history. No DB is created.
+        db_offset = max(0, offset - len(imported))
+        selected = imported[offset : offset + limit]
+        remaining = limit - len(selected)
+        recorded = read_experiments(
+            root / DEFAULT_DATABASE, limit=max(1, remaining), offset=db_offset
+        )
+        db_rows = recorded["experiments"] if remaining else []
+        return {
+            "available": bool(imported) or recorded["available"],
+            "experiments": [*selected, *db_rows],
+            "limit": limit,
+            "offset": offset,
+            "comparison_group": current["comparison_group"],
+        }
     except (OSError, sqlite3.Error, ValueError, KeyError) as error:
         raise ArtifactUnavailable("Experiment history is unavailable or invalid.") from error
 
@@ -89,11 +123,14 @@ def get_health() -> dict[str, Any]:
     predictions = _submission() is not None
     metrics = _summary_metrics() is not None
     transactions = (_configured_path("data", "directory") / "test_transactions.jsonl").is_file()
+    current = get_dashboard()
     return {
-        "status": "ready" if predictions else "waiting_for_outputs",
+        "status": "ready" if predictions or current["available"] else "waiting_for_outputs",
         "predictions_available": predictions,
         "metrics_available": metrics,
         "transactions_available": transactions,
+        "dashboard_available": current["available"],
+        "dashboard_model_version": dashboard.MODEL_VERSION,
     }
 
 

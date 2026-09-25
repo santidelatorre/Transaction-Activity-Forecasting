@@ -114,17 +114,26 @@ quedan en `outputs/metrics/ubs_v1/`; datos y outputs permanecen ignorados por Gi
 
 ## Dashboard React local
 
-El dashboard lee la submission validada y las métricas generadas por UBS V1;
-no entrena otro modelo ni duplica la lógica de predicción. Primero genera los
-artefactos con el comando anterior. Instala la API opcional con
-`python -m pip install -e ".[web]"`.
+La ruta principal (`frontend/src/App.jsx`) presenta las métricas e importancias
+reales de V3-A, con comparativas paginadas y trazabilidad del informe. Lee
+`outputs/metrics/ubs_v3/` sin entrenar ni cambiar predicciones. Instala la API
+opcional con `python -m pip install -e ".[web]"`. Consulta el
+[README del dashboard](frontend/README.md) para reutilizar los artefactos de otro
+worktree, elegir puertos y ejecutar las pruebas de navegador. Sin artefactos se
+muestran estados vacíos, no métricas ficticias. Los endpoints antiguos de
+clientes/submission siguen siendo V1 y no alimentan esta nueva pantalla.
 
 Para desarrollo, inicia la API y el frontend en dos terminales desde la raíz:
 
 ```powershell
 python -m uvicorn transaction_forecasting.api.main:app --app-dir src --reload
+```
+
+En la segunda terminal:
+
+```powershell
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 

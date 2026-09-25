@@ -62,3 +62,5 @@ checkpoints/
 dist/
 build/
 frontend/node_modules/
+frontend/test-results/
+frontend/playwright-report/
