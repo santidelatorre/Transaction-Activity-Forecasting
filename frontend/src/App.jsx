@@ -100,17 +100,16 @@ function ProgressChart({ data, loading, error }) {
       <h2 className="mt-2 text-xl font-medium tracking-tight">Every candidate, in view.</h2>
       <p className="mt-2 text-xs leading-5 text-[#686868]">Candidate Macro-F1 scores on the same VALID set.</p>
     </div>
-    {loading || error || !rows.length ? <Empty loading={loading} error={error}>The chart will appear when recorded evaluations are available. The team’s aspiration is 0.80.</Empty> : <>
+    {loading || error || !rows.length ? <Empty loading={loading} error={error}>The chart will appear when recorded evaluations are available.</Empty> : <>
       <div className="px-4 pt-4 sm:px-6">
         <div ref={chartContainer}>
         <svg viewBox={`0 0 ${width} ${height}`} className="w-full overflow-visible" aria-labelledby={`${chartId}-title ${chartId}-desc`}>
-          <title id={`${chartId}-title`}>Macro-F1 comparison with a 0.80 aspirational target</title>
+          <title id={`${chartId}-title`}>Macro-F1 comparison across evaluated candidates</title>
           <desc id={`${chartId}-desc`}>Points follow validation report order, not chronology. The selected model is V3-A. Exact values appear in the experiments table.</desc>
           {[0, 0.2, 0.4, 0.6, 0.8, 1].map((tick) => <g key={tick}>
-            <line x1={left} x2={width - right} y1={y(tick)} y2={y(tick)} stroke={tick === 0.8 ? RED : '#EAEAEA'} strokeDasharray={tick === 0.8 ? '5 5' : '2 4'} strokeOpacity={tick === 0.8 ? 0.55 : 1} />
+            <line x1={left} x2={width - right} y1={y(tick)} y2={y(tick)} stroke="#EAEAEA" strokeDasharray="2 4" />
             <text x={left - 12} y={y(tick) + 4} textAnchor="end" fill="#888" fontSize="10">{format(tick, 1)}</text>
           </g>)}
-          <text x={width - right} y={y(0.8) - 9} textAnchor="end" fill={RED} fontSize="10" letterSpacing="1">TEAM ASPIRATION · 0.80</text>
           <path d={`${path} L ${points.at(-1).x} ${y(0)} L ${left} ${y(0)} Z`} fill={RED} fillOpacity="0.035" />
           <path d={path} fill="none" stroke={RED} strokeWidth="2.4" />
           {rows.map((row, i) => <g key={row.experiment_id}>
@@ -268,7 +267,6 @@ export default function App() {
         <div className="grid gap-4 md:grid-cols-3">
           <MetricCard primary number="01" title="Overall prediction quality" value={format(metrics?.macro_f1, 4)} annotation="Macro-F1 · each of the eight classes has equal weight.">
             <span className="inline-flex items-center gap-1 text-[#1A1A1A]">{metrics?.delta_vs_baseline != null && <ArrowUpRight size={12} />}{metrics?.delta_vs_baseline != null ? `${signed(metrics.delta_vs_baseline)} F1 points vs V2` : 'No measured result available'}</span>
-            <span className="mt-1 block">Team aspiration: ≥ 0.80 · not an achieved result.</span>
           </MetricCard>
           <MetricCard number="02" title="Correct predictions" value={percent(metrics?.accuracy)} annotation="Overall accuracy: exact matches divided by all evaluated clients.">
             <span>Measured on VALID · TEST result unavailable.</span>

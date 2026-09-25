@@ -95,7 +95,7 @@ export default function ExecutiveDashboard() {
         </div>}
         {summary && <>
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                <Metric primary label="Validation Macro-F1" value={hasMacroF1 ? macroF1.toFixed(4) : '—'} detail={hasMacroF1 ? 'Measured on VALID, not TEST. Team aspiration ≥0.80 is not the achieved result.' : 'Run the baseline for validation metrics.'} />
+                <Metric primary label="Validation Macro-F1" value={hasMacroF1 ? macroF1.toFixed(4) : '—'} detail={hasMacroF1 ? 'Measured on VALID, not TEST.' : 'Run the baseline for validation metrics.'} />
                 <Metric label="Clients evaluated" value={metrics?.valid_clients ?? '—'} detail="Labeled VALID clients used for the reported Macro-F1." />
                 <Metric label="Prediction coverage" value="100%" detail={`${summary.clients.toLocaleString()} of ${summary.clients.toLocaleString()} sample client IDs have a valid label; “none” counts.`} />
                 <Metric label="Recurring-family rate" value={familyRate === null ? '—' : `${familyRate.toFixed(1)}%`} detail={`${summary.family_count.toLocaleString()} of ${summary.clients.toLocaleString()} clients predicted as a family other than “none”. Not accuracy.`} />

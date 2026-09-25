@@ -11,6 +11,8 @@ test('real metrics, explanation and experiment pagination agree with the API', a
   await expect(page.locator('#quality')).toContainText(source.metrics.macro_f1.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 }));
   await expect(page.locator('#quality')).toContainText((source.metrics.accuracy * 100).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }));
   await expect(page.locator('#progress svg')).toBeVisible();
+  await expect(page.getByText(/team aspiration|aspirational target/i)).toHaveCount(0);
+  await expect(page.locator('#progress svg line[stroke="#E60000"]')).toHaveCount(0);
   await expect(page.locator('#explainability [role="img"]')).toHaveCount(Math.min(6, source.importance.length));
   await page.screenshot({ path: 'test-results/dashboard-desktop.png', fullPage: true });
   await page.getByRole('button', { name: 'Next experiment page' }).click();

@@ -38,7 +38,7 @@ reales se omiten explícitamente si faltan artefactos; los de estados vacíos no
   y, a continuación, registros existentes en SQLite; nunca crea una base de datos.
 - La curva sigue el orden del informe. No se inventan fechas ni hitos de tuning.
 - La cifra de clientes se calcula de la matriz de confusión. Macro-F1 y accuracy
-  conservan sus nombres y significados. 0,80 es una aspiración del equipo.
+  conservan sus nombres y significados; el resultado medido es sobre VALID, no TEST.
 - Las barras corresponden a CatBoost del brazo A ajustado con TRAIN. No describen
   la contribución individual ni el ensemble completo (75 % CatBoost / 25 % heurística).
 - Sin artefactos, se muestran estados vacíos; un error de API permite reintentar.
