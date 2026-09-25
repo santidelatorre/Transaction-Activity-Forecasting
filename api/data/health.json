@@ -1,0 +1,8 @@
+{
+  "status": "ready",
+  "predictions_available": false,
+  "metrics_available": false,
+  "transactions_available": false,
+  "dashboard_available": true,
+  "dashboard_model_version": "V3-A"
+}

@@ -261,7 +261,15 @@ export default function App() {
   const [revision, setRevision] = useState(0);
   const { data, loading, error } = useResource('/api/v1/dashboard', revision);
   const metrics = data?.metrics;
-  const ready = Boolean(data?.available);
+  const recorded = data?.v4_experiments?.find((row) => row.status === 'selected');
+  const v2 = data?.version_history?.find((row) => row.id === 'v2');
+  const macroF1 = metrics?.macro_f1 ?? recorded?.valid;
+  const clients = metrics?.validation_clients ?? v2?.clients;
+  const delta = metrics?.delta_vs_baseline ?? (
+    Number.isFinite(macroF1) && Number.isFinite(v2?.macro_f1) ? macroF1 - v2.macro_f1 : null
+  );
+  const fromArtifact = Boolean(metrics);
+  const ready = Boolean(data?.available) || Number.isFinite(recorded?.valid);
   useEffect(() => { document.title = 'Transaction Activity Forecasting · Recurring Insights'; document.documentElement.lang = 'en'; }, []);
   return <div className="min-h-screen bg-white font-sans text-[#1A1A1A] selection:bg-[#FFE2E2]">
     <a href="#content" className="sr-only z-50 bg-white p-4 focus:not-sr-only focus:fixed">Skip to content</a>
@@ -281,10 +289,11 @@ export default function App() {
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><Eyebrow className="text-[#757575]">Measured result · selected predictor</Eyebrow><span className="flex items-center gap-2 text-[11px] text-[#686868]"><span className={`h-1.5 w-1.5 rounded-full ${ready ? 'bg-[#1A1A1A]' : 'bg-[#B8B8B8]'}`} />{loading ? 'Loading evaluation' : ready ? `${data.model_version} retained in V4 · reused VALID` : 'Evaluation artifact unavailable'}</span></div>
         {error && <div role="alert" className="mb-4 border-l-2 border-[#E60000] bg-[#FFF6F6] px-4 py-3 text-sm text-[#8A2020]">{error} Use Refresh to retry.</div>}
         {!loading && !error && !ready && <p role="status" className="mb-4 border-l-2 border-[#DADADA] bg-[#F5F5F5] px-4 py-3 text-sm text-[#686868]">The local V3-A evaluation artifact is unavailable. Recorded V1/V2 report scores remain visible; missing V3 results are not filled in.</p>}
+        {!loading && !error && ready && !fromArtifact && <p role="status" className="mb-4 border-l-2 border-[#DADADA] bg-[#F5F5F5] px-4 py-3 text-sm text-[#686868]">Headline score is the recorded V3-A VALID result from the V4 evidence file. The local confusion-matrix artifact is not bundled, so V3 subversions stay blank.</p>}
         <div className="grid gap-4 md:grid-cols-3">
-          <MetricCard primary number="01" title="Balanced prediction quality" value={format(metrics?.macro_f1, 4)} annotation="Macro-F1 · each of eight classes has equal weight.">{metrics?.delta_vs_baseline != null ? `${signed(metrics.delta_vs_baseline)} F1 points versus V2 on reused VALID` : 'No local selected-model score available'}</MetricCard>
+          <MetricCard primary number="01" title="Balanced prediction quality" value={format(macroF1, 4)} annotation="Macro-F1 · each of eight classes has equal weight.">{delta != null ? `${signed(delta)} F1 points versus V2 on reused VALID` : 'No local selected-model score available'}</MetricCard>
           <MetricCard number="02" title="Average class detection" value={percent(metrics?.macro_recall)} annotation="Macro recall · average recall across the eight classes.">Overall accuracy: {percent(metrics?.accuracy)} · VALID.</MetricCard>
-          <MetricCard number="03" title="Clients evaluated" value={format(metrics?.validation_clients)} annotation="VALID clients counted from the official confusion matrix.">Seven recurring families plus “none”.</MetricCard>
+          <MetricCard number="03" title="Clients evaluated" value={format(clients)} annotation={fromArtifact ? 'VALID clients counted from the official confusion matrix.' : 'VALID cohort size recorded with the V2 report.'}>Seven recurring families plus “none”.</MetricCard>
         </div>
       </section>
       <div className="mt-6 space-y-6"><VersionChart data={data} loading={loading} error={error} /><ImportanceChart data={data} loading={loading} error={error} /></div>

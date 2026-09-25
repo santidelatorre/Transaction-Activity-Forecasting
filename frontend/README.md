@@ -25,6 +25,21 @@ $env:RECURRING_API_TARGET='http://127.0.0.1:8001'
 npm run dev -- --port 5173
 ```
 
+## Vercel
+
+Import this repository on Vercel and leave the Root Directory as the repository
+root. `vercel.json` installs and builds `frontend/`. Do not point Vercel at
+`frontend/` alone: `/api/v1/*` is a small Node API in the repo root that serves
+the committed dashboard snapshot (`api/data/dashboard.json`). No Python runtime
+and no gitignored datasets are required. The free plan is enough.
+
+Refresh the snapshot after a real V3 artifact appears locally:
+
+```powershell
+$env:PYTHONPATH='src'
+python -c "import json; from pathlib import Path; from transaction_forecasting.api.dashboard import snapshot; Path('api/data/dashboard.json').write_text(json.dumps(snapshot(Path('.').resolve()), indent=2)+'\n', encoding='utf-8')"
+```
+
 Open <http://127.0.0.1:5173/>. Healthcheck:
 `http://127.0.0.1:8001/api/v1/health`. For a static build, run
 `npm run build`; FastAPI serves `frontend/dist` after restart.
