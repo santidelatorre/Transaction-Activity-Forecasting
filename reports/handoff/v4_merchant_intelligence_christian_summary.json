@@ -1,0 +1,90 @@
+{
+  "author": "Christian",
+  "branch": "exp/v4-merchant-intelligence-christian",
+  "base_branch": "origin/baseline/v4-frozen",
+  "base_sha": "051ce64a7cf0ab999f8aacb81fa405d5fa0257cf",
+  "implementation_commit": "1188a7b",
+  "frozen_oof_selection": "B_add_summary",
+  "recommendation": "do_not_promote; retain existing V3-A baseline",
+  "oof": {
+    "A_baseline": {
+      "macro_f1": 0.459793826868634,
+      "accuracy": 0.471
+    },
+    "B_add_summary": {
+      "macro_f1": 0.48250209475779193,
+      "accuracy": 0.5085
+    },
+    "C_replace_identity": {
+      "macro_f1": 0.48076962168177423,
+      "accuracy": 0.5065
+    }
+  },
+  "valid": {
+    "A_baseline": {
+      "macro_f1": 0.42411109773651157,
+      "accuracy": 0.461
+    },
+    "B_add_summary": {
+      "macro_f1": 0.337777576989852,
+      "accuracy": 0.411
+    },
+    "C_replace_identity": {
+      "macro_f1": 0.32961170284928776,
+      "accuracy": 0.403
+    }
+  },
+  "corruption_original_neighbor_recall_at_8": {
+    "description_masking": 0.794,
+    "alias_fragmentation": 0.06,
+    "typo_decorations": 0.972,
+    "generic_replacement": 0.644
+  },
+  "positive_candidate_family_recall": {
+    "exact_identity": {
+      "positive_candidate_recall_at_1": 0.48823948681397006,
+      "positive_candidate_recall_at_3": 0.8624376336421953,
+      "positive_candidate_recall_at_5": 0.9422665716322167,
+      "clients_unknown_fraction": 0.008
+    },
+    "merchant": {
+      "positive_candidate_recall_at_1": 0.44689950106913756,
+      "positive_candidate_recall_at_3": 0.8624376336421953,
+      "positive_candidate_recall_at_5": 0.9493941553813258,
+      "clients_unknown_fraction": 0.0
+    }
+  },
+  "complementarity_train_oof": {
+    "B_add_summary": {
+      "disagreement_fraction": 0.181,
+      "baseline_errors_recovered": 175,
+      "baseline_correct_lost": 100,
+      "pair_oracle_accuracy": 0.5585
+    },
+    "C_replace_identity": {
+      "disagreement_fraction": 0.2565,
+      "baseline_errors_recovered": 216,
+      "baseline_correct_lost": 145,
+      "pair_oracle_accuracy": 0.579
+    }
+  },
+  "protocol": {
+    "outer_folds": 5,
+    "inner_folds": 5,
+    "unsupervised_reference": "all TRAIN plus all unlabeled_pretrain, transductive within TRAIN",
+    "client_presence_family_evidence": true,
+    "valid_label_reads": 1,
+    "test_read": false,
+    "external_transaction_apis": false,
+    "post_valid_tuning": false
+  },
+  "limitations": [
+    "No merchant identity ground truth",
+    "Weak client targets are not stream labels",
+    "No material candidate recall gain",
+    "Alternating alias fragmentation recovery fails",
+    "Strong downstream VALID regression; OOF gain concentrated in none"
+  ],
+  "tests_passed": 97,
+  "local_artifact_directory": "outputs/metrics/v4_merchant_intelligence_christian_final"
+}
