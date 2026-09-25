@@ -1,190 +1,129 @@
-# UBS: next recurring merchant family
+# UBS recurring merchant forecasting
 
-**Historical claim: 0.619493 macro-F1, 0.647 accuracy.** VALID was consulted
-during model selection, including rejection of decision biases. This score is
-not evidence from an untouched holdout. The strict acceptance status is
-**INVALID** under a requirement of no VALID-informed selection. See the
-[V1/V2 comparison and independent reproduction audit](reports/stream_identity_benchmark.md)
-for the measured results, provenance, leakage findings and delivery checks.
-The 0.80 research objective was not reached.
+La baseline principal es **Stream Identity clean frozen**. Reconstruye streams
+recurrentes por cliente y combina rankers de familia con un detector dedicado de
+`none`. La selección y las pruebas de estabilidad se hicieron solo con TRAIN.
 
-The common-protocol benchmark rebuilds two independent models from raw data,
-refits the frozen historical V1/V2 recipes, scores every official VALID client
-with the historical evaluator, computes paired bootstrap intervals and writes
-a separate TRAIN-only submission. With the local official data installed:
+| Evaluación | Macro-F1 | Uso |
+| --- | ---: | --- |
+| TRAIN-only OOF | **0.673810376395381** | selección de la receta congelada |
+| VALID limpio congelado | **0.634819707075** | una evaluación posterior al freeze |
+
+VALID no debe reutilizarse para elegir features, parámetros, reglas o umbrales.
+La receta aprobada está en
+[`configs/stream_identity_clean_frozen.json`](configs/stream_identity_clean_frozen.json)
+y el protocolo metodológico completo en
+[`reports/stream_identity_clean_protocol.md`](reports/stream_identity_clean_protocol.md).
+El informe de esta integración está en
+[`reports/stream_identity_integration.md`](reports/stream_identity_integration.md).
+
+## Instalación y comprobaciones rápidas
+
+Se admite Python 3.11–3.13; la receta congelada se ejecutó con Python 3.12.6.
+
+```powershell
+py -3.12 -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements-lock.txt
+python -m pip install -e ".[dev]"
+pytest
+ruff check .
+ruff format --check .
+pre-commit run --all-files
+```
+
+Los tests cubren el contrato UBS, ocho clases fijas, alineación por `client_id`,
+duplicados, nulls, cutoff, aislamiento de folds, leakage, determinismo, hashes,
+reanudación y CLIs. No entrenan el modelo completo.
+
+## Submission limpia
+
+El CSV aprobado y versionado es:
+
+```text
+outputs/predictions/submission_stream_identity_clean.csv
+```
+
+Validarlo contra el sample oficial:
+
+```powershell
+python scripts/validate_submission.py
+```
+
+El comando comprueba columnas y orden, 1.000 IDs exactos, duplicados, valores
+vacíos y etiquetas legales. No lee labels de VALID.
+
+Para reconstruir la submission desde los datos oficiales y exigir igualdad byte
+a byte con el CSV aprobado:
+
+```powershell
+python scripts/prepare_data.py
+python scripts/reproduce_stream_identity_submission.py
+```
+
+El segundo comando usa un directorio de trabajo nuevo, verifica los hashes del
+freeze, reajusta únicamente con TRAIN, predice sin abrir labels de VALID y escribe
+`outputs/predictions/submission_stream_identity_clean_regenerated.csv`. Falla si
+el resultado difiere de la referencia o si intentaría sobrescribir un artefacto.
+Es un entrenamiento completo y se ejecuta manualmente, nunca en CI.
+
+El runner de investigación original
+[`scripts/run_stream_identity_clean.py`](scripts/run_stream_identity_clean.py)
+permanece byte a byte intacto porque forma parte de `source_sha256`. El lanzador
+de reproducción aporta compatibilidad con la rama de integración sin alterar la
+inferencia congelada.
+
+## Pipeline y estructura
+
+```text
+src/ubs_recurrence/                  pipeline Stream Identity y contratos
+scripts/run_stream_identity_clean.py runner de investigación congelado
+scripts/reproduce_stream_identity_submission.py reproducción en integración
+scripts/validate_submission.py       validator del CSV final
+configs/stream_identity_clean_frozen.json receta y hashes aprobados
+tests/                               tests rápidos de contrato y reproducibilidad
+reports/stream_identity_clean_protocol.md protocolo y resultados
+outputs/predictions/                 submission limpia versionada
+```
+
+La tarea oficial predice una etiqueta por cliente para los 90 días posteriores a
+`2026-01-01`: `cloud`, `gym`, `insurance`, `mobile`, `music`, `software`,
+`streaming` o `none`. La métrica es macro-F1 sobre las ocho clases. El contrato
+detallado está en [`docs/OFFICIAL_CHALLENGE.md`](docs/OFFICIAL_CHALLENGE.md).
+
+## Herramientas manuales
+
+El benchmark histórico V1/V2 frente a Stream Identity sigue disponible como
+herramienta manual:
 
 ```powershell
 python -X utf8 scripts/run_ubs_stream_identity.py --run-name benchmark_train_only_20260925 --device cuda --replicas 2
-python scripts/validate_submission.py --submission outputs/predictions/submission_stream_identity.csv --sample data/raw/ubs_2026/sample_submission.csv
 ```
 
-Completed runs are immutable. Add `--verify` to the benchmark command to
-check its input/source/artifact hashes and recalculate all three scores.
+Los scripts de auditoría e investigación bajo `scripts/` se conservan como
+evidencia ejecutada. No son todos entrypoints independientes. Los runs completos,
+modelos y datos permanecen ignorados por Git.
 
-This is a fresh implementation of the [official UBS 2026 challenge](https://github.com/UBS-AG/Swiss-AI-Weeks/blob/796d5805ec5f8a228a3ec0de36a2b4e6e1b1a1df/hackathons/2026/challenge.md).
-Given a client's transactions before **2026-01-01**, predict the next recurring
-merchant family in the following **90 days**: cloud, gym, insurance, mobile,
-music, software, streaming, or none. Macro-F1 is the selection metric.
+## Historia del proyecto
 
-The [validated submission](submissions/submission.csv) contains exactly the
-1,000 required test IDs. It has been generated and checked, **not uploaded** to
-the challenge. No hidden-test score is available.
+El repositorio empezó con pipelines V1/V2/V3/V4. Sus resultados, decisiones y
+limitaciones siguen documentados en los reportes versionados, especialmente:
 
-## Findings and final approach
+- [`reports/final_results.md`](reports/final_results.md)
+- [`reports/stream_identity_benchmark.md`](reports/stream_identity_benchmark.md)
+- [`reports/leakage_audit.md`](reports/leakage_audit.md)
+- [`reports/research_decisions.md`](reports/research_decisions.md)
+- [`reports/data_forensics.md`](reports/data_forensics.md)
 
-The central difficulty is distribution shift. Descriptions and merchant codes
-are substantially noisier in validation/test than in training. Feature-only
-adversarial validation distinguished train from validation/test at AUC
-0.960/0.976. An ordinary-CV winner scored 0.6851 OOF but collapsed to 0.1772 on
-official validation. Ordinary random CV alone was misleading.
+Esos runners no son la baseline activa. El score histórico Stream Identity de
+0.619493 estuvo condicionado por selección que consultó VALID y se conserva solo
+como contexto. La baseline limpia congelada es la referencia actual.
 
-The final system reconstructs approximate recurring streams using amount,
-currency, merchant templates and MCC evidence. It measures cadence, calendar
-phase, recency and matching refunds; compares eight family candidates; and
-uses a dedicated none detector. Independent unlabeled histories provide soft
-family price profiles. Fixed text/MCC corruption views make training more
-representative of the observed deployment noise.
+## CI y contribución
 
-```mermaid
-flowchart LR
-    A[Pre-cutoff transactions] --> B[Candidate recurring streams]
-    B --> C[Family, cadence and refund evidence]
-    C --> D[Family rankers and none detectors]
-    D --> E[Fixed ensemble]
-    E --> F[One legal family per client]
-    C --> G[Observed evidence for explanations]
-```
-
-The ensemble gives 75% weight to three seeded compact LightGBM rankers with
-separate none classifiers, and 25% to three complementary robustness rankers
-(two LightGBM, one XGBoost). These are six experts / nine fitted estimators.
-All seeds (42, 17, 2026) are retained. The final decision is argmax; fitted
-class biases failed the first external check and were rejected.
-
-## Evidence and validation
-
-| Evaluation | Macro-F1 | Interpretation |
-|---|---:|---|
-| Final original train OOF | 0.655305 | Exploratory five-fold client CV |
-| Final valid-like corruption OOF | 0.637367 | Train-side robustness diagnostic |
-| Final test-like corruption OOF | 0.613157 | Harsher train-side diagnostic |
-| **Final official validation** | **0.619493** | Frozen external check, reproduced |
-
-The official-validation client-bootstrap 95% interval is **0.5859–0.6500**.
-It conditions on the fitted model and this sample; it does not capture all
-selection uncertainty or hidden-test shift. The holdout was accessed in two
-frozen candidate batches, then once for exact reproduction. It is therefore
-not a pristine never-seen test set. Every access is recorded. Validation
-labels were never used for supervised fitting, feature construction, or
-decision calibration. Test labels were unavailable.
-
-CV splits by client; all augmented copies stay in that client's training fold.
-Every client receives all eight candidates. IDs and row ordering are excluded
-from predictive features. The final supervised models use only the 2,000
-training clients. Input hashes, pre-cutoff timestamps, cross-split overlap and
-the submission contract are checked.
-
-There are **95 executed evaluation records**, including explicitly marked
-auxiliary-task and decision-fit diagnostics. These are not 95 independent
-confirmatory tests. The 0.7698 auxiliary historical-task result is **not** a
-challenge score. Full precision/recall/F1, confusion matrices, class frequencies,
-calibration, parameters, seeds and timing are preserved.
-
-- [Final results and per-class metrics](reports/final_results.md)
-- [Frozen-model error analysis](reports/final_error_analysis.md)
-- [Executed experiment log](reports/experiment_log.md) and [full records](reports/experiment_results.jsonl)
-- [Data forensics](reports/data_forensics.md), [drift evidence](reports/distribution_shift.json), [cadence audit](reports/cadence_audit.json)
-- [Frozen final protocol](reports/final_protocol.md), [holdout access log](reports/holdout_access_log.jsonl), [reproduction evidence](reports/reproduction.json)
-- [Leakage and completion audit](reports/leakage_audit.md)
-- [Accepted/rejected hypotheses and remaining work](reports/research_decisions.md)
-
-## Reproduce
-
-Tested on Windows 11, Python 3.13.7, with the package versions in
-`requirements-lock.txt`. Python >=3.11 is declared; use the tested environment
-for the closest numerical reproduction. The reported XGBoost run used CUDA on
-an NVIDIA RTX 3060 Laptop GPU (6 GB, driver 610.78); each full training build
-took about six minutes. LightGBM uses four CPU threads. CPU mode can differ numerically
-from the recorded GPU result.
-
-From the repository root:
-
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install -r requirements-lock.txt
-python -m pip install -e ".[dev]"
-python scripts/prepare_data.py
-python -m pytest -q
-python -X utf8 scripts/run_pipeline.py --run-name reproduce_01 --device cuda
-```
-
-On a machine without CUDA, replace `--device cuda` with `--device cpu`.
-The runner downloads the pinned 18.7 MB official archive when needed; its
-SHA-256 and all seven extracted file hashes are verified. Raw data, models
-and caches are ignored by Git. Both final research runs rebuilt features from
-raw JSONL and refit all estimators; neither reused cached features or predictions.
-
-The runner creates `outputs/reproduce_01/` containing the model, validation
-metrics, evidence features, and checked test submission. Rerun the same command
-to resume completed stages, whose checksums are verified. Interrupted training
-restarts; completed training is preserved. A new run name starts a clean build.
-Evaluation necessarily reads the supplied validation labels after predictions
-are written and logs that access. No upload or external banking action occurs.
-
-The individual commands are also available. Use a new output-directory basename
-for each evaluation, since experiment IDs are immutable:
-
-```powershell
-python -X utf8 -m ubs_recurrence.cli train --output outputs/my_model --device cuda
-python -X utf8 -m ubs_recurrence.cli evaluate --model outputs/my_model/model.joblib --output outputs/my_eval
-python -X utf8 -m ubs_recurrence.cli submit --model outputs/my_model/model.joblib --output outputs/my_submission
-```
-
-Each prediction run writes normalized scores and actual extracted evidence.
-Submission generation verifies exact IDs, required column names, uniqueness,
-missing values and legal labels before and after CSV serialization.
-
-## Research structure
-
-```text
-src/ubs_recurrence/   Data contracts, features, stream discovery, models, CLI
-scripts/             Acquisition, audits, CV experiments, selection, reporting
-tests/               Alignment, metrics, deterministic transforms, resumability
-reports/             Committed findings, complete metrics and provenance
-submissions/         Small validated submission and checksum receipt
-data/                Ignored raw inputs and caches
-outputs/             Ignored predictions, fitted models and experiment artifacts
-```
-
-`scripts/` keeps the executed hypothesis-specific research scripts. They are
-not all independent entry points: several consume earlier feature caches.
-Use the raw-data CLI above for final reproduction. For forensic tables:
-
-```powershell
-python scripts/audit_data.py
-python scripts/forensic_streams.py
-python scripts/audit_relationships.py
-python scripts/calendar_audit.py
-```
-
-Historical experiment IDs refuse overwrites. The committed full result ledger
-is sufficient to inspect all reported metrics without rerunning the search;
-local detailed predictions remain in ignored experiment directories.
-
-## Limits and banking interpretation
-
-Software, streaming and music remain weakest (F1 about 0.56–0.57). Confusion
-with none is common, and test data appears noisier still. The exact synthetic
-target generator and future cancellations are not disclosed. Amount groups
-are approximate streams; matching refunds do not prove cancellation. Model
-scores are not guaranteed calibrated probabilities. No mathematical ceiling
-or impossibility of 0.80 has been established.
-
-The proposed banking use is to surface possible upcoming payment families for
-reminders, subscription reviews and planning support. Exact payment dates,
-amounts, real-client performance and business impact have not been validated.
-[Observed explanation examples](reports/explanations.md) use actual model
-inputs. The [jury brief](reports/jury_story.md) maps the work to the official
-qualitative criteria and describes the autonomous research loop honestly;
-inference is a prediction pipeline, not an autonomous banking-action agent.
+GitHub Actions ejecuta `pytest`, `ruff check .` y `ruff format --check .` con
+Python 3.12. El training y los benchmarks quedan como tareas manuales para evitar
+coste y accesos indebidos a VALID. Antes de un cambio, consulta
+[`CONTRIBUTING.md`](CONTRIBUTING.md) y no modifiques la receta congelada de forma
+silenciosa.

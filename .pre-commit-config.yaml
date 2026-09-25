@@ -1,4 +1,13 @@
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: [--maxkb=5000]
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
   - repo: local
     hooks:
       - id: ruff-check
@@ -14,7 +23,7 @@ repos:
         pass_filenames: false
         always_run: true
       - id: pytest
-        name: Repository tests
+        name: Fast repository tests
         entry: python -m pytest -q
         language: system
         pass_filenames: false

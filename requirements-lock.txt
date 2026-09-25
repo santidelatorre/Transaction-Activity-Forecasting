@@ -6,7 +6,10 @@ pyarrow==21.0.0
 catboost==1.2.10
 lightgbm==4.7.0
 joblib==1.6.0
+psutil==7.2.2
 pytest==8.4.2
 beautifulsoup4==4.13.5
 xgboost==3.4.1
 matplotlib==3.11.2
+ruff==0.16.8
+pre-commit==4.6.2

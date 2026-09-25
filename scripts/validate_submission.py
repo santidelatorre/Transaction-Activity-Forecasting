@@ -60,7 +60,9 @@ def inspect_submission(
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--submission", type=Path, default=Path("outputs/submission_v2.csv")
+        "--submission",
+        type=Path,
+        default=Path("outputs/predictions/submission_stream_identity_clean.csv"),
     )
     parser.add_argument(
         "--sample",
