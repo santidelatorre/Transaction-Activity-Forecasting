@@ -1,54 +1,64 @@
-# Recurring Insights
+# Recurring Insights dashboard
 
-Dashboard React en `src/App.jsx`, con Tailwind y gráficos SVG locales. No requiere
-servicios de gráficos, claves API ni datos simulados. La evaluación corresponde al
-brazo A de la baseline V3-A de `origin/main` (`051ce64`).
+The React dashboard is a read-only jury view of the frozen V3-A predictor and
+the recorded V1–V4 evaluation history. It does not fit a model, alter a
+prediction, read TEST labels, or treat model scores as probabilities.
 
-Desde la raíz del repositorio, en una terminal PowerShell con el entorno Python:
+From the repository root, in PowerShell with the project Python environment:
 
 ```powershell
 conda activate tx-forecasting
-# Opcional: reutilizar artefactos reales guardados en otro worktree.
+# Only needed when the ignored V3 evaluation files live in another worktree:
 $env:RECURRING_ARTIFACT_ROOT='C:\Users\jagui\Transaction-Activity-Forecasting'
-python -m uvicorn transaction_forecasting.api.main:app --app-dir src --port 8001
+python -m uvicorn transaction_forecasting.api.main:app --app-dir src --host 127.0.0.1 --port 8001
 ```
 
-En otra terminal, desde `frontend`, con Node 22.12+ disponible:
+In a second terminal:
 
 ```powershell
+cd frontend
 npm ci
 $env:RECURRING_API_TARGET='http://127.0.0.1:8001'
-npm run dev
+npm run dev -- --port 5173
 ```
 
-Abrir `http://127.0.0.1:5173/`. La API utiliza el puerto 8001 para poder convivir
-con otra demo en 8000. El proxy usa 8000 por defecto si no se configura la variable.
-Para producción: `npm run build`; FastAPI sirve ese `dist` al reiniciarse.
+Open <http://127.0.0.1:5173/>. Healthcheck:
+`http://127.0.0.1:8001/api/v1/health`. For a static build, run
+`npm run build`; FastAPI serves `frontend/dist` after restart.
 
-Con API y frontend arrancados, `npm run test:ui` comprueba en Chrome las métricas
-reales, paginación, móvil, falta de datos y recuperación de errores. Genera capturas
-locales en `frontend/test-results/`, ignoradas por Git. Los dos casos con datos
-reales se omiten explícitamente si faltan artefactos; los de estados vacíos no.
+## Evidence contract
 
-## Datos y alcance
+- `GET /api/v1/dashboard` reads
+  `outputs/metrics/ubs_v3/valid_results.json` and
+  `importance_A.csv` from `RECURRING_ARTIFACT_ROOT`.
+- `reports/dashboard_evidence.json` is a small, source-traced extract of the
+  V1/V2 final report and the V4 synthesis decision. Its V4 source commit and
+  Git blob are recorded in the file. It is data for the dashboard, not a new
+  evaluation. V3 variant scores come from the live evaluation artifact.
+- The version line joins official VALID points only when the V3 report's V2
+  control, cohort size, and input fingerprints match the V2 report. V4 is a
+  decision marker with **no new score**.
+  Source-report order is not experiment chronology.
+- V4 clean TRAIN OOF and reused VALID scores have separate dot-chart columns.
+  Author-reported scores use open markers; independently reproduced scores
+  use filled markers. The simulated Ginestar stress score is outside the
+  clean-model chart. Missing VALID evaluations remain missing.
+- `GET /api/v1/experiments` provides the paginated V3 report arms followed
+  by any existing SQLite experiment rows. It never creates a database.
+- The selected V3-A uses 75% CatBoost and 25% periodicity-heuristic **weights**.
+  The one V4 equal-average experiment uses fixed 50/50 weights; it was not
+  evaluated on VALID. Weights are not component scores.
+- VALID was reused in model research. There is no TEST performance claim.
 
-- `GET /api/v1/dashboard`: lee `outputs/metrics/ubs_v3/valid_results.json`,
-  `importance_A.csv` y, si existe, `valid_provenance.json` bajo la raíz configurada.
-- `GET /api/v1/experiments?limit=7&offset=0`: comparativas históricas del informe V3
-  y, a continuación, registros existentes en SQLite; nunca crea una base de datos.
-- La curva sigue el orden del informe. No se inventan fechas ni hitos de tuning.
-- Clientes, recall macro y Macro-F1 se calculan o se leen de la matriz de confusión;
-  accuracy es el valor del informe. Los resultados son sobre VALID, no TEST.
-- La importancia de variables corresponde a CatBoost A ajustado con TRAIN. La
-  comparación muestra solo candidatos medidos en el informe; no incluye resultados
-  individuales de LightGBM o XGBoost.
-- La corrección focalizada aplicó un umbral fijo de 0,85, sin búsqueda sobre VALID.
-  V3-A combina 75 % CatBoost y 25 % heurística de periodicidad.
-- Sin artefactos, se muestran estados vacíos; un error de API permite reintentar.
-- La API de presentación no entrena, consulta TEST labels ni escribe predicciones.
+Checks, with both servers running:
 
-Los artefactos de evaluación pueden ser históricos: su commit se muestra separado
-del commit de la baseline promovida. VALID se ha reutilizado al comparar modelos.
-Los endpoints heredados de clientes/submission siguen siendo V1 y no forman parte
-de esta nueva ruta. La integración completa del predictor/agente V3-A permanece en
-la rama de producto correspondiente.
+```powershell
+python -m pytest -q tests/test_dashboard.py
+cd frontend
+npm run build
+npm run test:ui
+```
+
+Browser tests verify API-to-screen scores, missing and incomparable results,
+pagination, responsive overflow, and retry behavior. They save ignored
+desktop/mobile screenshots under `frontend/test-results/`.

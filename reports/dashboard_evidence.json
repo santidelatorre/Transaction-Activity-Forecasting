@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "metric": "official fixed-eight-class macro_f1",
+  "horizon_days": 90,
+  "version_source": {
+    "path": "reports/v2_final_report.md",
+    "git_blob": "da6a14603255bf6f616efc25c6cad020f194b6e7",
+    "valid_fingerprints": {
+      "data/raw/ubs_2026/valid_transactions.jsonl": "2c30941d49ca20f7b082526407f24529c5a704205610373eff952f4f444a3622",
+      "data/raw/ubs_2026/valid_labels.csv": "979bd9b69253084fc9e2b1ef473c07a628a8b18091169051ba304cfed0fb5642"
+    }
+  },
+  "v4_source": {
+    "ref": "integration/v4-synthesis",
+    "commit": "135a50810e0e34ede2a0dd6b2e05dfb5d3551c29",
+    "path": "reports/v4_final_decision.json",
+    "git_blob": "2aa881b3f8096c805457c1ace14cbfa098c9f8ae",
+    "narrative_path": "reports/v4_synthesis.md"
+  },
+  "version_results": [
+    {
+      "id": "v1",
+      "version": "V1",
+      "label": "V1 baseline",
+      "macro_f1": 0.2710242658492452,
+      "scope": "VALID",
+      "clients": 1000,
+      "protocol": "official-eight-class-valid-1000",
+      "source": "reports/v2_final_report.md#v1-baseline",
+      "evidence": "reported and reproduced"
+    },
+    {
+      "id": "v2",
+      "version": "V2",
+      "label": "V2 final",
+      "macro_f1": 0.391549456,
+      "scope": "VALID",
+      "clients": 1000,
+      "protocol": "official-eight-class-valid-1000",
+      "source": "reports/v2_final_report.md#candidates-evaluated",
+      "evidence": "reported and reproduced"
+    }
+  ],
+  "v4_decision": {
+    "id": "v4",
+    "version": "V4",
+    "label": "V4 decision",
+    "macro_f1": null,
+    "scope": "No new VALID evaluation",
+    "selected_model": "V3-A",
+    "base_sha": "051ce64a7cf0ab999f8aacb81fa405d5fa0257cf",
+    "note": "V3-A retained; V4 did not promote a new predictor or claim a gain.",
+    "source": "reports/v4_synthesis.md#final-model-decision"
+  },
+  "v4_experiments": [
+    {
+      "id": "v3a",
+      "name": "Frozen V3-A",
+      "branch": "baseline/v4-frozen",
+      "train_oof": 0.45979382686863396,
+      "valid": 0.4241110977365116,
+      "train_evidence": "verified",
+      "valid_evidence": "verified; VALID reused",
+      "status": "selected",
+      "note": "Retained for transfer reliability; not the highest TRAIN OOF score."
+    },
+    {
+      "id": "javi-direct",
+      "name": "Direct robust classifier",
+      "branch": "exp/v4-direct-robust-javi",
+      "train_oof": 0.507419936954947,
+      "valid": 0.076353284,
+      "train_evidence": "verified",
+      "valid_evidence": "author-reported; VALID reused",
+      "status": "evaluated",
+      "note": "Large transfer failure on reused VALID."
+    },
+    {
+      "id": "christian-b",
+      "name": "Merchant intelligence B",
+      "branch": "exp/v4-merchant-intelligence-christian",
+      "train_oof": 0.482502095,
+      "valid": 0.337777577,
+      "train_evidence": "author-reported; transductive unsupervised component",
+      "valid_evidence": "author-reported; VALID reused",
+      "status": "evaluated",
+      "note": "Full expensive graph/model run was not independently repeated."
+    },
+    {
+      "id": "santiago-ranker",
+      "name": "Soft candidate ranker",
+      "branch": "exp/v4-soft-candidate-santiago",
+      "train_oof": 0.5426622087569586,
+      "valid": 0.4006622046362836,
+      "train_evidence": "verified",
+      "valid_evidence": "verified; VALID reused",
+      "status": "evaluated",
+      "note": "Strongest TRAIN candidate, but below V3-A on reused VALID."
+    },
+    {
+      "id": "santiago-logistic",
+      "name": "Soft candidate logistic",
+      "branch": "exp/v4-soft-candidate-santiago",
+      "train_oof": 0.4991810426021103,
+      "valid": null,
+      "train_evidence": "verified",
+      "valid_evidence": "not evaluated",
+      "status": "evaluated",
+      "note": "No recorded VALID evaluation."
+    },
+    {
+      "id": "santiago-average",
+      "name": "Fixed 50/50 A + ranker average",
+      "branch": "integration/v4-synthesis",
+      "train_oof": 0.5400597679950233,
+      "valid": null,
+      "train_evidence": "verified",
+      "valid_evidence": "not evaluated",
+      "status": "evaluated",
+      "weights": {"v3a": 0.5, "ranker": 0.5},
+      "note": "Predeclared weights; not tuned or tested on VALID."
+    },
+    {
+      "id": "laura-hybrid",
+      "name": "Temporal hybrid · median gap",
+      "branch": "exp/v4-survival-laura",
+      "train_oof": 0.4572161680832407,
+      "valid": 0.3891,
+      "train_evidence": "verified",
+      "valid_evidence": "author-reported; VALID reused",
+      "status": "evaluated",
+      "note": "Official target, distinct temporal research arm."
+    },
+    {
+      "id": "esteban-svd",
+      "name": "SVD + history statistics",
+      "branch": "exp/v4-self-supervised-esteban",
+      "train_oof": 0.4391003104865256,
+      "valid": 0.3219,
+      "train_evidence": "verified; transductive unsupervised component",
+      "valid_evidence": "author-reported; VALID reused",
+      "status": "evaluated",
+      "note": "Unsupervised representation is transductive; not an inductive-client claim."
+    }
+  ],
+  "diagnostics": [
+    {
+      "id": "ginestar-severe",
+      "name": "Identity-corruption stress test",
+      "branch": "exp/v4-shift-corruption-ginestar",
+      "macro_f1": 0.3733838220578183,
+      "scope": "TRAIN OOF · synthetic severe corruption",
+      "protocol": "stress-not-comparable-to-clean",
+      "evidence": "verified",
+      "note": "V3-A under simulated corruption, not a replacement model."
+    }
+  ]
+}
