@@ -71,14 +71,37 @@ function MetricCard({ number, title, value, annotation, primary = false, childre
   </article>;
 }
 
+function chartRows(data) {
+  const history = (data?.version_history ?? []).map((row) => ({ ...row, selected: false }));
+  const official = data?.mainline_v4?.official_valid ?? [];
+  const source = data?.mainline_v4?.source?.protocol_path;
+  const additions = official
+    .filter((row) => row.id === 'stream-historical' || row.id === 'stream-clean')
+    .map((row) => ({
+      id: row.id,
+      label: row.id === 'stream-clean' ? 'V4 frozen' : 'Stream hist.',
+      macro_f1: row.macro_f1,
+      scope: 'VALID',
+      protocol: 'main-stream-valid',
+      kind: 'measured',
+      is_subversion: false,
+      selected: row.status === 'selected_on_main',
+      evidence: row.note,
+      source,
+    }));
+  return [...history, ...additions];
+}
+
 function VersionChart({ data, loading, error }) {
   const chartId = useId();
-  const rows = data?.version_history ?? [];
+  const rows = chartRows(data);
   const [activeId, setActiveId] = useState(null);
   const active = rows.find((row) => row.id === activeId) ?? rows.find((row) => row.selected && row.macro_f1 != null) ?? rows[0];
-  const width = 850, height = 300, left = 44, right = 56, top = 24, bottom = 82;
+  const width = 850, height = 300, left = 44, right = 70, top = 24, bottom = 82;
+  const axisMax = rows.some((row) => row.macro_f1 > 0.6) ? 0.8 : 0.6;
+  const ticks = axisMax === 0.8 ? [0, 0.2, 0.4, 0.6, 0.8] : [0, 0.2, 0.4, 0.6];
   const x = (index) => left + (index / Math.max(rows.length - 1, 1)) * (width - left - right);
-  const y = (score) => top + (0.6 - score) / 0.6 * (height - top - bottom);
+  const y = (score) => top + (axisMax - score) / axisMax * (height - top - bottom);
   const lineSegments = rows.slice(1).flatMap((row, index) => {
     const previous = rows[index];
     return row.macro_f1 != null && previous.macro_f1 != null && row.protocol === previous.protocol
@@ -89,14 +112,14 @@ function VersionChart({ data, loading, error }) {
     <div className="px-6 pt-6 sm:px-7">
       <Eyebrow className="text-[#858585]">01 / Project evidence</Eyebrow>
       <h2 className="mt-2 text-xl font-medium tracking-tight">How the measured Macro-F1 changed</h2>
-      <p className="mt-2 text-xs leading-5 text-[#686868]">Official eight-class VALID results in report order. V4 retained V3-A; it has no new performance point.</p>
+      <p className="mt-2 text-xs leading-5 text-[#686868]">Official eight-class VALID results in report order. The last point is Stream Identity clean frozen on main: Macro-F1 0.6348.</p>
     </div>
     {loading || error || !rows.length || !measured.length ? <Empty loading={loading} error={error}>No verified version results are available.</Empty> : <>
       <div className="overflow-x-auto px-4 pt-5 sm:px-6">
         <svg viewBox={`0 0 ${width} ${height}`} className="min-w-[550px] w-full" role="img" aria-labelledby={`${chartId}-title ${chartId}-desc`}>
           <title id={`${chartId}-title`}>Macro-F1 across measured project versions</title>
-          <desc id={`${chartId}-desc`}>V1, V2 and measured V3 variants use the official eight-class VALID protocol. Lines join only adjacent comparable measurements. Diamond markers are V3 subversions. V4 is a retention decision without a new score. VALID was reused for model comparison; this is not TEST performance or a chronological learning curve.</desc>
-          {[0, 0.2, 0.4, 0.6].map((tick) => <g key={tick}>
+          <desc id={`${chartId}-desc`}>V1, V2 and measured V3 variants use the official eight-class VALID protocol. The final points are the Stream Identity historical score and the clean frozen VALID score from main. Lines join only adjacent comparable measurements. This is not TEST performance.</desc>
+          {ticks.map((tick) => <g key={tick}>
             <line x1={left} x2={width - right} y1={y(tick)} y2={y(tick)} stroke="#EAEAEA" strokeDasharray="2 4" />
             <text x={left - 10} y={y(tick) + 4} textAnchor="end" fill="#777" fontSize="11">{format(tick, 1)}</text>
           </g>)}
@@ -329,7 +352,15 @@ export default function App() {
   const [revision, setRevision] = useState(0);
   const { data, loading, error } = useResource('/api/v1/dashboard', revision);
   const metrics = data?.metrics;
-  const ready = Boolean(data?.available);
+  const frozen = data?.mainline_v4?.official_valid?.find((row) => row.status === 'selected_on_main');
+  const v2Main = data?.mainline_v4?.official_valid?.find((row) => row.id === 'main-v2');
+  const recalls = data?.mainline_v4?.per_class_valid?.map((row) => row.recall).filter((value) => Number.isFinite(value)) ?? [];
+  const macroF1 = frozen?.macro_f1 ?? metrics?.macro_f1;
+  const accuracy = frozen?.accuracy ?? metrics?.accuracy;
+  const macroRecall = recalls.length ? recalls.reduce((sum, value) => sum + value, 0) / recalls.length : metrics?.macro_recall;
+  const clients = frozen ? 1000 : metrics?.validation_clients;
+  const delta = frozen && v2Main ? frozen.macro_f1 - v2Main.macro_f1 : metrics?.delta_vs_baseline;
+  const ready = Boolean(data?.available) || Number.isFinite(frozen?.macro_f1);
   useEffect(() => { document.title = 'Transaction Activity Forecasting · Recurring Insights'; document.documentElement.lang = 'en'; }, []);
   return <div className="min-h-screen bg-white font-sans text-[#1A1A1A] selection:bg-[#FFE2E2]">
     <a href="#content" className="sr-only z-50 bg-white p-4 focus:not-sr-only focus:fixed">Skip to content</a>
@@ -346,13 +377,13 @@ export default function App() {
         <aside className="relative overflow-hidden bg-[#1A1A1A] px-7 py-6 text-white lg:py-8" aria-label="Prediction horizon"><Eyebrow className="text-[#B8B8B8]">Prediction horizon</Eyebrow><p className="mt-5 text-6xl font-light leading-none tracking-[-0.055em]">90<span className="ml-2 text-base font-normal tracking-normal text-[#B8B8B8]">days</span></p><div className="my-5 flex items-center gap-2" aria-hidden="true"><span className="h-1.5 w-1.5 rounded-full bg-[#E60000]" /><span className="h-px flex-1 bg-[#666]" /><ArrowRight size={13} className="text-[#E60000]" /></div><p className="text-[11px] leading-5 text-[#B8B8B8]">One recurring family per client.<br />History cutoff: 1 Jan 2026.</p></aside>
       </section>
       <section id="quality" className="scroll-mt-24 border-t border-[#EAEAEA] pt-6">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><Eyebrow className="text-[#757575]">Measured result · selected predictor</Eyebrow><span className="flex items-center gap-2 text-[11px] text-[#686868]"><span className={`h-1.5 w-1.5 rounded-full ${ready ? 'bg-[#1A1A1A]' : 'bg-[#B8B8B8]'}`} />{loading ? 'Loading evaluation' : ready ? `${data.model_version} retained in V4 · reused VALID` : 'Evaluation artifact unavailable'}</span></div>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><Eyebrow className="text-[#757575]">Measured result · selected predictor</Eyebrow><span className="flex items-center gap-2 text-[11px] text-[#686868]"><span className={`h-1.5 w-1.5 rounded-full ${ready ? 'bg-[#1A1A1A]' : 'bg-[#B8B8B8]'}`} />{loading ? 'Loading evaluation' : frozen ? 'Stream Identity clean frozen · VALID after freeze' : ready ? `${data.model_version} retained in V4 · reused VALID` : 'Evaluation artifact unavailable'}</span></div>
         {error && <div role="alert" className="mb-4 border-l-2 border-[#E60000] bg-[#FFF6F6] px-4 py-3 text-sm text-[#8A2020]">{error} Use Refresh to retry.</div>}
         {!loading && !error && !ready && <p role="status" className="mb-4 border-l-2 border-[#DADADA] bg-[#F5F5F5] px-4 py-3 text-sm text-[#686868]">The local V3-A evaluation artifact is unavailable. Recorded V1/V2 report scores remain visible; missing V3 results are not filled in.</p>}
         <div className="grid gap-4 md:grid-cols-3">
-          <MetricCard primary number="01" title="Balanced prediction quality" value={format(metrics?.macro_f1, 4)} annotation="Macro-F1 · each of eight classes has equal weight.">{metrics?.delta_vs_baseline != null ? `${signed(metrics.delta_vs_baseline)} F1 points versus V2 on reused VALID` : 'No local selected-model score available'}</MetricCard>
-          <MetricCard number="02" title="Average class detection" value={percent(metrics?.macro_recall)} annotation="Macro recall · average recall across the eight classes.">Overall accuracy: {percent(metrics?.accuracy)} · VALID.</MetricCard>
-          <MetricCard number="03" title="Clients evaluated" value={format(metrics?.validation_clients)} annotation="VALID clients counted from the official confusion matrix.">Seven recurring families plus “none”.</MetricCard>
+          <MetricCard primary number="01" title="Balanced prediction quality" value={format(macroF1, 4)} annotation="Macro-F1 · each of eight classes has equal weight.">{delta != null ? `${signed(delta)} F1 points versus V2 on VALID` : 'No local selected-model score available'}</MetricCard>
+          <MetricCard number="02" title="Average class detection" value={percent(macroRecall)} annotation="Macro recall · average recall across the eight classes.">Overall accuracy: {percent(accuracy)} · VALID.</MetricCard>
+          <MetricCard number="03" title="Clients evaluated" value={format(clients)} annotation={frozen ? 'VALID clients in the Stream Identity clean evaluation.' : 'VALID clients counted from the official confusion matrix.'}>Seven recurring families plus “none”.</MetricCard>
         </div>
       </section>
       <div className="mt-6 space-y-6"><VersionChart data={data} loading={loading} error={error} /><ImportanceChart data={data} loading={loading} error={error} /></div>
