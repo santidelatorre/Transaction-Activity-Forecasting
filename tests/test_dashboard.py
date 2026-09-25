@@ -42,6 +42,9 @@ def test_promoted_arm_not_highest_score_or_historical_oof_selection(tmp_path):
     assert result["importance"][0] == {"feature": "mcc_4814_share", "importance": 4.2}
     selected = [row for row in result["experiments"] if row["result"] == "selected"]
     assert [row["candidate"] for row in selected] == ["A"]
+    assert selected[0]["model_name"] == "V3-A · family identity"
+    assert selected[0]["milestone"] == "Family identity features"
+    assert result["importance_scope"] == "CatBoost arm A, trained on TRAIN and evaluated on VALID"
     assert all(row["recorded_at_utc"] is None for row in result["experiments"])
     assert all(row["order_kind"] == "report" for row in result["experiments"])
     assert result["validation_independent"] is False

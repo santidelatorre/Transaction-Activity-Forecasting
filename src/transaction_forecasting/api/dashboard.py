@@ -17,13 +17,13 @@ import pandas as pd
 BASE_SHA = "051ce64a7cf0ab999f8aacb81fa405d5fa0257cf"
 MODEL_VERSION = "V3-A"
 ARMS = {
-    "V2": ("Base V2", "Historial y periodicidad"),
-    "history_control": ("Historial", "Control: solo historial"),
-    "A": ("V3-A · identidad", "Identidad por familia"),
-    "B": ("V3-B · recurrencia", "Recurrencia adicional"),
-    "full": ("V3 completo", "Identidad y recurrencia"),
-    "ensemble": ("Mezcla V3 / V2", "Mezcla 50/50"),
-    "focused": ("Corrección focalizada", "Corrección de familias"),
+    "V2": ("V2 baseline", "History and recurrence"),
+    "history_control": ("History only", "Control: history features only"),
+    "A": ("V3-A · family identity", "Family identity features"),
+    "B": ("V3-B · recurrence", "Additional recurrence features"),
+    "full": ("Full V3", "Identity and recurrence features"),
+    "ensemble": ("V3 / V2 blend", "50/50 blend"),
+    "focused": ("Targeted correction", "Family-level correction"),
 }
 
 
@@ -108,7 +108,7 @@ def snapshot(root: Path) -> dict[str, Any]:
                 "delta_vs_baseline": score - baseline if baseline is not None else None,
                 "source": "valid_results.json",
                 "order_kind": "report",
-                "notes": "Comparación histórica sobre VALID reutilizado; orden del informe.",
+                "notes": "Historical comparison on reused VALID; shown in report order.",
             }
         )
 
@@ -137,7 +137,7 @@ def snapshot(root: Path) -> dict[str, Any]:
             ),
         },
         "importance": importance,
-        "importance_scope": "CatBoost del brazo A, ajustado en TRAIN para evaluar VALID",
+        "importance_scope": "CatBoost arm A, trained on TRAIN and evaluated on VALID",
         "importance_method": "CatBoost PredictionValuesChange",
         "experiments": rows,
         "comparison_group": group,
