@@ -25,11 +25,13 @@ def norm(s):
 
 
 def main():
+    expected = json.loads((ROOT / "reports/data_manifest.json").read_text())
     manifest = {}
     for path in sorted(RAW.iterdir()):
         manifest[path.name] = {"bytes": path.stat().st_size,
                                "sha256": hashlib.file_digest(path.open("rb"), "sha256").hexdigest()}
-    (ROOT / "reports/data_manifest.json").write_text(json.dumps(manifest, indent=2))
+    if manifest != expected:
+        raise ValueError("Raw files differ from pinned manifest; run prepare_data.py to verify inputs")
     frames, info, idsets, signatures = {}, {}, {}, {}
     schema = {"client_id", "timestamp", "amount", "currency", "direction", "type", "mcc", "description", "fee"}
     for split in ["train", "valid", "test", "unlabeled_pretrain"]:

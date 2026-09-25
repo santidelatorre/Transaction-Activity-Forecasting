@@ -1,0 +1,11 @@
+cohort,clients,accuracy,errors
+all,1000,0.647,353
+low_history_under_40_events,63,0.7301587301587301,17
+high_activity_over_100_events,139,0.60431654676259,55
+true_none,293,0.7918088737201365,61
+true_recurring_family,707,0.5869872701555869,292
+family_without_3_event_amount_candidate,140,0.12142857142857143,123
+family_regular_candidate,348,0.7442528735632183,89
+family_irregular_candidate,219,0.634703196347032,80
+family_last_candidate_event_within_45_days,542,0.7250922509225092,149
+family_last_candidate_event_over_90_days,13,0.15384615384615385,11

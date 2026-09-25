@@ -17,12 +17,13 @@ def history():
     return pd.DataFrame(rows).sort_values(["client_id","timestamp"])
 
 
-def test_amount_components_equal_dbscan():
+@pytest.mark.parametrize("min_samples",[2,3])
+def test_amount_components_equal_dbscan(min_samples):
     rng=np.random.default_rng(777)
     for _ in range(15):
         a=np.exp(rng.uniform(1,5,70))
-        ours={frozenset(c) for c in amount_components(a)}
-        lab=DBSCAN(eps=.035,min_samples=3).fit_predict(np.log(a).reshape(-1,1))
+        ours={frozenset(c) for c in amount_components(a,min_samples=min_samples)}
+        lab=DBSCAN(eps=.035,min_samples=min_samples).fit_predict(np.log(a).reshape(-1,1))
         expected={frozenset(np.flatnonzero(lab==k)) for k in set(lab)-{-1}}
         assert ours==expected
 

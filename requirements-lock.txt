@@ -9,3 +9,4 @@ joblib==1.6.0
 pytest==8.4.2
 beautifulsoup4==4.13.5
 xgboost==3.4.1
+matplotlib==3.11.2

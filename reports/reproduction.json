@@ -1,0 +1,15 @@
+{
+  "two_independent_raw_data_training_runs": true,
+  "all_predictions_identical": true,
+  "maximum_probability_difference": 0.0,
+  "test_submissions_byte_identical": true,
+  "macro_f1_a": 0.6194934236214421,
+  "macro_f1_b": 0.6194934236214421,
+  "source_sha_a": "330c8858c3525d2443f0b5f598932cde993ce14734fae98c2f7971940ad7374a",
+  "source_sha_b": "a6d0cdb91566d8025e2281d59e1d10fe0b454352df3356cd92364fa161eb24b5",
+  "prediction_source_commit": "ffc656e",
+  "prediction_source_unchanged": true,
+  "source_hash_note": "Full source fingerprints also include research/reporting scripts, which were added between runs; the prediction package is unchanged.",
+  "train_clients": 2000,
+  "validation_used_for_training": false
+}

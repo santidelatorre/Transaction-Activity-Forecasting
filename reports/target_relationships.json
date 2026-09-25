@@ -1,0 +1,108 @@
+{
+  "scope": "Train labels only; descriptive, not predictive validation; produced after model freeze",
+  "conditional_unit": "Unique client per condition; different conditions can overlap",
+  "repeated_description_streams_at_least_2_events": 22724,
+  "repeated_description_streams_at_least_3_events": 14400,
+  "conditional_tables": [
+    "amount_band_counts.csv",
+    "amount_band_probabilities.csv",
+    "day_of_month_counts.csv",
+    "day_of_month_probabilities.csv",
+    "description_mcc_counts.csv",
+    "description_mcc_probabilities.csv",
+    "interval_band_counts.csv",
+    "interval_band_probabilities.csv",
+    "month_counts.csv",
+    "month_probabilities.csv",
+    "occurrence_band_counts.csv",
+    "occurrence_band_probabilities.csv",
+    "recency_band_counts.csv",
+    "recency_band_probabilities.csv",
+    "recurring_description_counts.csv",
+    "recurring_description_probabilities.csv",
+    "regularity_band_counts.csv",
+    "regularity_band_probabilities.csv",
+    "stream_statistics_by_target.csv",
+    "type_mcc_counts.csv",
+    "type_mcc_probabilities.csv",
+    "weekday_counts.csv",
+    "weekday_probabilities.csv",
+    "word_ngrams_counts.csv",
+    "word_ngrams_probabilities.csv"
+  ],
+  "most_concentrated_ngrams_minimum_50_clients": [
+    {
+      "ngram": "member plan",
+      "clients": 393,
+      "dominant_label": "none",
+      "dominant_fraction": 0.7201017811704835
+    },
+    {
+      "ngram": "digital service",
+      "clients": 423,
+      "dominant_label": "none",
+      "dominant_fraction": 0.7044917257683215
+    },
+    {
+      "ngram": "subscription charge",
+      "clients": 380,
+      "dominant_label": "none",
+      "dominant_fraction": 0.7
+    },
+    {
+      "ngram": "subscription",
+      "clients": 380,
+      "dominant_label": "none",
+      "dominant_fraction": 0.7
+    },
+    {
+      "ngram": "charge",
+      "clients": 588,
+      "dominant_label": "none",
+      "dominant_fraction": 0.5340136054421769
+    },
+    {
+      "ngram": "plus core",
+      "clients": 81,
+      "dominant_label": "none",
+      "dominant_fraction": 0.4567901234567901
+    },
+    {
+      "ngram": "digital plus core",
+      "clients": 64,
+      "dominant_label": "none",
+      "dominant_fraction": 0.40625
+    },
+    {
+      "ngram": "monthly plan",
+      "clients": 787,
+      "dominant_label": "none",
+      "dominant_fraction": 0.4027954256670902
+    },
+    {
+      "ngram": "plus plus",
+      "clients": 92,
+      "dominant_label": "none",
+      "dominant_fraction": 0.3804347826086957
+    },
+    {
+      "ngram": "premium plan plus",
+      "clients": 72,
+      "dominant_label": "none",
+      "dominant_fraction": 0.375
+    },
+    {
+      "ngram": "plus digital",
+      "clients": 79,
+      "dominant_label": "none",
+      "dominant_fraction": 0.3670886075949367
+    },
+    {
+      "ngram": "media stream",
+      "clients": 53,
+      "dominant_label": "none",
+      "dominant_fraction": 0.3584905660377358
+    }
+  ],
+  "warning": "Conditional association is not a classifier score; background exposure and class priors are confounders."
+}

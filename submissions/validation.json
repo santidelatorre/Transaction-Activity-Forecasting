@@ -1,0 +1,17 @@
+{
+  "rows": 1000,
+  "exact_ids": true,
+  "duplicates": 0,
+  "missing": 0,
+  "labels": {
+    "none": 374,
+    "gym": 105,
+    "software": 97,
+    "insurance": 97,
+    "cloud": 96,
+    "mobile": 88,
+    "streaming": 79,
+    "music": 64
+  },
+  "sha256": "e226823a1cacb1579d3f7f40a2636e3f60f8126e362e4495d5a0e9cdb5ebadf7"
+}

@@ -9,8 +9,9 @@
     "pyarrow": "21.0.0",
     "catboost": "1.2.10",
     "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
     "joblib": "1.6.0",
     "pytest": "8.4.2",
-    "beautifulsoup4": "4.13.5"
+    "matplotlib": "3.11.2"
   }
 }

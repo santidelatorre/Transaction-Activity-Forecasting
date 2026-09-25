@@ -1,0 +1,33 @@
+{
+  "scope": "Training histories only; recurring candidate audit, not task evaluation",
+  "regular_candidates_with_at_least_5_events": 2398,
+  "median_interval_near_period_plus_minus_2_days": {
+    "7": 0,
+    "14": 168,
+    "28": 1217,
+    "30": 1763,
+    "60": 49,
+    "90": 0,
+    "365": 0
+  },
+  "count_warning": "28 and 30 day bins overlap; annual recurrence cannot be identified by this >=5-event filter in a 420-day history",
+  "weekend_event_fraction": 0.2885485555168813,
+  "monthly_like_next_observed_date_diagnostics": {
+    "median_interval": {
+      "forecast_count": 12400,
+      "mean_absolute_error_days": 2.7988992308841096,
+      "median_absolute_error_days": 2.425665509259259
+    },
+    "calendar_same_day": {
+      "forecast_count": 12400,
+      "mean_absolute_error_days": 2.6642530549955197,
+      "median_absolute_error_days": 2.230636574074074
+    },
+    "calendar_next_business_day": {
+      "forecast_count": 12400,
+      "mean_absolute_error_days": 2.8480911467667265,
+      "median_absolute_error_days": 2.3879513888888892
+    }
+  },
+  "limitation": "Recovered streams are approximate. These date diagnostics are not merchant-family macro-F1 and do not establish a complete generator."
+}

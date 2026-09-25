@@ -13,7 +13,7 @@ dependencies = ["numpy", "pandas>=2.2", "scipy", "scikit-learn", "pyarrow", "cat
 ubs-recurrence = "ubs_recurrence.cli:main"
 
 [project.optional-dependencies]
-dev = ["pytest", "beautifulsoup4"]
+dev = ["pytest", "beautifulsoup4", "matplotlib"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

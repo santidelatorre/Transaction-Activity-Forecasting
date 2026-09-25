@@ -2,7 +2,10 @@
 
 Generated input evidence is in `reports/data_manifest.json` and
 `outputs/audit/`; reproduce with `python scripts/audit_data.py`.
-This report uses training labels only. Official validation labels are sealed.
+This initial report used training labels only, while official validation
+labels were sealed. Later frozen evaluations are documented separately in
+`holdout_access_log.jsonl`; this historical report is not a claim that they
+remain unopened.
 
 ## Verified structure
 
@@ -92,3 +95,20 @@ stress sets approximate the observed shift; they are not official validation.
 
 Client-ID quartiles show no significant training class association (chi-square
 p=0.637). IDs and ordering remain excluded from all predictive features.
+
+## Additional descriptive evidence
+
+The complete compact initial audit is preserved in `audit_summary.json`.
+`scripts/audit_relationships.py` generates train-only conditional tables for
+word 1/2/3-grams, day of week/month, month, amount bands, description-MCC and
+type-MCC combinations, repeated descriptions, recurrence counts, recency,
+intervals and regularity. Its inventory and strongest sufficiently supported
+ngram associations are in `target_relationships.json`. These supplementary
+tables were produced after the final model freeze and did not change it.
+
+Calendar recurrence diagnostics are in `cadence_audit.json`: the observed
+monthly-like prefix forecasts had mean date error 2.80 days for median-interval
+extrapolation, 2.66 for same-day-next-month, and 2.85 for next-business-day
+adjustment. These are approximate recovered streams and diagnostic date
+errors, not challenge classification results. Period bins overlap, and annual
+recurrence cannot be established from five events in a roughly 420-day history.
