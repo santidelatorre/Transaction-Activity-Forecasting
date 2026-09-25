@@ -1,5 +1,6 @@
 import { useEffect, useId, useState } from 'react';
 import { ArrowDown, ArrowRight, ChevronDown, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import ubsLogo from './ubs-logo.svg';
 
 const RED = '#E60000';
 const PAGE_SIZE = 6;
@@ -261,19 +262,19 @@ export default function App() {
   const { data, loading, error } = useResource('/api/v1/dashboard', revision);
   const metrics = data?.metrics;
   const ready = Boolean(data?.available);
-  useEffect(() => { document.title = 'Recurring Insights · Evidence behind the forecast'; document.documentElement.lang = 'en'; }, []);
+  useEffect(() => { document.title = 'Transaction Activity Forecasting · Recurring Insights'; document.documentElement.lang = 'en'; }, []);
   return <div className="min-h-screen bg-white font-sans text-[#1A1A1A] selection:bg-[#FFE2E2]">
     <a href="#content" className="sr-only z-50 bg-white p-4 focus:not-sr-only focus:fixed">Skip to content</a>
     <header className="sticky top-0 z-30 border-b border-[#EAEAEA] bg-white/95 backdrop-blur-sm">
       <div className="mx-auto flex h-[76px] max-w-[1320px] items-center justify-between gap-5 px-5 sm:px-8 lg:px-12">
         <a href="#content" className="flex shrink-0 items-center gap-3" aria-label="Recurring Insights home"><span className="grid h-8 w-8 grid-cols-2 items-end gap-[3px] border-b-[3px] border-[#E60000] pb-[3px]" aria-hidden="true"><span className="h-3 bg-[#E60000]" /><span className="h-6 bg-[#E60000]" /></span><span className="text-base font-semibold tracking-[-0.035em]">Recurring Insights<span className="mt-0.5 block text-[9px] font-medium uppercase tracking-[0.22em] text-[#888]">Transaction intelligence</span></span></a>
         <nav aria-label="Main navigation" className="hidden items-center gap-7 text-xs text-[#686868] md:flex"><a href="#quality" className="hover:text-[#E60000]">Overview</a><a href="#progress" className="hover:text-[#E60000]">Versions</a><a href="#comparison" className="hover:text-[#E60000]">V4 research</a><a href="#experiments" className="hover:text-[#E60000]">Audit trail</a></nav>
-        <button type="button" onClick={() => setRevision((value) => value + 1)} disabled={loading} className="flex items-center gap-2 border border-[#DADADA] px-3 py-2 text-[11px] hover:border-[#1A1A1A] disabled:opacity-50" aria-label="Refresh results"><RefreshCw size={12} className={loading ? 'motion-safe:animate-spin' : ''} /><span className="hidden sm:inline">Refresh</span></button>
+        <div className="flex shrink-0 items-center gap-2 sm:gap-5"><img src={ubsLogo} alt="UBS logo" className="h-7 w-auto sm:h-8" /><button type="button" onClick={() => setRevision((value) => value + 1)} disabled={loading} className="flex items-center gap-2 border border-[#DADADA] px-3 py-2 text-[11px] hover:border-[#1A1A1A] disabled:opacity-50" aria-label="Refresh results"><RefreshCw size={12} className={loading ? 'motion-safe:animate-spin' : ''} /><span className="hidden sm:inline">Refresh</span></button></div>
       </div>
     </header>
     <main id="content" className="mx-auto max-w-[1320px] scroll-mt-24 px-5 pb-14 sm:px-8 lg:px-12">
       <section className="grid gap-10 pb-10 pt-10 sm:pt-14 lg:grid-cols-[1fr_260px] lg:items-center lg:gap-20">
-        <div><Eyebrow className="text-[#E60000]">UBS challenge / Swiss AI Weeks</Eyebrow><h1 className="mt-5 max-w-[780px] text-[clamp(2.25rem,4.2vw,3.5rem)] font-medium leading-[1.1] tracking-[-0.045em]">Every transaction matters.<br /><span className="text-[#777]">Make the next signal explainable.</span></h1><p className="mt-5 max-w-[600px] text-sm leading-7 text-[#686868]">Transaction history becomes an evidence-backed signal about a client’s next recurring-payment family. The measurement, uncertainty, and model decision stay visible.</p><a href="#progress" className="mt-6 inline-flex items-center gap-3 text-xs font-semibold text-[#E60000]">Explore the evidence <ArrowDown size={14} /></a></div>
+        <div><Eyebrow className="text-[#E60000]">UBS challenge / Swiss AI Weeks</Eyebrow><h1 className="mt-5 max-w-[780px] text-[clamp(2.25rem,4.2vw,3.5rem)] font-medium leading-[1.1] tracking-[-0.045em]">Transaction Activity<br /><span className="text-[#777]">Forecasting</span></h1><p className="mt-5 max-w-[600px] text-sm leading-7 text-[#686868]">Transaction history becomes an evidence-backed signal about a client’s next recurring-payment family. The measurement, uncertainty, and model decision stay visible.</p><a href="#progress" className="mt-6 inline-flex items-center gap-3 text-xs font-semibold text-[#E60000]">Explore the evidence <ArrowDown size={14} /></a></div>
         <aside className="relative overflow-hidden bg-[#1A1A1A] px-7 py-6 text-white lg:py-8" aria-label="Prediction horizon"><Eyebrow className="text-[#B8B8B8]">Prediction horizon</Eyebrow><p className="mt-5 text-6xl font-light leading-none tracking-[-0.055em]">90<span className="ml-2 text-base font-normal tracking-normal text-[#B8B8B8]">days</span></p><div className="my-5 flex items-center gap-2" aria-hidden="true"><span className="h-1.5 w-1.5 rounded-full bg-[#E60000]" /><span className="h-px flex-1 bg-[#666]" /><ArrowRight size={13} className="text-[#E60000]" /></div><p className="text-[11px] leading-5 text-[#B8B8B8]">One recurring family per client.<br />History cutoff: 1 Jan 2026.</p></aside>
       </section>
       <section id="quality" className="scroll-mt-24 border-t border-[#EAEAEA] pt-6">
@@ -286,7 +287,7 @@ export default function App() {
           <MetricCard number="03" title="Clients evaluated" value={format(metrics?.validation_clients)} annotation="VALID clients counted from the official confusion matrix.">Seven recurring families plus “none”.</MetricCard>
         </div>
       </section>
-      <div className="mt-6 grid items-stretch gap-6 lg:grid-cols-[1.15fr_1fr]"><VersionChart data={data} loading={loading} error={error} /><ImportanceChart data={data} loading={loading} error={error} /></div>
+      <div className="mt-6 space-y-6"><VersionChart data={data} loading={loading} error={error} /><ImportanceChart data={data} loading={loading} error={error} /></div>
       <V4Comparison data={data} loading={loading} error={error} />
       <ExperimentTable revision={revision} ensembleWeights={data?.ensemble_weights} />
       <section id="method" className="mt-10 grid gap-7 border-y border-[#E4E4E4] py-8 md:grid-cols-[1.1fr_1fr_1fr]"><div><Eyebrow className="text-[#E60000]">Trust needs context</Eyebrow><h2 className="mt-3 max-w-xs text-xl font-medium leading-7 tracking-tight">A useful signal.<br />With its limits in view.</h2></div><div><h3 className="text-xs font-semibold">History precedes prediction</h3><p className="mt-2 text-xs leading-6 text-[#686868]">The predictor uses transactions before the cutoff. Descriptions can be ambiguous; family associations are learned with client separation.</p></div><div><h3 className="text-xs font-semibold">Validation is not a final test</h3><p className="mt-2 text-xs leading-6 text-[#686868]">VALID was reused during research. “None” means no recurring family is predicted within the horizon, not a guarantee of zero transactions.</p></div></section>

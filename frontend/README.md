@@ -3,6 +3,9 @@
 The React dashboard is a read-only jury view of the frozen V3-A predictor and
 the recorded V1–V4 evaluation history. It does not fit a model, alter a
 prediction, read TEST labels, or treat model scores as probabilities.
+The bundled UBS mark identifies the challenge sponsor; this remains an
+independent prototype, not an official UBS product. SVG source:
+<https://en.wikipedia.org/wiki/File:UBS_Logo.svg> (UBS trademark).
 
 From the repository root, in PowerShell with the project Python environment:
 

@@ -9,7 +9,11 @@ test('version and V4 experiment visuals agree with sourced API values', async ({
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.getByRole('heading', { name: /Every transaction matters/ })).toBeVisible();
+  await expect(page).toHaveTitle('Transaction Activity Forecasting · Recurring Insights');
+  await expect(page.getByRole('heading', { level: 1, name: 'Transaction Activity Forecasting' })).toBeVisible();
+  const logo = page.getByRole('img', { name: 'UBS logo' });
+  await expect(logo).toBeVisible();
+  expect(await logo.evaluate((image) => image.naturalWidth)).toBeGreaterThan(0);
   await expect(page.locator('#quality')).toContainText(score(source.metrics.macro_f1));
   await expect(page.locator('#progress svg')).toBeVisible();
   for (const row of source.version_history.filter((item) => item.macro_f1 != null)) {
@@ -18,6 +22,11 @@ test('version and V4 experiment visuals agree with sourced API values', async ({
   await expect(page.locator('#progress')).toContainText('No new score');
   await expect(page.locator('#progress')).toContainText('VALID was reused');
   await expect(page.locator('#progress svg line[stroke="#686868"]')).toHaveCount(5);
+  const progressBox = await page.locator('#progress').boundingBox();
+  const signalsBox = await page.locator('#explainability').boundingBox();
+  const comparisonBox = await page.locator('#comparison').boundingBox();
+  expect(Math.abs(progressBox.width - comparisonBox.width)).toBeLessThan(2);
+  expect(signalsBox.y).toBeGreaterThanOrEqual(progressBox.y + progressBox.height);
   await expect(page.locator('#comparison > div [role="img"]')).toHaveCount(
     source.v4_experiments.reduce((total, row) => total + Number(row.train_oof != null) + Number(row.valid != null), 0),
   );
@@ -48,6 +57,7 @@ test('mobile layout keeps charts and audit table inside scroll containers', asyn
   test.skip(!source.available, 'Requires the measured V3 evaluation artifact.');
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
+  await expect(page.getByRole('img', { name: 'UBS logo' })).toBeVisible();
   await expect(page.locator('#progress svg')).toBeVisible();
   await expect(page.locator('#comparison [role="group"]')).toBeVisible();
   await expect(page.locator('#experiments tbody tr')).not.toHaveCount(0);
