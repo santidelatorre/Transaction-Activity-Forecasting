@@ -89,7 +89,7 @@ function chartRows(data) {
       evidence: row.note,
       source,
     }));
-  return [...history, ...additions];
+  return [...history, ...additions].filter((row) => row.kind !== 'decision' && Number.isFinite(row.macro_f1));
 }
 
 function VersionChart({ data, loading, error }) {
@@ -104,7 +104,7 @@ function VersionChart({ data, loading, error }) {
   const y = (score) => top + (axisMax - score) / axisMax * (height - top - bottom);
   const lineSegments = rows.slice(1).flatMap((row, index) => {
     const previous = rows[index];
-    return row.macro_f1 != null && previous.macro_f1 != null && row.protocol === previous.protocol
+    return Number.isFinite(row.macro_f1) && Number.isFinite(previous.macro_f1)
       ? [{ from: previous, to: row, index }] : [];
   });
   const measured = rows.filter((row) => Number.isFinite(row.macro_f1));
