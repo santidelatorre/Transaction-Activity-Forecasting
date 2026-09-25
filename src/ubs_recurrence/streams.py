@@ -84,7 +84,7 @@ def extract_streams(df, eps=.035, filter_background=False):
     return pd.DataFrame(rows)
 
 
-def family_features(streams, ids):
+def family_features(streams, ids, price_profiles=None):
     """One symmetric row per client/family, sharing statistical strength."""
     rows=[]
     st=streams.copy()
@@ -94,7 +94,16 @@ def family_features(streams, ids):
         g=grouped.get(cid,st.iloc[:0])
         for f in FAMILIES:
             row={"client_id":cid,"family":f,"family_index":FAMILIES.index(f)}
-            eligible=g[((g.family==f)&(g.group_type=="amount")) | (g.group_type=="family_"+f)].copy()
+            if price_profiles is not None:
+                from .price_prior import price_support
+                likelihood=np.stack([(3*g["semantic_"+o].to_numpy()+g["mcc_"+o].to_numpy()+.05)*price_support(g.amount_median.to_numpy(),price_profiles[o]) for o in FAMILIES],axis=1)
+                own=likelihood[:,FAMILIES.index(f)]
+                keep=(own>=.4*likelihood.max(axis=1))&(own>.02)
+                eligible=g[(keep&(g.group_type=="amount")) | (g.group_type=="family_"+f)].copy()
+                row["prior_low"]=price_profiles[f]["low"]
+                row["prior_high"]=price_profiles[f]["high"]
+            else:
+                eligible=g[((g.family==f)&(g.group_type=="amount")) | (g.group_type=="family_"+f)].copy()
             row["stream_count"]=len(eligible)
             for prefix,sub in [("amount",eligible[eligible.group_type=="amount"]),("broad",eligible[eligible.group_type=="family_"+f])]:
                 sub=sub.copy()
@@ -109,6 +118,9 @@ def family_features(streams, ids):
                         row[f"{prefix}{rank}_own_template_diversity"]=s[f"template_{f}_diversity"]
                         row[f"{prefix}{rank}_own_template_count"]=s[f"template_{f}_count"]
                         row[f"{prefix}{rank}_other_semantic"]=max(s["semantic_"+o] for o in FAMILIES if o!=f)
+                        if price_profiles is not None:
+                            row[f"{prefix}{rank}_price_support"]=price_support(s["amount_median"],price_profiles[f])
+                            row[f"{prefix}{rank}_normalized_price"]=(s["amount_median"]-price_profiles[f]["low"])/(price_profiles[f]["high"]-price_profiles[f]["low"])
             rows.append(row)
     x=pd.DataFrame(rows).set_index(["client_id","family"]).fillna(-999)
     # Context for comparisons is computed within client, never across labeled rows.
