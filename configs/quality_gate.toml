@@ -1,0 +1,18 @@
+[gate]
+reference = "origin/main"
+pipeline_config = "configs/ubs_v1.toml"
+output_directory = "outputs/metrics/quality_gate"
+# Optional: path to a reviewed, full quality-gate report from the V1 commit.
+baseline_report = ""
+baseline_macro_f1_approximate = 0.271
+targeted_tests = ["tests/test_official.py", "tests/test_evaluation_compatibility.py", "tests/test_ubs_v1.py", "tests/test_temporal.py", "tests/test_quality_gate.py"]
+
+[thresholds]
+# Absolute score drops, not percentages. Blocking requires comparable evidence.
+macro_f1_warn_drop = 0.005
+macro_f1_fail_drop = 0.010
+per_class_f1_warn_drop = 0.05
+prediction_share_warn_change = 0.10
+runtime_warn_ratio = 1.5
+file_warn_mib = 5
+file_fail_mib = 25
