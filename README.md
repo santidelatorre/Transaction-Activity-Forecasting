@@ -1,5 +1,25 @@
 # Swiss AI Weeks / Transaction Activity Forecasting
 
+## V4 synthesis ? current integration recipe
+
+V4 retains **V3-A**, fitted with **TRAIN only**. No predictive experiment is
+promoted. See [the synthesis](reports/v4_synthesis.md),
+[seven-branch audit](reports/v4_integration_audit.md), and
+[product instructions](DEMO_README.md).
+
+```powershell
+python scripts/run_ubs_v4.py --phase oof
+python scripts/run_ubs_v4.py --phase valid
+python scripts/run_ubs_v4.py --phase submission
+```
+
+The final CSV is `outputs/metrics/ubs_v4_final/submission_v4.csv`.
+`python scripts/experiments/v4_shift_corruption.py --output-dir outputs/metrics/v4_stress_new`
+runs the fixed TRAIN-only robustness simulation. It is not a calibrated UBS shift generator.
+The V1/V2/V3 workflows below are historical; their TRAIN+VALID refit policy is
+not used by the V4 runner. No submission is uploaded automatically.
+
+
 ## Contrato oficial y trabajo actual — 24 septiembre 2026
 
 El objetivo oficial ya está confirmado: predecir la próxima familia recurrente

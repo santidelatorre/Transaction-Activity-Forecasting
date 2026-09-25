@@ -1,0 +1,166 @@
+{
+    "branch":  "exp/v4-direct-robust-javi",
+    "base_sha":  "051ce64a7cf0ab999f8aacb81fa405d5fa0257cf",
+    "selected":  "ComplementNB/R4/normalized",
+    "selection":  "0.25 clean + 0.35 medium + 0.40 severe - 0.10 mean fold SD",
+    "robust_score":  0.4766202012413981,
+    "train_oof_clean":  0.507419936954947,
+    "train_oof_medium":  0.47811921168886085,
+    "train_oof_severe":  0.4613827458062723,
+    "fold_instability":  0.021296054109489312,
+    "valid_macro_f1":  0.07635328439142453,
+    "baseline_v3a_valid":  0.42411109773651162,
+    "valid_delta_vs_v3a":  -0.34775781334508747,
+    "valid_prediction_distribution":  {
+                                          "cloud":  2,
+                                          "gym":  3,
+                                          "insurance":  2,
+                                          "mobile":  0,
+                                          "music":  0,
+                                          "software":  2,
+                                          "streaming":  2,
+                                          "none":  989
+                                      },
+    "valid_per_class":  {
+                            "cloud":  {
+                                          "precision":  1.0,
+                                          "recall":  0.02247191011235955,
+                                          "f1-score":  0.04395604395604396
+                                      },
+                            "gym":  {
+                                        "precision":  0.6666666666666666,
+                                        "recall":  0.01652892561983471,
+                                        "f1-score":  0.03225806451612903
+                                    },
+                            "insurance":  {
+                                              "precision":  0.5,
+                                              "recall":  0.010101010101010102,
+                                              "f1-score":  0.019801980198019802
+                                          },
+                            "mobile":  {
+                                           "precision":  0.0,
+                                           "recall":  0.0,
+                                           "f1-score":  0.0
+                                       },
+                            "music":  {
+                                          "precision":  0.0,
+                                          "recall":  0.0,
+                                          "f1-score":  0.0
+                                      },
+                            "software":  {
+                                             "precision":  0.5,
+                                             "recall":  0.009615384615384616,
+                                             "f1-score":  0.018867924528301886
+                                         },
+                            "streaming":  {
+                                              "precision":  1.0,
+                                              "recall":  0.020618556701030927,
+                                              "f1-score":  0.04040404040404041
+                                          },
+                            "none":  {
+                                         "precision":  0.29524772497472196,
+                                         "recall":  0.9965870307167235,
+                                         "f1-score":  0.45553822152886114
+                                     }
+                        },
+    "valid_confusion_matrix":  [
+                                   [
+                                       2,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       87
+                                   ],
+                                   [
+                                       0,
+                                       2,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       119
+                                   ],
+                                   [
+                                       0,
+                                       1,
+                                       1,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       97
+                                   ],
+                                   [
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       104
+                                   ],
+                                   [
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       1,
+                                       0,
+                                       92
+                                   ],
+                                   [
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       1,
+                                       0,
+                                       103
+                                   ],
+                                   [
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       2,
+                                       95
+                                   ],
+                                   [
+                                       0,
+                                       0,
+                                       1,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       292
+                                   ]
+                               ],
+    "valid_mean_entropy":  0.10941673531429036,
+    "valid_mean_confidence":  0.9677580750946128,
+    "vocabulary_coverage":  0.9916641857695743,
+    "feature_dimensionality":  9919,
+    "valid_seconds":  155.38256129994988,
+    "valid_peak_python_mib":  350.5611877441406,
+    "oof_probabilities":  "oof_probabilities.csv",
+    "class_order":  [
+                        "cloud",
+                        "gym",
+                        "insurance",
+                        "mobile",
+                        "music",
+                        "software",
+                        "streaming",
+                        "none"
+                    ],
+    "all_candidates":  "oof_results.json"
+}
