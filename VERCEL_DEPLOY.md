@@ -50,3 +50,10 @@ node --test tests/public-api.test.js
 A Git-connected Vercel project redeploys when this branch changes. Refreshing
 metrics requires a new verified export and commit; the page does not re-run
 the predictor at request time.
+
+For a disposable preview when the Windows CLI cannot run its internal build,
+run `node build-prebuilt.mjs` from `frontend` after `npm run build`, followed by
+`vercel deploy --temporary --prebuilt --yes`. The script packages the same
+allowlisted snapshot and API handlers as Node.js functions. Anonymous preview
+links expire after the interval printed by Vercel; they are **not** suitable
+as final submission URLs until claimed by a Vercel account.
