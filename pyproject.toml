@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ubs-recurrence"
+version = "0.1.0"
+description = "Reproducible research into next recurring merchant family prediction"
+requires-python = ">=3.11"
+dependencies = ["numpy", "pandas>=2.2", "scipy", "scikit-learn", "pyarrow", "catboost", "lightgbm", "joblib"]
+
+[project.optional-dependencies]
+dev = ["pytest", "beautifulsoup4"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
