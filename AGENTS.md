@@ -71,6 +71,18 @@ indicar: `Recomiendo escalar esta tarea a [modelo] con reasoning [nivel] porque
 
 ## Prioridades del hackathon
 
+### Criterios del jurado (25 septiembre 2026)
+
+Fuente: https://zh.ai-weeks.ch/jury-process-and-criteria
+
+La evaluación es cualitativa. Sus ejes son: funcionalidad técnica y
+reproducibilidad; experiencia de usuario; profundidad agéntica; originalidad;
+potencial e impacto de mercado. El jurado también prefiere código limpio y
+reproducible, paradigmas modernos de IA y cumplimiento del objetivo del reto.
+Estos ejes orientan la demo y la presentación, pero no justifican inventar
+métricas, interpretaciones o capacidades ausentes. En particular, distinguir
+VALID de TEST, Macro-F1 de accuracy y aspiraciones de resultados medidos.
+
 - Favorecer cambios pequeños, verificables e integrables rápidamente.
 - Mantener interfaces entre componentes estables y detectar pronto bloqueos
   entre los siete miembros del equipo.

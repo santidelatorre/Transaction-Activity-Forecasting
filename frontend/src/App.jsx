@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import ClientDetail from '@/pages/ClientDetail';
 import ImportExport from '@/pages/ImportExport';
-import Overview from '@/pages/Overview';
+import ExecutiveDashboard from '@/pages/ExecutiveDashboard';
 import TechnicalResults from '@/pages/TechnicalResults';
 
 export default function App() {
@@ -17,5 +17,5 @@ export default function App() {
   if (route === '/client') return <ClientDetail key={hash} />;
   if (route === '/data') return <ImportExport />;
   if (route === '/results') return <TechnicalResults />;
-  return <Overview />;
+  return <ExecutiveDashboard />;
 }
