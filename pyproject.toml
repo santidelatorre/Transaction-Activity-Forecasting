@@ -13,7 +13,7 @@ dependencies = ["numpy", "pandas>=2.2", "scipy", "scikit-learn", "pyarrow", "cat
 ubs-recurrence = "ubs_recurrence.cli:main"
 
 [project.optional-dependencies]
-dev = ["pytest", "beautifulsoup4", "matplotlib", "ruff==0.16.8"]
+dev = ["pytest", "beautifulsoup4", "matplotlib", "psutil", "ruff==0.16.8"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -23,4 +23,4 @@ pythonpath = ["src"]
 testpaths = ["tests"]
 
 [tool.ruff]
-extend-exclude = [".codex", ".pre-commit-cache*", "outputs", "data", "*tmp*", "test-temp-none-gate"]
+extend-exclude = [".codex", ".pre-commit-cache*", ".runtime314", "pytest-cache-files-javier-stream", "outputs", "data", "*tmp*", "test-temp-none-gate"]
